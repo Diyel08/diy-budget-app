@@ -474,6 +474,81 @@ body.sh-open #miniToast.on{transform:translate(-50%,0)}
 /* hide scroll bars everywhere (page and sheets) for a clean, app-like look; scrolling still works */
 html,body,.sh,.list,*{scrollbar-width:none;-ms-overflow-style:none}
 html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none;width:0;height:0;background:transparent}
+.tb-brand,.tb-foot{display:none}
+
+/* ===================== DESKTOP: premium dashboard ===================== */
+@media(min-width:900px){
+  body{background:
+    radial-gradient(900px 520px at 85% -10%,rgba(47,107,255,.20),transparent 60%),
+    radial-gradient(700px 500px at 10% 110%,rgba(163,92,245,.10),transparent 60%),
+    #050507;background-attachment:fixed}
+  :root{--side:252px}
+  .app{padding:40px 0 48px calc(var(--side) + 8px)}
+  .scr{width:min(100%,1180px);padding:0 44px}
+
+  /* sidebar */
+  .tabbar{left:16px;top:16px;bottom:16px;right:auto;transform:none;width:var(--side);height:auto;padding:22px 14px;
+    flex-direction:column;justify-content:flex-start;align-items:stretch;gap:6px;border-radius:26px;border:1px solid rgba(255,255,255,.07);
+    background:linear-gradient(180deg,rgba(24,26,34,.92),rgba(12,13,18,.94));box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05)}
+  .tb-brand{display:flex;align-items:center;gap:12px;padding:2px 8px 22px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .tb-brand .av{width:42px;height:42px;box-shadow:0 8px 24px rgba(47,107,255,.45)}
+  .tb-brand b{display:block;font-size:17px;font-weight:700;letter-spacing:-.2px}
+  .tb-brand small{display:block;font-size:12px;color:var(--sub);margin-top:1px}
+  .tabbar button{position:relative;width:100%;height:48px;padding:0 14px;flex-direction:row;justify-content:flex-start;gap:14px;border-radius:14px;color:#8a8a93;transition:background .2s,color .2s}
+  .tabbar button small{display:block;font-size:15px;font-weight:500}
+  .tabbar button svg{width:22px;height:22px}
+  .tabbar button.on{color:#fff;background:linear-gradient(135deg,rgba(74,134,255,.28),rgba(22,56,201,.18));box-shadow:inset 0 0 0 1px rgba(122,162,255,.25)}
+  .tabbar button.on svg{color:#6f9bff;filter:drop-shadow(0 0 1.5px rgba(111,155,255,.95)) drop-shadow(0 0 6px rgba(47,107,255,.7))}
+  .tabbar button.on::after{content:"";position:absolute;left:-14px;top:12px;bottom:12px;width:3px;border-radius:0 3px 3px 0;background:#4a86ff;box-shadow:0 0 12px #4a86ff}
+  .tb-foot{display:block;margin-top:auto;padding:12px 10px 0;font-size:12px;color:var(--sub2);border-top:1px solid rgba(255,255,255,.06)}
+  #miniToast{bottom:28px;left:calc(50% + var(--side)/2)}
+
+  /* glass surfaces */
+  .list,.grp,.empty,.status,.tiles div,.seg,.legend button,.pay{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.07)}
+  .list .it{border-top-color:rgba(255,255,255,.06)}
+  .seg button.on{background:linear-gradient(135deg,#4a86ff,#1f55e0);color:#fff;box-shadow:0 6px 18px rgba(47,107,255,.35)}
+  .ph{margin-bottom:22px}.ph h1,.hd h1{font-size:34px;letter-spacing:-.8px}
+
+  /* Home: blue hero card + side card */
+  .pg[data-pg=home].on{grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:0 28px}
+  .home-l{border-radius:28px;padding:26px 24px 20px;background:linear-gradient(165deg,#22356b,#111a3a 55%,#0b0f1d);border:1px solid rgba(122,162,255,.2);box-shadow:0 30px 60px rgba(8,20,60,.45)}
+  .home-l .legend button{background:rgba(0,0,0,.22);border-color:rgba(255,255,255,.06)}
+  .home-l .seg{background:rgba(0,0,0,.28);border-color:rgba(255,255,255,.06)}
+  .home-l .status{background:rgba(0,0,0,.25);border-color:rgba(255,255,255,.06);margin-bottom:0}
+  .home-l .ring-wrap circle.bgc{stroke:rgba(0,0,0,.3)}
+  .home-r{border-radius:28px;padding:24px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.07);min-height:100%}
+  .home-r .empty{background:rgba(0,0,0,.25)}
+
+  /* Plan: keep the blue summary, make it glow */
+  .sum{border-radius:26px;padding:22px;box-shadow:0 30px 60px rgba(8,20,60,.45);border-color:rgba(122,162,255,.22)}
+  .sum-t b{font-size:34px}
+
+  /* Wallet & Log: highlight first tile like the blue card */
+  #aSum div:first-child,#logSum div:first-child,#tSum div:first-child{background:linear-gradient(135deg,#2c4fb8,#16255a);border-color:rgba(122,162,255,.25)}
+  .tiles div{padding:16px 18px;border-radius:18px}.tiles b{font-size:22px;margin-top:4px}.tiles span{font-size:12px}
+  .pg[data-pg=wallet] [data-wp],.pg[data-pg=log] #logList,.pg[data-pg=log] #logSum{max-width:860px}
+  .pg[data-pg=wallet] .seg{max-width:860px}
+
+  /* Settings: two columns */
+  .pg[data-pg=settings] .set{max-width:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px;align-items:start}
+  .pg[data-pg=settings] .set .foot{grid-column:1/-1}
+
+  @media(hover:hover){.list .it:hover{background:rgba(255,255,255,.05)}.tabbar button:not(.on):hover{color:#d6d6dc;background:rgba(255,255,255,.04)}}
+}
+.hx{display:none}
+@media(min-width:900px){
+  .hx{display:block;margin-top:26px}.hx[hidden]{display:none}
+  .hx .sec-h{margin-top:18px}.hx .sec-h:first-child{margin-top:0}
+  .hx .list{background:rgba(0,0,0,.22)}
+  .hx .it.hg>span:first-child{flex:1;min-width:0}
+  .hx .it.hg .bar{display:block;margin-top:8px;height:5px}
+  .hd .av{display:none}
+  .scr{width:min(100%,1160px)}
+  .pg[data-pg=wallet] [data-wp],.pg[data-pg=log] #logList,.pg[data-pg=log] #logSum,.pg[data-pg=wallet] .seg{max-width:none}
+  .pg[data-pg=settings] .set{display:block;columns:2;column-gap:24px}
+  .pg[data-pg=settings] .set-g{break-inside:avoid;display:inline-block;width:100%}
+  .pg[data-pg=settings] .set .foot{column-span:all}
+}
 
 </style>
 </head>
@@ -519,6 +594,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
   <div class="home-r">
     <div class="sec-h"><h2>Upcoming Payments</h2><button class="lnk" type="button" data-go="wallet:pay">See all</button></div>
     <div class="up" id="upList"></div>
+    <div class="hx" id="homeX"></div>
   </div>
 </section>
 
@@ -605,10 +681,13 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
 <section class="pg" data-pg="settings" aria-label="Settings">
   <header class="ph"><h1>Settings</h1></header>
   <div class="set">
+    <div class="set-g">
     <p class="list-t">Display</p>
     <div class="list">
       <button class="it" type="button" role="switch" id="setHide" aria-checked="false"><i class="ic" style="--c:#8e8e93" data-icon="eyeoff"></i><span><b>Hide balance</b><small>Mask the balance on Home</small></span><i class="tg" aria-hidden="true"></i></button>
     </div>
+    </div>
+    <div class="set-g">
     <p class="list-t">Budget backup</p>
     <div class="list">
       <button class="it" type="button" id="bdExport"><i class="ic" style="--c:var(--green)" data-icon="down"></i><span><b>Export backup</b><small>Plan, debts, goals, accounts and payday log as .json</small></span></button>
@@ -616,6 +695,8 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
       <button class="it danger" type="button" id="bdReset"><i class="ic" style="--c:var(--red);color:#fff" data-icon="reset"></i><span><b>Erase budget data</b><small>Plan, debts, goals, accounts and payday log</small></span></button>
     </div>
     <input type="file" id="bdFile" accept="application/json,.json" hidden>
+    </div>
+    <div class="set-g">
     <p class="list-t">Payment trackers backup</p>
     <div class="list">
       <button class="it" type="button" id="tExport"><i class="ic" style="--c:var(--green)" data-icon="down"></i><span><b>Export trackers</b><small>Trackers and payments as .json</small></span></button>
@@ -623,17 +704,20 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
       <button class="it danger" type="button" id="tReset"><i class="ic" style="--c:var(--red);color:#fff" data-icon="reset"></i><span><b>Erase payment trackers</b></span></button>
     </div>
     <input type="file" id="tFile" accept="application/json,.json" hidden>
+    </div>
     <p class="foot">Everything you type stays in this browser and is never sent anywhere. Export a backup before clearing browser data.</p>
   </div>
 </section>
 </main>
 
 <nav class="tabbar" id="tabbar" aria-label="Sections">
+  <div class="tb-brand" aria-hidden="true"><span class="av tb-av" aria-hidden="true"><svg viewBox="193 193 225 224"><defs><linearGradient id="avG2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe8ff"/></linearGradient></defs><path d="M193 193H306A112 112 0 0 1 306 417H262Q250 417 250 405V361H306A56 56 0 0 0 306 249H205Q193 249 193 237ZM193 317Q193 305 205 305H237Q249 305 249 317V361H205Q193 361 193 349Z" fill="url(#avG2)"/></svg></span><div><b>Budget</b><small>Diyelo Dulay</small></div></div>
   <button type="button" data-tab="home" class="on" aria-current="page" aria-label="Home"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.2 2.6l3.4 3.4-3.4 3.4L3.8 6zM16.8 2.6l3.4 3.4-3.4 3.4L13.4 6zM7.2 12.2l3.4 3.4-3.4 3.4-3.4-3.4zM16.8 12.2l3.4 3.4-3.4 3.4-3.4-3.4z" transform="translate(0 1.2)"/></svg><small>Home</small></button>
   <button type="button" data-tab="plan" aria-label="Plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg><small>Plan</small></button>
   <button type="button" data-tab="log" aria-label="Log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><small>Log</small></button>
   <button type="button" data-tab="wallet" aria-label="Wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 9h18M15 14.5h3"/></svg><small>Wallet</small></button>
   <button type="button" data-tab="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><small>Settings</small></button>
+  <p class="tb-foot" aria-hidden="true">Saved on this device only</p>
 </nav>
 
 <!-- Add New -->
@@ -832,7 +916,7 @@ function setEye(){
   $('balSub').textContent=useBank?'Across '+s.bank.length+' account'+(s.bank.length===1?'':'s')+(s.balAt?' · as of '+fmtDay(s.balAt):''):s.accts.length?'Total in '+s.accts.length+' savings goal'+(s.accts.length===1?'':'s'):'Add your accounts in Wallet';
   $('setHide').setAttribute('aria-checked',String(hidden));
 }
-const toggleHide=()=>{hidden=!hidden;persist('dc_bud_hide',hidden);setEye();if(document.querySelector('.pg.on[data-pg=wallet]'))renderWallet()};
+const toggleHide=()=>{hidden=!hidden;persist('dc_bud_hide',hidden);setEye();renderHomeX();if(document.querySelector('.pg.on[data-pg=wallet]'))renderWallet()};
 $('eye').addEventListener('click',toggleHide);$('setHide').addEventListener('click',toggleHide);
 $('range').addEventListener('click',e=>{const b=e.target.closest('button[data-r]');if(!b)return;range=b.dataset.r;segSet($('range'),'r',range);renderHome()});
 
@@ -866,8 +950,13 @@ function renderHome(){
   $('ringL').textContent=f?f[1]:(g.net?'Net pay':'No pay yet');{const rv=$('ringV'),v=f?g[f[0]]:g.net,txt=range==='pay'?peso(v):peso(Math.round(v));rv.textContent=txt;rv.style.fontSize=(txt.length<=8?25:txt.length<=10?22:txt.length<=12?19:16)+'px'}$('ringS').textContent=f?Math.round(g[f[0]]/total*100)+'% of pay':(g.net?lbl:'Set it in Plan');
   $('legend').innerHTML=L.map(([k,n,c])=>`<li><button type="button" data-seg="${k}" class="${focusSeg===k?'on':''}" style="--c:${c}" aria-pressed="${focusSeg===k}"><span>${n}</span><b>${peso(range==='pay'?g[k]:Math.round(g[k]))}</b></button></li>`).join('');
   setStatus($('status'),calc(s.payday));
-  renderUpcoming();
+  renderUpcoming();renderHomeX();
 }
+/* desktop home: accounts and goals at a glance (hidden on phones to keep Home short) */
+function renderHomeX(){const box=$('homeX');if(!box)return;const mask=v=>hidden?'••••••':v;
+  const acc=s.bank.length?`<div class="sec-h"><h2>Accounts</h2><button class="lnk" type="button" data-go="wallet:accts">Manage</button></div><div class="list">${s.bank.map((a,i)=>`<button class="it" type="button" data-go="wallet:accts"><i class="ic" style="--c:#5ac8fa">${ICONS.bank}</i><span><b>${escapeHTML(a.n||'Untitled account')}</b><small>${escapeHTML(hasSubs(a)?a.subs.length+' sub-accounts':(a.role||(a.cur==='USD'?'Dollar account':'Peso account')))}</small></span><span class="val">${mask(money(a,acctBal(a)))}</span></button>`).join('')}</div>`:'';
+  const gl=s.accts.length?`<div class="sec-h"><h2>Goals</h2><button class="lnk" type="button" data-go="wallet:goals">Manage</button></div><div class="list">${s.accts.map(g=>{const pr=num(g.g)?Math.min(num(g.b)/num(g.g),1):0;return `<button class="it hg" type="button" data-go="wallet:goals"><span><b>${escapeHTML(g.n||'Untitled goal')}</b><small>${mask(peso(g.b))} of ${peso(g.g)}</small><i class="bar" style="--c:var(--green)"><i style="width:${pr*100}%"></i></i></span><span class="val">${Math.round(pr*100)}%</span></button>`}).join('')}</div>`:'';
+  box.innerHTML=acc+gl;box.hidden=!(acc||gl)}
 $('legend').addEventListener('click',e=>{const b=e.target.closest('[data-seg]');if(!b)return;focusSeg=focusSeg===b.dataset.seg?null:b.dataset.seg;renderHome()});
 
 /* ========== PLAN ========== */
