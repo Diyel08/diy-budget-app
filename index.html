@@ -474,7 +474,7 @@ body.sh-open #miniToast.on{transform:translate(-50%,0)}
 /* hide scroll bars everywhere (page and sheets) for a clean, app-like look; scrolling still works */
 html,body,.sh,.list,*{scrollbar-width:none;-ms-overflow-style:none}
 html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none;width:0;height:0;background:transparent}
-.tb-brand,.tb-foot{display:none}
+.tabbar .tb-brand,.tb-foot{display:none}
 
 /* ===================== DESKTOP: premium dashboard ===================== */
 @media(min-width:900px){
@@ -490,7 +490,9 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
   .tabbar{left:16px;top:16px;bottom:16px;right:auto;transform:none;width:var(--side);height:auto;padding:22px 14px;
     flex-direction:column;justify-content:flex-start;align-items:stretch;gap:6px;border-radius:26px;border:1px solid rgba(255,255,255,.07);
     background:linear-gradient(180deg,rgba(24,26,34,.92),rgba(12,13,18,.94));box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05)}
-  .tb-brand{display:flex;align-items:center;gap:12px;padding:2px 8px 22px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .tabbar .tb-brand{display:flex;flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;height:auto;padding:6px 8px 22px;margin-bottom:8px;border-radius:0;border-bottom:1px solid rgba(255,255,255,.06);color:#fff;background:none;box-shadow:none}
+  .tabbar .tb-brand:hover{background:none}
+  .tabbar .tb-brand:active .av{transform:scale(.9) rotate(-10deg)}
   .tb-brand .av{width:42px;height:42px;box-shadow:0 8px 24px rgba(47,107,255,.45)}
   .tb-brand b{display:block;font-size:17px;font-weight:700;letter-spacing:-.2px}
   .tb-brand small{display:block;font-size:12px;color:var(--sub);margin-top:1px}
@@ -549,6 +551,50 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
   .pg[data-pg=settings] .set-g{break-inside:avoid;display:inline-block;width:100%}
   .pg[data-pg=settings] .set .foot{column-span:all}
 }
+/* ===== Me sheet ===== */
+button.av{cursor:pointer;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
+button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f,0 0 22px rgba(74,134,255,.7)}
+.tabbar .tb-brand{text-align:left;cursor:pointer}
+.me-hero{display:flex;align-items:center;gap:14px;padding:18px;border-radius:22px;background:linear-gradient(150deg,#2c55d6,#14246b 60%,#0d1430);border:1px solid rgba(122,162,255,.25);box-shadow:0 18px 40px rgba(20,40,120,.35)}
+.me-av{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,#4a86ff,#1638c9);box-shadow:0 0 0 3px rgba(255,255,255,.12),0 8px 24px rgba(0,0,0,.4)}
+.me-av svg{width:58%;height:58%}
+.me-hero small{display:block;font-size:13px;color:rgba(255,255,255,.7)}
+.me-hero b{display:block;font-size:24px;font-weight:700;letter-spacing:-.4px}
+.me-hero span{display:block;font-size:13px;color:rgba(255,255,255,.75);margin-top:3px}
+.me-hero em{font-style:normal;color:#fff;font-weight:600}
+.me-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.me-c{background:var(--card2);border-radius:18px;padding:12px 14px;min-width:0;border:1px solid var(--line)}
+.me-c.wide{grid-column:1/-1}
+.me-c span{display:block;font-size:12px;color:var(--sub)}
+.me-c b{display:block;font-size:20px;font-weight:700;margin-top:2px;letter-spacing:-.3px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me-c.wide b{font-size:26px}
+.me-c small{display:block;font-size:12px;color:var(--sub2,#8e8e93);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me-c.ring{grid-row:span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative}
+.me-c.ring svg{width:84px;height:84px;transform:rotate(-90deg)}
+.me-c.ring circle{fill:none;stroke-width:7;stroke:var(--card3)}
+.me-c.ring circle+circle{stroke:var(--green);stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1)}
+.me-c.ring b{position:absolute;top:calc(50% - 46px);left:0;right:0;line-height:84px;font-size:18px;margin:0}
+.me-c.ring span{margin-top:6px}
+.me-badges{display:flex;flex-wrap:wrap;gap:6px}
+.me-badges span{padding:7px 11px;border-radius:999px;font-size:13px;background:var(--card2);color:var(--sub2,#6c6c73);border:1px solid var(--line)}
+.me-badges span.ok{color:#ffd76a;background:rgba(255,204,0,.1);border-color:rgba(255,204,0,.28)}
+.me-acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:6px}
+.me-acts button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 6px;border-radius:18px;background:var(--card2);border:1px solid var(--line);font:500 13px var(--sf);color:#fff;transition:transform .15s,background .2s}
+.me-acts button:active{transform:scale(.95);background:var(--card3)}
+.me-acts i{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(47,107,255,.16);color:#6f9bff}
+.me-acts i svg{width:20px;height:20px}
+@media(max-width:899px){.tabbar button[data-tab=settings]{display:none}}
+.me-c.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.me-c.row b{font-size:26px;margin:0}
+/* polish */
+.in .pst.clr{width:24px;height:24px;padding:0;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.14);color:#c7c7cc;flex:none}
+.in .pst.clr svg{width:12px;height:12px}
+.sh .tiles b{font-size:15px}
+.legend button,.legend div{min-width:0}
+.me-c.ring .rw{position:relative;width:84px;height:84px}
+.me-c.ring .rw b{position:absolute;top:0;left:0;right:0;bottom:0;display:grid;place-items:center;font-size:18px;line-height:1;margin:0}
+.me-c.ring small{white-space:normal}
+.me-c.ring small.from{font-size:11px;opacity:.8}
 
 </style>
 </head>
@@ -576,7 +622,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
       </div>
       <div class="hd-r">
         <button class="pill" id="addNew" type="button">Add New</button>
-        <span class="av" aria-hidden="true"><svg viewBox="193 193 225 224"><defs><linearGradient id="avG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe8ff"/></linearGradient></defs><path d="M193 193H306A112 112 0 0 1 306 417H262Q250 417 250 405V361H306A56 56 0 0 0 306 249H205Q193 249 193 237ZM193 317Q193 305 205 305H237Q249 305 249 317V361H205Q193 361 193 349Z" fill="url(#avG)"/></svg></span>
+        <button class="av" type="button" id="meBtn" aria-label="Open your profile"><svg viewBox="193 193 225 224"><defs><linearGradient id="avG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe8ff"/></linearGradient></defs><path d="M193 193H306A112 112 0 0 1 306 417H262Q250 417 250 405V361H306A56 56 0 0 0 306 249H205Q193 249 193 237ZM193 317Q193 305 205 305H237Q249 305 249 317V361H205Q193 361 193 349Z" fill="url(#avG)"/></svg></button>
       </div>
     </header>
     <div class="ring-wrap">
@@ -702,7 +748,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
 </main>
 
 <nav class="tabbar" id="tabbar" aria-label="Sections">
-  <div class="tb-brand" aria-hidden="true"><span class="av tb-av" aria-hidden="true"><svg viewBox="193 193 225 224"><defs><linearGradient id="avG2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe8ff"/></linearGradient></defs><path d="M193 193H306A112 112 0 0 1 306 417H262Q250 417 250 405V361H306A56 56 0 0 0 306 249H205Q193 249 193 237ZM193 317Q193 305 205 305H237Q249 305 249 317V361H205Q193 361 193 349Z" fill="url(#avG2)"/></svg></span><div><b>Budget</b><small>Diyelo Dulay</small></div></div>
+  <button class="tb-brand" type="button" id="meBtn2" aria-label="Open your profile"><span class="av tb-av" aria-hidden="true"><svg viewBox="193 193 225 224"><defs><linearGradient id="avG2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe8ff"/></linearGradient></defs><path d="M193 193H306A112 112 0 0 1 306 417H262Q250 417 250 405V361H306A56 56 0 0 0 306 249H205Q193 249 193 237ZM193 317Q193 305 205 305H237Q249 305 249 317V361H205Q193 361 193 349Z" fill="url(#avG2)"/></svg></span><div><b>Budget</b><small>Diyelo Dulay</small></div></button>
   <button type="button" data-tab="home" class="on" aria-current="page" aria-label="Home"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.2 2.6l3.4 3.4-3.4 3.4L3.8 6zM16.8 2.6l3.4 3.4-3.4 3.4L13.4 6zM7.2 12.2l3.4 3.4-3.4 3.4-3.4-3.4zM16.8 12.2l3.4 3.4-3.4 3.4-3.4-3.4z" transform="translate(0 1.2)"/></svg><small>Home</small></button>
   <button type="button" data-tab="plan" aria-label="Plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg><small>Plan</small></button>
   <button type="button" data-tab="log" aria-label="Log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><small>Log</small></button>
@@ -751,6 +797,14 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
   </div>
 </div>
 
+<!-- Me / profile sheet -->
+<div class="sheet" id="meSheet" aria-hidden="true">
+  <div class="sh" role="dialog" aria-modal="true" aria-labelledby="meTitle">
+    <div class="sh-top"><div class="grab" aria-hidden="true"></div><div class="sh-h"><h3 id="meTitle">Me</h3><button class="lnk" type="button" data-close>Done</button></div></div>
+    <div id="meBody"></div>
+  </div>
+</div>
+
 <!-- In-app confirm -->
 <div class="cfm" id="cfm" aria-hidden="true"><div class="cfm-b" role="alertdialog" aria-modal="true" aria-labelledby="cfmT"><p id="cfmT"></p><small id="cfmS"></small><div class="cfm-a"><button type="button" id="cfmNo">Cancel</button><button type="button" id="cfmYes">Delete</button></div></div></div>
 
@@ -772,6 +826,9 @@ function persist(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catc
 function dlFile(name,data,type){try{const u=URL.createObjectURL(new Blob([data],{type})),l=document.createElement('a');l.href=u;l.download=name;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}catch(e){}}
 function toast(msg){let t=$('miniToast');if(!t){t=document.createElement('div');t.id='miniToast';t.setAttribute('role','status');document.body.appendChild(t)}t.textContent=msg;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
 const ICONS={
+  pie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  logi:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
   eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   eyeoff:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 5.1A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
   x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -823,7 +880,7 @@ document.addEventListener('paste',e=>{const el=e.target;if(!el.matches||!el.matc
   el.dispatchEvent(new Event('input',{bubbles:true}))},true);
 /* a Paste / Clear button in every money field: "Paste" when empty, "Clear" when it has an amount */
 function syncPst(inp){const b=inp&&inp.parentElement&&inp.parentElement.querySelector('.pst:not(#fxRefresh)');if(!b)return;const has=inp.value.trim()!=='';
-  if(b.dataset.mode!==(has?'clear':'paste')){b.dataset.mode=has?'clear':'paste';b.textContent=has?'Clear':'Paste';b.setAttribute('aria-label',has?'Clear amount':'Paste amount');b.classList.toggle('clr',has)}}
+  if(b.dataset.mode!==(has?'clear':'paste')){b.dataset.mode=has?'clear':'paste';if(has)b.innerHTML=ICONS.x;else b.textContent='Paste';b.setAttribute('aria-label',has?'Clear amount':'Paste amount');b.classList.toggle('clr',has)}}
 function addPasteBtns(root){(root||document).querySelectorAll('.in input[inputmode=decimal]').forEach(inp=>{const box=inp.parentElement;
   if(!box.querySelector('.pst:not(#fxRefresh)')){const b=document.createElement('button');b.type='button';b.className='pst';const rf=box.querySelector('#fxRefresh');rf?box.insertBefore(b,rf):box.appendChild(b)}
   syncPst(inp)})}
@@ -842,7 +899,7 @@ const peso=(n,dec)=>'₱'+(Number(n)||0).toLocaleString('en-PH',{minimumFraction
 const peso2=n=>peso(n,true);
 const get=k=>k.split('.').reduce((o,x)=>o[x],s);
 const setv=(k,v)=>{const a=k.split('.');const last=a.pop();a.reduce((o,x)=>o[x],s)[last]=v};
-const C={bills:'var(--pink)',loan:'var(--yellow)',save:'var(--green)',wants:'var(--purple)',main:'var(--white)',acc:['var(--green)','#5ac8fa','var(--purple)']};
+const C={bills:'var(--pink)',loan:'var(--yellow)',save:'var(--green)',wants:'var(--purple)',main:'#6b7794',acc:['var(--green)','#5ac8fa','var(--purple)']};
 const splitName=i=>((s.accts.find(a=>a.k===i)||{}).n||'Split '+(i+1));
 const hasSplit=i=>s.accts.some(a=>a.k===i);
 
@@ -904,7 +961,7 @@ function setEye(){
   const useBank=s.bank.length>0,tot=useBank?bankTotal():s.accts.reduce((a,x)=>a+num(x.b),0);
   $('balV').textContent=hidden?'••••••••••••':peso2(tot);$('balV').classList.toggle('mask',hidden);
   $('eye').innerHTML=hidden?ICONS.eye:ICONS.eyeoff;$('eye').setAttribute('aria-label',hidden?'Show balance':'Hide balance');$('eye').setAttribute('aria-pressed',String(!hidden));
-  $('balSub').textContent=useBank?'Across '+s.bank.length+' account'+(s.bank.length===1?'':'s')+(s.balAt?' · as of '+fmtDay(s.balAt):''):s.accts.length?'Total in '+s.accts.length+' savings goal'+(s.accts.length===1?'':'s'):'Add your accounts in Wallet';
+  $('balSub').textContent=useBank?s.bank.length+' account'+(s.bank.length===1?'':'s')+(s.balAt?' · updated '+dShort(T.parse(s.balAt)):''):s.accts.length?'Total in '+s.accts.length+' savings goal'+(s.accts.length===1?'':'s'):'Add your accounts in Wallet';
   $('setHide').setAttribute('aria-checked',String(hidden));
 }
 const toggleHide=()=>{hidden=!hidden;persist('dc_bud_hide',hidden);setEye();renderHomeX();if(document.querySelector('.pg.on[data-pg=wallet]'))renderWallet()};
@@ -991,7 +1048,7 @@ function renderPlan(){
 $('bdOpen').addEventListener('click',()=>openSheet('bdSheet'));
 
 /* ========== WALLET ========== */
-function wallet(w){if(!['accts','goals','pay'].includes(w))w='accts';segSet($('wSeg'),'w',w);document.querySelectorAll('[data-wp]').forEach(p=>p.hidden=p.dataset.wp!==w);try{localStorage.setItem('dc_bud_w',w)}catch(e){}if(w==='pay')renderTrackers()}
+function wallet(w){if(!['accts','goals','pay'].includes(w))w='accts';setTimeout(walletSubSet,0);segSet($('wSeg'),'w',w);document.querySelectorAll('[data-wp]').forEach(p=>p.hidden=p.dataset.wp!==w);try{localStorage.setItem('dc_bud_w',w)}catch(e){}if(w==='pay')renderTrackers()}
 $('wSeg').addEventListener('click',e=>{const b=e.target.closest('button[data-w]');if(b)wallet(b.dataset.w)});
 function renderWallet(){
   const r=calc(s.payday),CIR=2*Math.PI*16;
@@ -1001,9 +1058,14 @@ function renderWallet(){
     +'<button class="it add" type="button" id="addGoal">+ Add savings goal</button>';
   renderBank();
   const tot=s.accts.reduce((a,x)=>a+num(x.b),0);
-  $('walletSub').textContent=!s.accts.length?'Savings goals and payment trackers.':hidden?s.accts.length+' savings goal'+(s.accts.length===1?'':'s'):peso2(tot)+' saved in '+s.accts.length+' goal'+(s.accts.length===1?'':'s');
+  walletSubSet();
 }
 
+function walletSubSet(){const w=(document.querySelector('#wSeg .on')||{dataset:{}}).dataset.w||'accts',n=(k,x)=>x+' '+k+(x===1?'':'s');let t='';
+  if(w==='accts')t=s.bank.length?n('account',s.bank.length)+(hidden?'':' · '+peso(Math.round(bankTotal())))+' total':'Your banks and e-wallets, in one place.';
+  else if(w==='goals'){const tot=s.accts.reduce((a,x)=>a+num(x.b),0);t=s.accts.length?(hidden?n('savings goal',s.accts.length):peso2(tot)+' saved in '+n('goal',s.accts.length)):'Set targets and watch them fill up.'}
+  else t=ts.trackers.length?n('payment tracker',ts.trackers.length):'Loans, installments and contributions.';
+  $('walletSub').textContent=t}
 function renderBank(){
   const tot=bankTotal(),usd=s.bank.filter(a=>a.cur==='USD'),miss=usd.length&&!num(s.usd);
   $('aSum').innerHTML=`<div><span>Total</span><b>${hidden?'••••••':peso(Math.round(tot))}</b></div><div><span>Accounts</span><b>${s.bank.length}</b></div><div><span>Updated</span><b>${s.balAt?dShort(T.parse(s.balAt)):'—'}</b></div>`;
@@ -1195,7 +1257,7 @@ const SYM={PHP:'₱',USD:'$',EUR:'€',GBP:'£',INR:'₹'};
 let ts=store(TKEY,null);if(!ts||!Array.isArray(ts.trackers))ts={version:1,currency:'PHP',trackers:[]};
 function tnorm(t){t.payments=t.payments||{};t.paid=t.paid||{};t.type=t.type||'fixed';t.frequency=t.frequency||'monthly';t.category=t.category||'Other';t.periods=t.periods?Number(t.periods):null;t.amount=Number(t.amount)||0;t.targetTotal=Number(t.targetTotal)||0;t.customPerMonth=Number(t.customPerMonth)||1;t.day1=Number(t.day1)||15;t.day2=Number(t.day2)||30;t.method=t.method||'';t.bank=t.bank||'';t.notes=t.notes||'';return t}
 ts.trackers.forEach(tnorm);
-function tsave(){persist(TKEY,ts);renderUpcoming();if(document.querySelector('.pg.on[data-pg=wallet]'))renderTrackers()}
+function tsave(){persist(TKEY,ts);renderUpcoming();if(document.querySelector('.pg.on[data-pg=wallet]')){renderTrackers();walletSubSet()}}
 const sym=()=>SYM[ts.currency]||'₱';
 const tm=(n,dec)=>sym()+(Number(n)||0).toLocaleString('en-PH',{minimumFractionDigits:dec?2:0,maximumFractionDigits:2});
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1364,7 +1426,7 @@ function renderLog(){
   $('logSum').innerHTML=`<div><span>Saved, all paydays</span><b>${peso(Math.round(saved))}</b></div><div><span>Last payday</span><b>${last?dShort(T.parse(last.date)||new Date()):'—'}</b></div><div class="${last&&lTot(last).left<0?'bad':''}"><span>Left last time</span><b>${last?peso(Math.round(lTot(last).left)):'—'}</b></div>`;
   $('logSum').hidden=!L.length;
   $('logList').innerHTML=L.length?L.map(p=>{const t=lTot(p),sv=t.by['Savings']||0;
-    return `<button class="it" type="button" data-lp="${escapeHTML(p.id)}"><i class="ic" style="--c:var(--blue);color:#fff">${ICONS.bill}</i><span><b>${fmtDay(p.date)}</b><small>In ${peso(t.inc)} · Saved ${peso(sv)} · ${p.items.length} entr${p.items.length===1?'y':'ies'}</small></span><span class="val${t.left<0?' red':''}">${peso2(t.left)}<small>left</small></span><i class="chev"></i></button>`}).join('')
+    return `<button class="it" type="button" data-lp="${escapeHTML(p.id)}"><i class="ic" style="--c:var(--blue);color:#fff">${ICONS.bill}</i><span><b>${fmtDay(p.date)}</b><small>Saved ${peso(sv)} · ${p.items.length} entr${p.items.length===1?'y':'ies'}</small></span><span class="val${t.left<0?' red':''}">${peso2(t.left)}<small>left</small></span><i class="chev"></i></button>`}).join('')
     :'<div class="empty">No paydays logged yet.<br>After each payday, log your net pay and every transfer or expense.<br><button class="pill" type="button" id="logNew2">Log a payday</button></div>';
 }
 function logNew(){const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:defDate(),net:0,items:[]};s.log.push(p);save();lDetail(p.id)}
@@ -1427,6 +1489,54 @@ $('lBody').addEventListener('click',e=>{if(!lv)return;const p=lget(lv.id);if(!p)
   const la=e.target.closest('[data-la]');if(la){x.acct=la.dataset.la;$('lAc').value=x.acct;$('lAccts').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===la));$('lSubs').innerHTML=lv.subChips();save();return}
   const ls=e.target.closest('[data-ls]');if(ls){x.acct=ls.dataset.ls;$('lAc').value=x.acct;$('lSubs').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===ls));save();return}
   if(e.target.closest('#lDelE')){const go=()=>{p.items.splice(lv.i,1);save();lDetail(p.id)};if(lv.isNew)go();else ask('Delete this entry?').then(ok=>{if(ok)go()})}});
+
+/* ========== ME (profile sheet from the logo) ========== */
+const pdEnd=(y,m)=>Math.min(30,new Date(y,m+1,0).getDate());
+function paydaysFrom(start,count){const out=[];let y=start.getFullYear(),m=start.getMonth();const t0=new Date(start.getFullYear(),start.getMonth(),start.getDate()).getTime();
+  while(out.length<count){for(const d of [15,pdEnd(y,m)]){const dt=new Date(y,m,d);if(dt.getTime()>=t0&&out.length<count)out.push(dt)}m++;if(m>11){m=0;y++}}return out}
+const whichPd=d=>d.getDate()===15?'15th':'30th';
+function debtInfo(l){const left=debtLeft(l);if(left<=0)return null;let n=0,amt=0,last=null;
+  for(const d of paydaysFrom(new Date(),400)){const a=amountFor(l,whichPd(d));if(a>0){amt+=a;n++;last=d;
+    if(l.w==='Split'?n>=left*2:n>=left)break}}return {amt,last}}
+function meData(){const now=new Date(),next=paydaysFrom(now,1)[0],days=Math.round((new Date(next.getFullYear(),next.getMonth(),next.getDate())-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
+  const worth=s.bank.length?bankTotal():s.accts.reduce((a,g)=>a+num(g.b),0);
+  /* emergency fund: money in accounts marked "Emergency fund" counts automatically; otherwise the goal's saved amount */
+  const ef=s.accts.find(g=>/emerg/i.test(g.n||''))||s.accts[0]||null,efAc=s.bank.filter(a=>/emerg/i.test(a.role||'')||/emerg/i.test(a.n||''));
+  const efSaved=efAc.length?efAc.reduce((x,a)=>x+bankPHP(a),0):ef?num(ef.b):0,efp=ef&&num(ef.g)?Math.min(efSaved/num(ef.g),1):0;
+  const efFrom=efAc.length?efAc.map(a=>String(a.n||'').replace(/\s*\(.*\)\s*/,'')).join(' + '):'';
+  let dAmt=0,dLast=null,anyDone=false;s.loans.forEach(l=>{if(num(l.total)&&debtLeft(l)===0)anyDone=true;const i=debtInfo(l);if(i){dAmt+=i.amt;if(!dLast||i.last>dLast)dLast=i.last}});
+  const L=sortedLog(),last=L[0],lt=last?lTot(last):null,rate=lt&&lt.inc>0?(lt.by['Savings']||0)/lt.inc:null;
+  return {next,days,worth,ef,efp,efSaved,efFrom,dAmt,dLast,anyDone,last,rate}}
+function renderMe(){const m=meData(),hr=new Date().getHours(),greet=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';
+  const mask=v=>hidden?'••••••':v,CIR=2*Math.PI*26;
+  const badges=[['First payday logged',s.log.length>0],['Accounts set up',s.bank.length>=3],['Emergency fund 50%',m.efp>=.5],['Emergency fund 75%',m.efp>=.75],['Emergency fund full',m.efp>=1],['A debt paid off',m.anyDone],['Debt-free',s.loans.length>0&&s.loans.every(l=>debtLeft(l)===0)]];
+  const got=badges.filter(b=>b[1]).length;
+  $('meBody').innerHTML=`<div class="me-hero"><div class="me-av">${$('meBtn').innerHTML}</div><div><small>${greet},</small><b>Diyelo</b><span>Next payday <em>${dLong(m.next)}</em> · ${m.days===0?'today':m.days===1?'tomorrow':'in '+m.days+' days'}</span></div></div>
+  <div class="me-grid">
+    <div class="me-c wide"><span>Net worth</span><b>${mask(peso2(m.worth))}</b><small>${s.bank.length?'All '+s.bank.length+' accounts'+(s.balAt?' · as of '+dShort(T.parse(s.balAt)):''):'Add accounts in Wallet to see this'}</small></div>
+    <div class="me-c ring"><div class="rw"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26"/><circle cx="32" cy="32" r="26" stroke-dasharray="${CIR}" stroke-dashoffset="${CIR*(1-m.efp)}"/></svg><b>${Math.round(m.efp*100)}%</b></div><span>Emergency fund</span><small>${m.ef?mask(peso(m.efSaved))+' of '+peso(m.ef.g):'Add an Emergency fund goal'}</small>${m.efFrom?`<small class="from">${escapeHTML(m.efFrom)}</small>`:''}</div>
+    <div class="me-c"><span>Debts left</span><b>${m.dAmt?peso(Math.round(m.dAmt)):'₱0'}</b><small>${m.dLast?'Free by '+m.dLast.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):s.loans.length?'All paid off':'No debts added'}</small></div>
+    <div class="me-c"><span>Saved last payday</span><b>${m.rate==null?'—':Math.round(m.rate*100)+'%'}</b><small>${m.last?'of pay · '+dShort(T.parse(m.last.date)||new Date()):'Log a payday to see this'}</small></div>
+    <div class="me-c wide row"><div><span>Paydays logged</span><small>${s.log.length?'Keep logging every payday':'Start after your next pay'}</small></div><b>${s.log.length}</b></div>
+  </div>
+  <p class="cap">Milestones · ${got} of ${badges.length}</p>
+  <div class="me-badges">${badges.map(([t,ok])=>`<span class="${ok?'ok':''}">${ok?'★':'☆'} ${t}</span>`).join('')}</div>
+  <p class="cap">Quick actions</p>
+  <div class="me-acts">
+    <button type="button" data-me="log"><i>${ICONS.logi}</i>Log payday</button>
+    <button type="button" data-me="acct"><i>${ICONS.bank}</i>Add account</button>
+    <button type="button" data-me="hide"><i>${ICONS[hidden?'eye':'eyeoff']||ICONS.eyeoff}</i>${hidden?'Show balance':'Hide balance'}</button>
+    <button type="button" data-me="plan"><i>${ICONS.pie||ICONS.target}</i>Payday plan</button>
+    <button type="button" data-me="export"><i>${ICONS.down}</i>Export backup</button>
+    <button type="button" data-me="settings"><i>${ICONS.gear||ICONS.reset}</i>Settings</button>
+  </div>`}
+function openMe(){renderMe();openSheet('meSheet')}
+$('meBtn').addEventListener('click',openMe);$('meBtn2').addEventListener('click',openMe);
+$('meBody').addEventListener('click',e=>{const b=e.target.closest('[data-me]');if(!b)return;const k=b.dataset.me;
+  if(k==='hide'){toggleHide();renderMe();return}
+  if(k==='export'){$('bdExport').click();return}
+  closeSheet(true);
+  if(k==='log'){show('log');setTimeout(logNew,60)}else if(k==='acct'){show('wallet');wallet('accts');setTimeout(addAcct,60)}else if(k==='settings')show('settings');else if(k==='plan')show('plan')});
 
 /* ========== SETTINGS ========== */
 /* one backup file for everything; older budget-only or trackers-only files still import */
