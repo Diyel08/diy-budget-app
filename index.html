@@ -471,6 +471,9 @@ body.sh-open #miniToast.on{transform:translate(-50%,0)}
   .tabbar button.on svg{filter:drop-shadow(0 0 1.5px rgba(77,132,255,.95)) drop-shadow(0 0 5px rgba(47,107,255,.7))}
   .tabbar button:active{transform:scale(.9)}
 }
+/* hide scroll bars everywhere (page and sheets) for a clean, app-like look; scrolling still works */
+html,body,.sh,.list,*{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none;width:0;height:0;background:transparent}
 
 </style>
 </head>
