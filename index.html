@@ -467,11 +467,8 @@ body.sh-open #miniToast.on{transform:translate(-50%,0)}
   .tabbar button{position:relative;width:62px;height:52px;gap:0;color:#6c6c73;transition:color .25s,transform .15s}
   .tabbar button small{display:none}
   .tabbar button svg{width:25px;height:25px;position:relative;z-index:1;transition:filter .25s}
-  .tabbar button::before{content:"";position:absolute;left:50%;top:50%;width:58px;height:40px;transform:translate(-50%,-30%) scale(.6);border-radius:50%;
-    background:radial-gradient(closest-side,rgba(47,107,255,.42),rgba(47,107,255,0));opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
-  .tabbar button.on{color:var(--blue)}
-  .tabbar button.on::before{opacity:1;transform:translate(-50%,-30%) scale(1)}
-  .tabbar button.on svg{filter:drop-shadow(0 0 8px rgba(47,107,255,.65))}
+  .tabbar button.on{color:#3d7bff}
+  .tabbar button.on svg{filter:drop-shadow(0 0 1.5px rgba(77,132,255,.95)) drop-shadow(0 0 5px rgba(47,107,255,.7))}
   .tabbar button:active{transform:scale(.9)}
 }
 
