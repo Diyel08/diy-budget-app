@@ -688,22 +688,13 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
     </div>
     </div>
     <div class="set-g">
-    <p class="list-t">Budget backup</p>
+    <p class="list-t">Backup</p>
     <div class="list">
-      <button class="it" type="button" id="bdExport"><i class="ic" style="--c:var(--green)" data-icon="down"></i><span><b>Export backup</b><small>Plan, debts, goals, accounts and payday log as .json</small></span></button>
-      <button class="it" type="button" id="bdImport"><i class="ic" style="--c:var(--blue);color:#fff" data-icon="up"></i><span><b>Import backup</b></span></button>
-      <button class="it danger" type="button" id="bdReset"><i class="ic" style="--c:var(--red);color:#fff" data-icon="reset"></i><span><b>Erase budget data</b><small>Plan, debts, goals, accounts and payday log</small></span></button>
+      <button class="it" type="button" id="bdExport"><i class="ic" style="--c:var(--green)" data-icon="down"></i><span><b>Export all data</b><small>Plan, debts, goals, accounts, payday log and payment trackers in one file</small></span></button>
+      <button class="it" type="button" id="bdImport"><i class="ic" style="--c:var(--blue);color:#fff" data-icon="up"></i><span><b>Import backup</b><small>Restores everything from a backup file (older backups work too)</small></span></button>
+      <button class="it danger" type="button" id="bdReset"><i class="ic" style="--c:var(--red);color:#fff" data-icon="reset"></i><span><b>Erase all data</b><small>Start fresh, as if newly installed</small></span></button>
     </div>
     <input type="file" id="bdFile" accept="application/json,.json" hidden>
-    </div>
-    <div class="set-g">
-    <p class="list-t">Payment trackers backup</p>
-    <div class="list">
-      <button class="it" type="button" id="tExport"><i class="ic" style="--c:var(--green)" data-icon="down"></i><span><b>Export trackers</b><small>Trackers and payments as .json</small></span></button>
-      <button class="it" type="button" id="tImport"><i class="ic" style="--c:var(--blue);color:#fff" data-icon="up"></i><span><b>Import trackers</b></span></button>
-      <button class="it danger" type="button" id="tReset"><i class="ic" style="--c:var(--red);color:#fff" data-icon="reset"></i><span><b>Erase payment trackers</b></span></button>
-    </div>
-    <input type="file" id="tFile" accept="application/json,.json" hidden>
     </div>
     <p class="foot">Everything you type stays in this browser and is never sent anywhere. Export a backup before clearing browser data.</p>
   </div>
@@ -1355,10 +1346,6 @@ $('tBody').addEventListener('click',e=>{if(!tv)return;const t=tget(tv.id);
 $('tBody').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();e.target.blur()}});
 
 /* backup for trackers (same file format as before) */
-$('tExport').addEventListener('click',()=>{if(!ts.trackers.length){toast('No trackers to export yet');return}dlFile('payment-tracker-backup.json',JSON.stringify(ts,null,2),'application/json');toast('Backup saved')});
-$('tImport').addEventListener('click',()=>$('tFile').click());
-$('tFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!j||!Array.isArray(j.trackers))throw 0;ts=j;ts.currency=SYM[ts.currency]?ts.currency:'PHP';ts.trackers.forEach(tnorm);tsave();toast('Trackers imported')}catch(x){toast('That file is not a valid payment tracker backup')}};r.readAsText(f);e.target.value=''});
-$('tReset').addEventListener('click',()=>{if(!ts.trackers.length){toast('No trackers to erase');return}ask('Erase all payment trackers?','Export a backup first if you want to keep them.','Erase').then(ok=>{if(!ok)return;ts={version:1,currency:ts.currency||'PHP',trackers:[]};tsave();toast('Payment trackers erased')})});
 addEventListener('storage',e=>{if(e.key===TKEY){const j=store(TKEY,null);if(j&&Array.isArray(j.trackers)){ts=j;ts.trackers.forEach(tnorm);renderUpcoming();renderTrackers()}}});
 
 
@@ -1442,10 +1429,22 @@ $('lBody').addEventListener('click',e=>{if(!lv)return;const p=lget(lv.id);if(!p)
   if(e.target.closest('#lDelE')){const go=()=>{p.items.splice(lv.i,1);save();lDetail(p.id)};if(lv.isNew)go();else ask('Delete this entry?').then(ok=>{if(ok)go()})}});
 
 /* ========== SETTINGS ========== */
-$('bdExport').addEventListener('click',()=>{dlFile('budget-backup.json',JSON.stringify(s),'application/json');toast('Backup saved')});
+/* one backup file for everything; older budget-only or trackers-only files still import */
+function afterImport(){fillInputs();splitRows();changed();tsave()}
+$('bdExport').addEventListener('click',()=>{const d=iso(new Date());dlFile('budget-backup-'+d+'.json',JSON.stringify({app:'diyelo-budget',version:3,exported:new Date().toISOString(),budget:s,trackers:ts}),'application/json');toast('Backup saved')});
 $('bdImport').addEventListener('click',()=>$('bdFile').click());
-$('bdReset').addEventListener('click',()=>{ask('Erase your budget?','Plan, debts, goals, accounts and the payday log will be cleared. Export a backup first if you want to keep them.','Erase').then(ok=>{if(ok){s=blank();fillInputs();splitRows();changed();toast('Budget erased')}})});
-$('bdFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!j||!Array.isArray(j.bills)||!Array.isArray(j.accts)||!Array.isArray(j.pct))throw 0;s=norm(j);fillInputs();splitRows();changed();toast('Backup imported')}catch(x){toast('That file is not a valid budget backup')}};r.readAsText(f);e.target.value=''});
+$('bdFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();
+  r.onload=()=>{let j;try{j=JSON.parse(r.result)}catch(x){toast('That file is not a valid backup');return}
+    const okB=b=>b&&Array.isArray(b.bills)&&Array.isArray(b.accts)&&Array.isArray(b.pct),okT=t=>t&&Array.isArray(t.trackers);
+    let B=null,Tr=null,what='';
+    if(j&&j.app==='diyelo-budget'){B=okB(j.budget)?j.budget:null;Tr=okT(j.trackers)?j.trackers:null;what='everything'}
+    else if(okB(j)){B=j;what='budget only (older backup)'}else if(okT(j)){Tr=j;what='payment trackers only (older backup)'}
+    if(!B&&!Tr){toast('That file is not a valid backup');return}
+    ask('Restore this backup?','This replaces your current '+(B&&Tr?'data':B?'plan, debts, goals, accounts and log':'payment trackers')+' with the backup ('+what+').','Restore').then(ok=>{if(!ok)return;
+      if(B)s=norm(B);if(Tr){ts=Tr;ts.currency=SYM[ts.currency]?ts.currency:'PHP';ts.trackers.forEach(tnorm)}
+      afterImport();toast('Backup restored')})};
+  r.readAsText(f)});
+$('bdReset').addEventListener('click',()=>{ask('Erase all data?','Plan, debts, goals, accounts, payday log and payment trackers will all be cleared. Export a backup first if you want to keep them.','Erase').then(ok=>{if(!ok)return;s=blank();ts={version:1,currency:ts.currency||'PHP',trackers:[]};afterImport();toast('All data erased')})});
 
 /* ========== RENDER ========== */
 function render(){setTimeout(()=>addPasteBtns(),0);const p=(document.querySelector('.pg.on')||{dataset:{}}).dataset.pg;
