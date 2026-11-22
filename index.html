@@ -131,7 +131,7 @@ body *{visibility:hidden!important}
   --ink:#fff;--sub:#8e8e93;--sub2:#636366;
   --blue:#2f6bff;--blue2:#1f55e0;--green:#74e0b4;--pink:#f47ef0;--yellow:#ffd60a;--purple:#a35cf5;--white:#ececec;--red:#ff5a52;
   --sf:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,"Segoe UI",Roboto,system-ui,sans-serif;
-  --r:20px;--tab-h:72px;
+  --r:20px;--tab-h:60px;--sb:max(calc(env(safe-area-inset-bottom,0px) - 18px),6px);
 }
 /* no tap flashes, no long-press callouts or text selection on UI; inputs stay selectable */
 html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -145,7 +145,7 @@ input,select{color:var(--ink)}
 :focus{outline:none}
 button:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .scr>*,.pg>*{min-width:0}
-.app{min-height:100vh;min-height:100dvh;padding:calc(env(safe-area-inset-top,0px) + 14px) 0 calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 6px)}
+.app{min-height:100vh;min-height:100dvh;padding:calc(env(safe-area-inset-top,0px) + 14px) 0 calc(var(--tab-h) + var(--sb) + 12px)}
 .scr{width:min(100%,520px);margin:0 auto;padding:0 18px}
 .pg{display:none;animation:pgIn .28s cubic-bezier(.2,.8,.2,1)}
 .pg.on{display:block}
@@ -305,7 +305,7 @@ input[type=number]{-moz-appearance:textfield}
 .trk{display:block;width:100%;height:60vh;min-height:360px;border:0;background:#000}
 
 /* tab bar */
-.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;justify-content:space-around;align-items:flex-start;height:calc(var(--tab-h) + env(safe-area-inset-bottom,0px));padding:8px 14px env(safe-area-inset-bottom,0px);background:rgba(10,10,12,.86);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);border-top:1px solid var(--line)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;justify-content:space-around;align-items:center;height:calc(var(--tab-h) + var(--sb));padding:0 14px var(--sb);border-radius:24px 24px 0 0;background:rgba(10,10,12,.86);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);border-top:1px solid var(--line)}
 .tabbar button{width:64px;height:50px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#5d5d63;transition:color .2s}
 .tabbar button svg{width:24px;height:24px}
 .tabbar button small{font-size:10px;font-weight:500}
@@ -335,7 +335,7 @@ input[type=number]{-moz-appearance:textfield}
 .sh .cancel{width:100%;height:46px;margin-top:4px;border-radius:14px;font:600 16px var(--sf);color:var(--blue)}
 
 /* toast */
-#miniToast{position:fixed;left:50%;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 14px);transform:translate(-50%,16px);z-index:99;max-width:min(420px,90vw);padding:10px 16px;border-radius:14px;background:#2a2a2e;color:#fff;font:500 14px var(--sf);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+#miniToast{position:fixed;left:50%;bottom:calc(var(--tab-h) + var(--sb) + 14px);transform:translate(-50%,16px);z-index:99;max-width:min(420px,90vw);padding:10px 16px;border-radius:14px;background:#2a2a2e;color:#fff;font:500 14px var(--sf);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 #miniToast.on{opacity:1;transform:translate(-50%,0)}
 
 /* hover effects only where a mouse exists, so taps never leave a stuck highlight */
@@ -457,6 +457,23 @@ body.sh-open #miniToast.on{transform:translate(-50%,0)}
 .it .val small.up{color:var(--green)}.it .val small.dn{color:var(--red)}
 #aHist .none{padding:14px;color:var(--sub);font-size:13px}
 .in .pst.clr{background:rgba(255,255,255,.08);color:var(--sub)}
+.tabbar button.on svg{filter:drop-shadow(0 0 10px rgba(47,107,255,.55))}
+/* ===== Premium tab bar (phone): icons only, soft glow under the active tab ===== */
+@media(max-width:899px){
+  :root{--tab-h:62px}
+  .tabbar{padding:0 10px var(--sb);border-radius:28px 28px 0 0;border-top:0;
+    background:linear-gradient(180deg,rgba(30,30,34,.92),rgba(12,12,14,.96));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 -12px 30px rgba(0,0,0,.55)}
+  .tabbar button{position:relative;width:62px;height:52px;gap:0;color:#6c6c73;transition:color .25s,transform .15s}
+  .tabbar button small{display:none}
+  .tabbar button svg{width:25px;height:25px;position:relative;z-index:1;transition:filter .25s}
+  .tabbar button::before{content:"";position:absolute;left:50%;top:50%;width:58px;height:40px;transform:translate(-50%,-30%) scale(.6);border-radius:50%;
+    background:radial-gradient(closest-side,rgba(47,107,255,.42),rgba(47,107,255,0));opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+  .tabbar button.on{color:var(--blue)}
+  .tabbar button.on::before{opacity:1;transform:translate(-50%,-30%) scale(1)}
+  .tabbar button.on svg{filter:drop-shadow(0 0 8px rgba(47,107,255,.65))}
+  .tabbar button:active{transform:scale(.9)}
+}
 
 </style>
 </head>
@@ -612,11 +629,11 @@ body.sh-open #miniToast.on{transform:translate(-50%,0)}
 </main>
 
 <nav class="tabbar" id="tabbar" aria-label="Sections">
-  <button type="button" data-tab="home" class="on" aria-current="page"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.2 2.6l3.4 3.4-3.4 3.4L3.8 6zM16.8 2.6l3.4 3.4-3.4 3.4L13.4 6zM7.2 12.2l3.4 3.4-3.4 3.4-3.4-3.4zM16.8 12.2l3.4 3.4-3.4 3.4-3.4-3.4z" transform="translate(0 1.2)"/></svg><small>Home</small></button>
-  <button type="button" data-tab="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg><small>Plan</small></button>
-  <button type="button" data-tab="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><small>Log</small></button>
-  <button type="button" data-tab="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 9h18M15 14.5h3"/></svg><small>Wallet</small></button>
-  <button type="button" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><small>Settings</small></button>
+  <button type="button" data-tab="home" class="on" aria-current="page" aria-label="Home"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.2 2.6l3.4 3.4-3.4 3.4L3.8 6zM16.8 2.6l3.4 3.4-3.4 3.4L13.4 6zM7.2 12.2l3.4 3.4-3.4 3.4-3.4-3.4zM16.8 12.2l3.4 3.4-3.4 3.4-3.4-3.4z" transform="translate(0 1.2)"/></svg><small>Home</small></button>
+  <button type="button" data-tab="plan" aria-label="Plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg><small>Plan</small></button>
+  <button type="button" data-tab="log" aria-label="Log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><small>Log</small></button>
+  <button type="button" data-tab="wallet" aria-label="Wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 9h18M15 14.5h3"/></svg><small>Wallet</small></button>
+  <button type="button" data-tab="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><small>Settings</small></button>
 </nav>
 
 <!-- Add New -->
