@@ -717,6 +717,11 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
   #meSheet .me-c.row b{font-size:20px;margin-top:2px}
   #meSheet .me-grid>.me-c:nth-child(3){grid-row:span 2}
 }
+.hrow{cursor:pointer}
+.hrow .why{color:#9fb6ff;margin-top:2px}
+.hrow .why.add{color:var(--blue);opacity:.8}
+.hrow .hwhy{display:block;width:100%;margin-top:8px;height:38px;padding:0 12px;border-radius:10px;background:var(--card3);color:#fff;font:400 16px var(--sf);border:1px solid rgba(91,140,255,.45)}
+.hrow.open{align-items:flex-start}
 
 </style>
 </head>
@@ -1311,7 +1316,8 @@ function histRows(a,all){const H=(a.hist||[]).map((e,k)=>({...e,k})).sort((x,y)=
   const R=H.reverse().filter(e=>e.note!=='Starting balance'),show=all?R:R.slice(0,8);
   if(!R.length)return '<p class="none">No changes yet. Deposits, withdrawals and balance updates will show here.</p>';
   const sgn=v=>v>0?'+'+money(a,v):v<0?'−'+money(a,-v):money(a,0);
-  return show.map(e=>`<div class="it ent"><span><b>${fmtDay(e.d)}</b><small>${escapeHTML(e.note||'')}</small></span><span class="val">${money(a,e.bal)}${e.ch!=null&&e.ch!==0?`<small class="${e.ch>0?'up':'dn'}">${sgn(e.ch)}</small>`:''}</span><button type="button" class="x" data-hx="${e.k}" aria-label="Remove history line">${ICONS.x}</button></div>`).join('')
+  const openK=ed&&ed.type==='acct'?ed.hedit:null;
+  return show.map(e=>`<div class="it ent hrow${openK===e.k?' open':''}" data-hrow="${e.k}"><span><b>${fmtDay(e.d)}</b><small>${escapeHTML(e.note||'')}</small>${e.why&&openK!==e.k?`<small class="why">For: ${escapeHTML(e.why)}</small>`:openK!==e.k?'<small class="why add">+ Add what it was for</small>':''}${openK===e.k?`<input class="hwhy" data-hwhy="${e.k}" value="${escapeHTML(e.why||'')}" placeholder="e.g. Groceries, rent, sent to Maya" autocomplete="off" enterkeyhint="done">`:''}</span><span class="val">${money(a,e.bal)}${e.ch!=null&&e.ch!==0?`<small class="${e.ch>0?'up':'dn'}">${sgn(e.ch)}</small>`:''}</span><button type="button" class="x" data-hx="${e.k}" aria-label="Remove history line">${ICONS.x}</button></div>`).join('')
     +(!all&&R.length>8?`<button class="it add" type="button" id="aHistAll">Show all ${R.length}</button>`:'')}
 function editAcct(i,isNew,histAll){
   const same=ed&&ed.type==='acct'&&ed.i===i;ed={type:'acct',i,isNew,msub:same?ed.msub||0:0,mvd:same?ed.mvd:''};const a=s.bank[i],sy=a.cur==='USD'?'$':'₱',subs=hasSubs(a);if(subs&&ed.msub>=a.subs.length)ed.msub=0;
@@ -1324,6 +1330,7 @@ function editAcct(i,isNew,histAll){
     ${subs?`<div class="chips sm" id="aMvSub">${a.subs.map((u,j)=>`<button type="button" data-msub="${j}" class="${ed.msub===j?'on':''}">${escapeHTML(u.n||'Sub '+(j+1))}</button>`).join('')}</div>`:''}
     <div class="g2"><label class="fld"><span>Amount</span><div class="in"><i class="aSym">${sy}</i><input type="text" inputmode="decimal" autocomplete="off" id="aMv" placeholder="0.00"></div></label>
     <label class="fld"><span>Date</span><div class="in"><input type="date" id="aMvD" value="${ed.mvd||iso(new Date())}"></div></label></div>
+    <label class="fld" style="margin-top:10px"><span>What for (optional)</span><div class="in"><input id="aMvWhy" placeholder="e.g. Groceries, rent, sent to Maya" autocomplete="off" enterkeyhint="done"></div></label>
     <div class="g2" style="margin-top:10px"><button class="btn ghost" type="button" id="aWd">− Withdraw</button><button class="btn" type="button" id="aDep">+ Deposit</button></div>
     <p class="note">Adds to or takes from the balance and saves it in the history below.</p>
     <p class="cap">Currency</p><div class="chips" id="aCur">${['PHP','USD'].map(c=>`<button type="button" data-cur="${c}" class="${(a.cur||'PHP')===c?'on':''}">${c}</button>`).join('')}</div>
@@ -1342,12 +1349,14 @@ function reAcct(all){const sh=$('editSheet').querySelector('.sh'),y=sh.scrollTop
 $('editBody').addEventListener('change',e=>{if(!ed||ed.type!=='acct')return;const el=e.target;if(el.dataset.eaF==='bal'||el.dataset.subB!==undefined){recBal(s.bank[ed.i],'Updated');save();const hb=$('aHist');if(hb)hb.innerHTML=histRows(s.bank[ed.i])}});
 $('editBody').addEventListener('input',e=>{const el=e.target;if(!ed)return;
   if(el.dataset.edF){const f=el.dataset.edF;s.loans[ed.i][f]=f==='n'?el.value:num(el.value);updDebtSheet();changed();return}
+  if(el.dataset.hwhy!==undefined){const a=s.bank[ed.i],e2=a.hist&&a.hist[+el.dataset.hwhy];if(e2){e2.why=el.value.trim();save()}return}
   if(el.dataset.subN!==undefined||el.dataset.subB!==undefined){const a=s.bank[ed.i],j=+(el.dataset.subN??el.dataset.subB);if(!a.subs[j])return;
     if(el.dataset.subN!==undefined){a.subs[j].n=el.value;const ch=$('editBody').querySelector('[data-msub="'+j+'"]');if(ch)ch.textContent=el.value||'Sub '+(j+1)}else{a.subs[j].bal=num(el.value);s.balAt=iso(new Date());const t=$('aTot');if(t)t.textContent=money(a,acctBal(a))}changed();return}
   if(el.dataset.eaF){const f=el.dataset.eaF;s.bank[ed.i][f]=f==='bal'?num(el.value):el.value;if(f==='bal')s.balAt=iso(new Date());changed();return}
   if(el.dataset.ebF){const f=el.dataset.ebF;s.bills[ed.i][f]=f==='a'?num(el.value):el.value;updBillSheet();changed()}
   else if(el.dataset.egF){const f=el.dataset.egF;s.accts[ed.i][f]=f==='n'?el.value:num(el.value);changed()}});
-$('editBody').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();const ins=[...$('editBody').querySelectorAll('input')],i=ins.indexOf(e.target);if(ins[i+1])ins[i+1].focus();else e.target.blur()}});
+$('editBody').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList.contains('hwhy')){e.preventDefault();ed.hedit=null;$('aHist').innerHTML=histRows(s.bank[ed.i],true);toast('Saved');return}
+  if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();const ins=[...$('editBody').querySelectorAll('input')],i=ins.indexOf(e.target);if(ins[i+1])ins[i+1].focus();else e.target.blur()}});
 $('editBody').addEventListener('click',e=>{if(!ed)return;const w=e.target.closest('[data-when]'),k=e.target.closest('[data-kk]');
   const dw=e.target.closest('[data-dw]'),cur=e.target.closest('[data-cur]');
   if(dw){s.loans[ed.i].w=dw.dataset.dw;$('dWhen').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===dw));updDebtSheet();changed()}
@@ -1357,8 +1366,9 @@ $('editBody').addEventListener('click',e=>{if(!ed)return;const w=e.target.closes
     if(!(v>0)){toast('Enter the amount first');return}if(!T.parse(d)){toast('Pick a date');return}ed.mvd=d;
     if(!(a.hist||[]).length)recBal(a,'Starting balance',d);
     const amt=dep?v:-v,sub=hasSubs(a)?a.subs[ed.msub]:null;if(sub)sub.bal=r2(num(sub.bal)+amt);else a.bal=r2(num(a.bal)+amt);
-    recBal(a,(dep?'Deposit':'Withdrawal')+(sub?' · '+(sub.n||'Sub '+(ed.msub+1)):''),d,amt);s.balAt=iso(new Date());changed();reAcct();toast((dep?'Deposited ':'Withdrew ')+money(a,v)+' · now '+money(a,acctBal(a)))}
+    recBal(a,(dep?'Deposit':'Withdrawal')+(sub?' · '+(sub.n||'Sub '+(ed.msub+1)):''),d,amt);{const w=($('aMvWhy')||{}).value||'';const last=a.hist[a.hist.length-1];if(w.trim()&&last)last.why=w.trim()}s.balAt=iso(new Date());changed();reAcct();toast((dep?'Deposited ':'Withdrew ')+money(a,v)+' · now '+money(a,acctBal(a)))}
   else if(e.target.closest('#aHistAll'))reAcct(true)
+  else if(e.target.closest('[data-hrow]')&&!e.target.closest('[data-hx]')&&!e.target.closest('.hwhy')){const k=+e.target.closest('[data-hrow]').dataset.hrow;ed.hedit=ed.hedit===k?null:k;const hb=$('aHist');hb.innerHTML=histRows(s.bank[ed.i],true);const inp=hb.querySelector('.hwhy');if(inp)inp.focus()}
   else if(e.target.closest('[data-hx]')){const a=s.bank[ed.i],k=+e.target.closest('[data-hx]').dataset.hx;ask('Remove this history line?','Your current balance stays the same.','Remove').then(ok=>{if(!ok)return;a.hist.splice(k,1);save();reAcct()})}
   else if(e.target.closest('#aSubAdd')){const a=s.bank[ed.i];if(!hasSubs(a)){a.subs=[];a.subs.push({n:'',bal:num(a.bal)})}else a.subs.push({n:'',bal:0});a.bal=0;changed();reAcct()}
   else if(e.target.closest('[data-sub-x]')){const a=s.bank[ed.i],j=+e.target.closest('[data-sub-x]').dataset.subX,u=a.subs[j];
