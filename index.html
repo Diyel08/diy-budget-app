@@ -743,6 +743,44 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
 .lifted{position:relative;z-index:5;border-radius:16px;box-shadow:0 18px 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08);background:var(--card3)!important;transition:box-shadow .2s}
 body.dragging{overflow:hidden;touch-action:none}
 body.dragging .list{overflow:visible}
+/* interactive donut */
+.ring-wrap circle[data-s]{cursor:pointer;pointer-events:stroke;transition:stroke-dasharray .6s cubic-bezier(.2,.8,.2,1),stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1),opacity .25s,stroke-width .25s,filter .25s}
+.ring-wrap circle.pop{stroke-width:36;filter:drop-shadow(0 0 6px rgba(255,255,255,.18))}
+.ring-wrap svg{overflow:visible}
+.ring-c{pointer-events:none}
+.legend button.on{background:var(--card2);box-shadow:inset 0 0 0 1px var(--c)}
+.seginfo{margin:-4px 0 14px;padding:12px 14px;border-radius:18px;background:var(--card);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);animation:siIn .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes siIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.si-h{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.si-h>i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.si-h b{font-size:16px}.si-h span{flex:1;font-size:13px;color:var(--sub);text-align:right}
+.si-h .x{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:var(--sub);background:var(--card2)}.si-h .x svg{width:12px;height:12px}
+.si-r{display:grid;grid-template-columns:minmax(0,1fr) 28% 104px;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.si-r span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si-r b{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.si-b{height:6px;border-radius:3px;background:var(--card3);overflow:hidden}.si-b i{display:block;height:100%;background:var(--c);border-radius:3px}
+.seginfo .note{margin:6px 0 0}
+/* ===== 3D holographic donut ===== */
+.ring-wrap{perspective:700px;touch-action:none;--rx:0deg;--ry:0deg;--hx:50%;--hy:30%}
+.ring-wrap svg{transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .5s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 16px 24px rgba(0,0,0,.6))}
+.ring-wrap.touching svg{transition:transform .12s linear}
+.ring-wrap .rbg{fill:none;stroke:rgba(255,255,255,.035);stroke-width:34}
+#ringG{transform-origin:120px 120px;transition:transform .7s cubic-bezier(.22,1,.36,1)}
+.wd{cursor:pointer;transition:transform .45s cubic-bezier(.34,1.56,.64,1),opacity .3s,filter .3s}
+.wd .ws{opacity:0;mix-blend-mode:soft-light;transition:opacity .3s}
+.wd .wg{pointer-events:none}
+.wd.pop{filter:brightness(1.08)}
+.wd.pop .ws{opacity:.9;animation:sheen 2.4s linear infinite}
+.wd.dim{opacity:.55;filter:saturate(.8)}
+@keyframes sheen{0%{transform:translateX(-140px)}100%{transform:translateX(140px)}}
+/* clean edge shimmer: a thin rainbow rim only, no muddy overlay */
+.ring-wrap::after{content:"";position:absolute;inset:6.5%;border-radius:50%;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:conic-gradient(from 0deg at var(--hx) var(--hy),#ff6ec7,#7afcff,#a0ff8c,#ffe66d,#ff8a5c,#c58cff,#ff6ec7);
+  -webkit-mask:radial-gradient(closest-side,transparent 96%,#000 97.5%,transparent 100%);mask:radial-gradient(closest-side,transparent 96%,#000 97.5%,transparent 100%);animation:holo 6s linear infinite}
+.ring-wrap.touching::after,.ring-wrap:hover::after{opacity:.85}
+@keyframes holo{to{filter:hue-rotate(360deg)}}
+.ring-c{transform:translateZ(30px)}
+@media(prefers-reduced-motion:reduce){.wd .ws,.ring-wrap::after{animation:none}}
 
 </style>
 </head>
@@ -774,10 +812,11 @@ body.dragging .list{overflow:visible}
       </div>
     </header>
     <div class="ring-wrap">
-      <svg viewBox="0 0 200 200" id="ring" aria-hidden="true"><circle class="bgc" cx="100" cy="100" r="80"/></svg>
+      <svg viewBox="0 0 200 200" id="ring" role="img" aria-label="Where your pay goes. Tap a slice for details."><circle class="bgc" cx="100" cy="100" r="80"/></svg>
       <div class="ring-c"><small id="ringL">Net pay</small><b id="ringV">₱0</b><em id="ringS"></em></div>
     </div>
     <ul class="legend" id="legend"></ul>
+    <div class="seginfo" id="segInfo" hidden></div>
     <div class="seg" id="range" role="tablist" aria-label="Period">
       <button type="button" role="tab" data-r="pay" class="on" aria-selected="true">Payday</button>
       <button type="button" role="tab" data-r="month" aria-selected="false">Month</button>
@@ -1069,7 +1108,7 @@ const peso=(n,dec)=>'₱'+(Number(n)||0).toLocaleString('en-PH',{minimumFraction
 const peso2=n=>peso(n,true);
 const get=k=>k.split('.').reduce((o,x)=>o[x],s);
 const setv=(k,v)=>{const a=k.split('.');const last=a.pop();a.reduce((o,x)=>o[x],s)[last]=v};
-const C={bills:'var(--pink)',loan:'var(--yellow)',save:'var(--green)',wants:'var(--purple)',main:'#6b7794',acc:['var(--green)','#5ac8fa','var(--purple)']};
+const C={bills:'#ff5fc8',loan:'#ffc233',save:'#2fe0a8',wants:'#9b6bff',main:'#5b8cff',acc:['var(--green)','#5ac8fa','var(--purple)']};
 const splitName=i=>((s.accts.find(a=>a.k===i)||{}).n||'Split '+(i+1));
 const hasSplit=i=>s.accts.some(a=>a.k===i);
 
@@ -1161,12 +1200,11 @@ function renderHome(){
   const g=segments();
   const L=[['bills','Bills',C.bills],['loan','Debts',C.loan],['save','Savings',C.save],['wants','Wants',C.wants],['main','Main account',C.main]];
   const total=L.reduce((a,x)=>a+g[x[0]],0)||1;
-  const R=80,CIRC=2*Math.PI*R,svg=$('ring');let off=0;
-  L.forEach(([k,,c])=>{let el=svg.querySelector('[data-s='+k+']');if(!el){el=document.createElementNS('http://www.w3.org/2000/svg','circle');el.setAttribute('cx',100);el.setAttribute('cy',100);el.setAttribute('r',R);el.dataset.s=k;svg.appendChild(el)}
-    const len=g[k]/total*CIRC;el.style.stroke=c;el.setAttribute('stroke-dasharray',len+' '+(CIRC-len));el.setAttribute('stroke-dashoffset',-off);el.classList.toggle('dim',!!focusSeg&&focusSeg!==k);off+=len});
+  drawRing(g,L,total);
+  renderSegInfo(g,L,total);
   const lbl={pay:s.payday+' cutoff',month:'Per month · est.',year:'Per year · est.'}[range];
   const f=focusSeg&&L.find(x=>x[0]===focusSeg);
-  $('ringL').textContent=f?f[1]:(g.net?'Net pay':'No pay yet');{const rv=$('ringV'),v=f?g[f[0]]:g.net,txt=range==='pay'?peso(v):peso(Math.round(v));rv.textContent=txt;rv.style.fontSize=(txt.length<=8?25:txt.length<=10?22:txt.length<=12?19:16)+'px'}$('ringS').textContent=f?Math.round(g[f[0]]/total*100)+'% of pay':(g.net?lbl:'Set it in Plan');
+  $('ringL').textContent=f?f[1]:(g.net?'Net pay':'No pay yet');{const rv=$('ringV'),v=f?g[f[0]]:g.net,txt=range==='pay'?peso(v):peso(Math.round(v));rv.textContent=txt;countUp(rv);rv.style.fontSize=(txt.length<=8?25:txt.length<=10?22:txt.length<=12?19:16)+'px'}$('ringS').textContent=f?Math.round(g[f[0]]/total*100)+'% of pay':(g.net?lbl:'Set it in Plan');
   $('legend').innerHTML=L.map(([k,n,c])=>`<li><button type="button" data-seg="${k}" class="${focusSeg===k?'on':''}" style="--c:${c}" aria-pressed="${focusSeg===k}"><span>${n}</span><b>${peso(range==='pay'?g[k]:Math.round(g[k]))}</b></button></li>`).join('');
   setStatus($('status'),calc(s.payday));
   renderUpcoming();renderHomeX();renderPdCard();
@@ -1184,7 +1222,69 @@ function renderHomeX(){const box=$('homeX');if(!box)return;const mask=v=>hidden?
   const gl=s.accts.length?`<div class="sec-h"><h2>Goals</h2><button class="lnk" type="button" data-go="wallet:goals">Manage</button></div><div class="list">${s.accts.map(g=>{const pr=num(g.g)?Math.min(num(g.b)/num(g.g),1):0;return `<button class="it hg" type="button" data-go="wallet:goals"><span><b>${escapeHTML(g.n||'Untitled goal')}</b><small>${mask(peso(g.b))} of ${peso(g.g)}</small><i class="bar" style="--c:var(--green)"><i style="width:${pr*100}%"></i></i></span><span class="val">${Math.round(pr*100)}%</span></button>`}).join('')}</div>`:'';
   const dt=s.loans.length?`<div class="sec-h"><h2>Debts</h2><button class="lnk" type="button" data-go="bills">Manage</button></div><div class="list">${s.loans.map(l=>{const t=num(l.total),pr=t?Math.min(num(l.paid)/t,1):0,i=debtInfo(l);return `<button class="it hg" type="button" data-go="bills"><span><b>${escapeHTML(l.n||'Debt')}</b><small>${i?mask(peso(Math.round(i.amt)))+' left · done '+i.last.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):'Paid off ✓'}</small><i class="bar" style="--c:var(--yellow)"><i style="width:${pr*100}%"></i></i></span><span class="val">${t?Math.round(pr*100)+'%':''}</span></button>`}).join('')}</div>`:'';
   box.innerHTML=acc+gl+dt;box.hidden=!(acc||gl||dt);box.style.setProperty('--hxc',[acc,gl,dt].filter(Boolean).length||1)}
-$('legend').addEventListener('click',e=>{const b=e.target.closest('[data-seg]');if(!b)return;focusSeg=focusSeg===b.dataset.seg?null:b.dataset.seg;renderHome()});
+$('legend').addEventListener('click',e=>{const b=e.target.closest('[data-seg]');if(!b)return;focusSeg=focusSeg===b.dataset.seg?null:b.dataset.seg;segTap();renderHome()});
+/* tap a slice of the donut to focus it; tap the middle or the same slice again to go back */
+function segTap(){if(navigator.vibrate)try{navigator.vibrate(6)}catch(_){}}
+
+/* ========== 3D DONUT: slices slide out, follow your finger, spin, tilt and shimmer ========== */
+const RC=120,RO=104,RI=70,GAP=1.6;let ringRot=0,ringSegs=[];
+const pol=(r,a)=>{const t=a*Math.PI/180;return [RC+r*Math.sin(t),RC-r*Math.cos(t)]};
+function arcPath(a0,a1){if(a1-a0>=359.9)a1=a0+359.9;const L=a1-a0>180?1:0,[x0,y0]=pol(RO,a0),[x1,y1]=pol(RO,a1),[x2,y2]=pol(RI,a1),[x3,y3]=pol(RI,a0);
+  return `M${x0} ${y0}A${RO} ${RO} 0 ${L} 1 ${x1} ${y1}L${x2} ${y2}A${RI} ${RI} 0 ${L} 0 ${x3} ${y3}Z`}
+function shade(c,f){const m=/^#([0-9a-f]{6})$/i.exec(c);if(!m)return c;const n=parseInt(m[1],16),ch=[n>>16,(n>>8)&255,n&255].map(v=>Math.max(0,Math.min(255,Math.round(f>1?v+(255-v)*(f-1):v*f))));return '#'+ch.map(v=>v.toString(16).padStart(2,'0')).join('')}
+const cssColor=c=>{if(!/^var\(/.test(c))return c;const v=getComputedStyle(document.documentElement).getPropertyValue(c.slice(4,-1)).trim();return v||'#888'};
+function drawRing(g,L,total){const svg=$('ring');const vis=L.filter(([k])=>g[k]>0);
+  if(!svg.querySelector('#ringG')){svg.setAttribute('viewBox','0 0 240 240');svg.innerHTML='<defs id="ringD"></defs><circle class="rbg" cx="120" cy="120" r="87"/><g id="ringG"></g>'}
+  const D=svg.querySelector('#ringD'),G=svg.querySelector('#ringG');
+  const PAL={bills:['#ff9ae0','#ff3fb4','#c22bff'],loan:['#ffe680','#ffc233','#ff8a1f'],save:['#8bffd9','#2fe0a8','#13b8e6'],wants:['#c9a8ff','#9b6bff','#5b4dff'],main:['#a9c4ff','#5b8cff','#3a4fe0']};
+  D.innerHTML=L.map(([k,,c])=>{const p=PAL[k]||[shade(cssColor(c),1.3),cssColor(c),shade(cssColor(c),.8)];return `<linearGradient id="rg-${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${p[0]}"/><stop offset=".5" stop-color="${p[1]}"/><stop offset="1" stop-color="${p[2]}"/></linearGradient><filter id="gl-${k}" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="${p[1]}" flood-opacity=".75"/></filter>`}).join('')
+    +'<radialGradient id="rg-gloss" cx="120" cy="120" r="104" gradientUnits="userSpaceOnUse"><stop offset=".67" stop-color="#000" stop-opacity=".28"/><stop offset=".8" stop-color="#fff" stop-opacity="0"/><stop offset=".95" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity=".05"/></radialGradient>'
+    +'<linearGradient id="rg-sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>';
+  let a=0;ringSegs=vis.map(([k,n,c])=>{const sw=g[k]/total*360,s0={k,a0:a+GAP/2,a1:a+sw-GAP/2,mid:a+sw/2};a+=sw;return s0});
+  G.innerHTML=ringSegs.map(sg=>{const d=arcPath(sg.a0,Math.max(sg.a1,sg.a0+.5));return `<g class="wd${focusSeg?(focusSeg===sg.k?' pop':' dim'):''}" data-s="${sg.k}"><path class="wf" d="${d}" fill="url(#rg-${sg.k})" ${focusSeg===sg.k?`filter="url(#gl-${sg.k})"`:''}/><path class="wg" d="${d}" fill="url(#rg-gloss)"/><path class="ws" d="${d}" fill="url(#rg-sheen)"/></g>`}).join('');
+  if(!vis.length)G.innerHTML='';
+  const f=focusSeg&&ringSegs.find(x=>x.k===focusSeg);
+  if(f){let target=180-f.mid,diff=((target-ringRot)%360+540)%360-180;ringRot+=diff}
+  G.style.transform=`rotate(${ringRot}deg)`;
+  ringSegs.forEach(sg=>{const el=G.querySelector(`[data-s="${sg.k}"]`);if(!el)return;const [dx,dy]=sg.k===focusSeg?[Math.sin(sg.mid*Math.PI/180)*12,-Math.cos(sg.mid*Math.PI/180)*12]:[0,0];el.style.transform=`translate(${dx}px,${dy}px)`});
+}
+function countUp(el){const txt=el.textContent,m=/([\d,]+(?:\.\d+)?)/.exec(txt);if(!m||el.dataset.last===txt)return;el.dataset.last=txt;const target=parseFloat(m[1].replace(/,/g,'')),dec=(m[1].split('.')[1]||'').length,t0=performance.now();
+  const step=t=>{const p=Math.min(1,(t-t0)/450),e=1-Math.pow(1-p,3),v=target*e;el.textContent=txt.replace(m[1],v.toLocaleString('en-PH',{minimumFractionDigits:dec,maximumFractionDigits:dec}));if(p<1)requestAnimationFrame(step);else el.textContent=txt};requestAnimationFrame(step)}
+(function(){const wrap=$('ring').closest('.ring-wrap'),svg=$('ring');let st=null;
+  const ang=(x,y)=>{const r=svg.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;return Math.atan2(x-cx,-(y-cy))*180/Math.PI};
+  const tilt=(x,y)=>{const r=wrap.getBoundingClientRect(),px=(x-r.left)/r.width-.5,py=(y-r.top)/r.height-.5;wrap.style.setProperty('--rx',(-py*14).toFixed(2)+'deg');wrap.style.setProperty('--ry',(px*14).toFixed(2)+'deg');wrap.style.setProperty('--hx',((px+.5)*100).toFixed(1)+'%');wrap.style.setProperty('--hy',((py+.5)*100).toFixed(1)+'%')};
+  wrap.addEventListener('pointerdown',e=>{const wd=e.target.closest('.wd');st={x:e.clientX,y:e.clientY,a:ang(e.clientX,e.clientY),rot:ringRot,wd,mode:null,id:e.pointerId,t:Date.now()};wrap.classList.add('touching');tilt(e.clientX,e.clientY)});
+  wrap.addEventListener('pointermove',e=>{if(!st){if(e.pointerType==='mouse')tilt(e.clientX,e.clientY);return}tilt(e.clientX,e.clientY);
+    const dx=e.clientX-st.x,dy=e.clientY-st.y,da=((ang(e.clientX,e.clientY)-st.a+540)%360)-180;
+    if(!st.mode&&Math.hypot(dx,dy)>12){const r=svg.getBoundingClientRect(),rx=st.x-(r.left+r.width/2),ry=st.y-(r.top+r.height/2),rl=Math.hypot(rx,ry)||1,rad=(dx*rx+dy*ry)/rl,tan=(dx*ry-dy*rx)/rl;
+      st.mode=Math.abs(tan)>Math.abs(rad)?'spin':'magnet';try{wrap.setPointerCapture(st.id)}catch(_){}}
+    if(st.mode==='spin'){ringRot=st.rot+da;const G=$('ringG');G.style.transition='none';G.style.transform=`rotate(${ringRot}deg)`}
+    else if(st.mode==='magnet'&&st.wd){const k=Math.min(1,22/Math.max(1,Math.hypot(dx,dy))),r=svg.getBoundingClientRect(),sc=240/r.width,
+      t=ringRot*Math.PI/180,ux=(dx*Math.cos(t)+dy*Math.sin(t))*sc*k,uy=(-dx*Math.sin(t)+dy*Math.cos(t))*sc*k;st.wd.style.transition='none';st.wd.style.transform=`translate(${ux}px,${uy}px)`}});
+  const end=e=>{if(!st)return;const s0=st;st=null;wrap.classList.remove('touching');
+    if(s0.mode==='spin'){$('ringG').style.transition='';return}
+    if(s0.wd){s0.wd.style.transition='';s0.wd.style.transform=''}
+    if(!s0.mode||s0.mode==='magnet'){const k=s0.wd&&s0.wd.dataset.s;focusSeg=k?(focusSeg===k?null:k):null;segTap();renderHome()}
+    if(e.pointerType!=='mouse'){wrap.style.setProperty('--rx','0deg');wrap.style.setProperty('--ry','0deg')}};
+  wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',end);
+  wrap.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&!st){wrap.style.setProperty('--rx','0deg');wrap.style.setProperty('--ry','0deg')}})})();
+/* what makes up the focused slice */
+function segItems(k){const mult=range==='year'?12:1,cuts=range==='pay'?[s.payday]:['15th','30th'],out={};
+  const add=(n,v)=>{if(v>0)out[n]=(out[n]||0)+v*mult};
+  cuts.forEach(w=>{const r=calc(w);
+    if(k==='bills')s.bills.forEach((b,i)=>add(b.n||'Bill',r.bills[i]));
+    if(k==='loan')s.loans.forEach((l,i)=>add(l.n||'Debt',r.loans[i]));
+    if(k==='save'){add('Scheduled savings',r.sched);[0,1].forEach(i=>add(splitName(i),r.parts[i]))}
+    if(k==='wants')add(splitName(2),r.parts[2]);
+    if(k==='main')add('Stays in your pay account',Math.max(r.stay,0))});
+  return Object.entries(out).sort((a,b)=>b[1]-a[1])}
+function renderSegInfo(g,L,total){const box=$('segInfo');if(!box)return;if(!focusSeg){box.hidden=true;box.innerHTML='';return}
+  const f=L.find(x=>x[0]===focusSeg),items=segItems(focusSeg),tip={main:'Money left after bills, debts and savings. Keep it as a cushion or move it to a goal.',wants:'The Wants split of your extra. Spend it guilt-free.'}[focusSeg];
+  box.hidden=false;box.style.setProperty('--c',f[2]);
+  box.innerHTML=`<div class="si-h"><i></i><b>${f[1]}</b><span>${Math.round(g[focusSeg]/total*100)}% · ${peso2(g[focusSeg])}</span><button type="button" class="x" id="segX" aria-label="Close">${ICONS.x}</button></div>`
+    +(items.length?items.map(([n,v])=>`<div class="si-r"><span>${escapeHTML(n)}</span><i class="si-b"><i style="width:${Math.max(4,v/(g[focusSeg]||1)*100)}%"></i></i><b>${peso2(v)}</b></div>`).join(''):'<p class="note">Nothing here yet.</p>')
+    +(tip?`<p class="note">${tip}</p>`:'')}
+document.addEventListener('click',e=>{if(e.target.closest('#segX')){focusSeg=null;renderHome()}});
 
 /* ========== PLAN ========== */
 let ptab='pay';
