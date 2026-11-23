@@ -760,27 +760,25 @@ body.dragging .list{overflow:visible}
 .si-r b{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
 .si-b{height:6px;border-radius:3px;background:var(--card3);overflow:hidden}.si-b i{display:block;height:100%;background:var(--c);border-radius:3px}
 .seginfo .note{margin:6px 0 0}
-/* ===== 3D holographic donut ===== */
-.ring-wrap{perspective:700px;touch-action:none;--rx:0deg;--ry:0deg;--hx:50%;--hy:30%}
-.ring-wrap svg{transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .5s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 16px 24px rgba(0,0,0,.6))}
-.ring-wrap.touching svg{transition:transform .12s linear}
-.ring-wrap .rbg{fill:none;stroke:rgba(255,255,255,.035);stroke-width:34}
-#ringG{transform-origin:120px 120px;transition:transform .7s cubic-bezier(.22,1,.36,1)}
-.wd{cursor:pointer;transition:transform .45s cubic-bezier(.34,1.56,.64,1),opacity .3s,filter .3s}
-.wd .ws{opacity:0;mix-blend-mode:soft-light;transition:opacity .3s}
-.wd .wg{pointer-events:none}
-.wd.pop{filter:brightness(1.08)}
-.wd.pop .ws{opacity:.9;animation:sheen 2.4s linear infinite}
-.wd.dim{opacity:.55;filter:saturate(.8)}
-@keyframes sheen{0%{transform:translateX(-140px)}100%{transform:translateX(140px)}}
-/* clean edge shimmer: a thin rainbow rim only, no muddy overlay */
-.ring-wrap::after{content:"";position:absolute;inset:6.5%;border-radius:50%;pointer-events:none;opacity:0;transition:opacity .35s;
-  background:conic-gradient(from 0deg at var(--hx) var(--hy),#ff6ec7,#7afcff,#a0ff8c,#ffe66d,#ff8a5c,#c58cff,#ff6ec7);
-  -webkit-mask:radial-gradient(closest-side,transparent 96%,#000 97.5%,transparent 100%);mask:radial-gradient(closest-side,transparent 96%,#000 97.5%,transparent 100%);animation:holo 6s linear infinite}
-.ring-wrap.touching::after,.ring-wrap:hover::after{opacity:.85}
-@keyframes holo{to{filter:hue-rotate(360deg)}}
-.ring-c{transform:translateZ(30px)}
-@media(prefers-reduced-motion:reduce){.wd .ws,.ring-wrap::after{animation:none}}
+/* ===== 3D extruded donut ===== */
+.ring-wrap{width:min(88vw,340px);aspect-ratio:260/196;touch-action:none;margin:0 auto 10px}
+.ring-wrap svg{transform:none;overflow:visible;filter:none}
+.ring-wrap .rsh{fill:url(#g3sh)}
+.ring-wrap .ring-c{pointer-events:none;top:0;bottom:auto;height:86%;}
+.ring-wrap .ring-c b{font-size:20px!important;text-shadow:0 2px 10px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9)}
+.ring-wrap .ring-c small,.ring-wrap .ring-c em{text-shadow:0 1px 6px rgba(0,0,0,.95);color:rgba(255,255,255,.85)}
+.ring-wrap .ring-c small,.ring-wrap .ring-c em{font-size:11px}
+@media(min-width:900px){.ring-wrap{width:360px}}
+
+/* glass donut */
+#setChart .chips{margin-left:auto;flex:none}
+#setChart span{flex:1;min-width:0}
+
+/* donut faces: no CSS filters on SVG (iOS draws them badly) */
+#ringG .f3{cursor:pointer;transition:opacity .3s}
+#ringG .f3.dim{opacity:.28}
+#ringG .glow{pointer-events:none}#ringG .glow.dim{opacity:.15}
+#ringG .spec,#ringG .rim,#ringG .hl{pointer-events:none}
 
 </style>
 </head>
@@ -937,6 +935,7 @@ body.dragging .list{overflow:visible}
     <p class="list-t">Display</p>
     <div class="list">
       <button class="it" type="button" role="switch" id="setHide" aria-checked="false"><i class="ic" style="--c:#8e8e93" data-icon="eyeoff"></i><span><b>Hide balance</b><small>Mask the balance on Home</small></span><i class="tg" aria-hidden="true"></i></button>
+      <div class="it" id="setChart"><i class="ic" style="--c:#4f7dff;color:#fff" data-icon="pie"></i><span><b>Chart style</b><small>How the donut on Home looks</small></span><div class="chips sm"><button type="button" data-cs="glass">Glass</button><button type="button" data-cs="solid">Solid</button></div></div>
     </div>
     </div>
     <div class="set-g">
@@ -1034,6 +1033,7 @@ function dlFile(name,data,type){try{const u=URL.createObjectURL(new Blob([data],
 function toast(msg){let t=$('miniToast');if(!t){t=document.createElement('div');t.id='miniToast';t.setAttribute('role','status');document.body.appendChild(t)}t.textContent=msg;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
 const ICONS_D='M193 193H306A112 112 0 0 1 306 417H262Q250 417 250 405V361H306A56 56 0 0 0 306 249H205Q193 249 193 237ZM193 317Q193 305 205 305H237Q249 305 249 317V361H205Q193 361 193 349Z';
 const ICONS={
+  pie2:'',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg>',
   pie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg>',
   gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
@@ -1108,7 +1108,7 @@ const peso=(n,dec)=>'₱'+(Number(n)||0).toLocaleString('en-PH',{minimumFraction
 const peso2=n=>peso(n,true);
 const get=k=>k.split('.').reduce((o,x)=>o[x],s);
 const setv=(k,v)=>{const a=k.split('.');const last=a.pop();a.reduce((o,x)=>o[x],s)[last]=v};
-const C={bills:'#ff5fc8',loan:'#ffc233',save:'#2fe0a8',wants:'#9b6bff',main:'#5b8cff',acc:['var(--green)','#5ac8fa','var(--purple)']};
+const C={bills:'#e83fb8',loan:'#ffb020',save:'#22c79a',wants:'#8f5cff',main:'#4f7dff',acc:['var(--green)','#5ac8fa','var(--purple)']};
 const splitName=i=>((s.accts.find(a=>a.k===i)||{}).n||'Split '+(i+1));
 const hasSplit=i=>s.accts.some(a=>a.k===i);
 
@@ -1226,48 +1226,75 @@ $('legend').addEventListener('click',e=>{const b=e.target.closest('[data-seg]');
 /* tap a slice of the donut to focus it; tap the middle or the same slice again to go back */
 function segTap(){if(navigator.vibrate)try{navigator.vibrate(6)}catch(_){}}
 
-/* ========== 3D DONUT: slices slide out, follow your finger, spin, tilt and shimmer ========== */
-const RC=120,RO=104,RI=70,GAP=1.6;let ringRot=0,ringSegs=[];
-const pol=(r,a)=>{const t=a*Math.PI/180;return [RC+r*Math.sin(t),RC-r*Math.cos(t)]};
-function arcPath(a0,a1){if(a1-a0>=359.9)a1=a0+359.9;const L=a1-a0>180?1:0,[x0,y0]=pol(RO,a0),[x1,y1]=pol(RO,a1),[x2,y2]=pol(RI,a1),[x3,y3]=pol(RI,a0);
-  return `M${x0} ${y0}A${RO} ${RO} 0 ${L} 1 ${x1} ${y1}L${x2} ${y2}A${RI} ${RI} 0 ${L} 0 ${x3} ${y3}Z`}
-function shade(c,f){const m=/^#([0-9a-f]{6})$/i.exec(c);if(!m)return c;const n=parseInt(m[1],16),ch=[n>>16,(n>>8)&255,n&255].map(v=>Math.max(0,Math.min(255,Math.round(f>1?v+(255-v)*(f-1):v*f))));return '#'+ch.map(v=>v.toString(16).padStart(2,'0')).join('')}
-const cssColor=c=>{if(!/^var\(/.test(c))return c;const v=getComputedStyle(document.documentElement).getPropertyValue(c.slice(4,-1)).trim();return v||'#888'};
+/* ========== 3D DONUT (extruded, like an infographic): tap a slice to slide it out; drag around to spin ========== */
+const DC={cx:130,cy:84,RO:112,RI:64,H:26,k:.56};let ringRot=0,ringSegs=[],ringAnim=null,ringTilt=.56;
+const PAL3={bills:['#ff8ad8','#e83fb8','#a3127d'],loan:['#ffd86b','#ffb020','#c97800'],save:['#6ff2c6','#22c79a','#0d8a69'],wants:['#c3a2ff','#8f5cff','#5b2fd1'],main:['#8fb3ff','#4f7dff','#2747c9']};
+function pr3(r,a,z,ox,oy){const t=a*Math.PI/180;return [DC.cx+ox+r*Math.sin(t),DC.cy+oy-r*Math.cos(t)*ringTilt+z]}
+function arcPts(r,a0,a1,z,ox,oy){const n=Math.max(2,Math.ceil((a1-a0)/4)),out=[];for(let i=0;i<=n;i++)out.push(pr3(r,a0+(a1-a0)*i/n,z,ox,oy));return out}
+const P=pts=>'M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')+'Z';
+/* visible part of [a0,a1] inside a window [w0,w1] (degrees, any turn) */
+function clipArc(a0,a1,w0,w1){const out=[];for(let off=-720;off<=720;off+=360){const s=Math.max(a0,w0+off),e=Math.min(a1,w1+off);if(e>s)out.push([s,e])}return out}
+const chartStyle=()=>{let v='glass';try{v=localStorage.getItem('dc_bud_chart')||'glass'}catch(e){}return v};
+/* Build every visible face of every slice, then draw them back-to-front so nothing pokes through */
+function ringFaces(glass){const H=DC.H,F=[];
+  ringSegs.forEach(sg=>{const k=sg.k,a0=sg.a0+ringRot,a1=sg.a1+ringRot,mid=(a0+a1)/2,d=k===focusSeg?14:0,t=mid*Math.PI/180,ox=Math.sin(t)*d,oy=-Math.cos(t)*d*ringTilt;
+    const Y=a=>-Math.cos(a*Math.PI/180);
+    const wall=(r,s,e,kind,back)=>{const top=arcPts(r,s,e,0,ox,oy),bot=arcPts(r,s,e,H,ox,oy);
+      F.push({k,kind,back,depth:(kind==='in'?-2:0)+Y((s+e)/2)*(r/DC.RO)+(back?-.5:0),d:P(top.concat(bot.slice().reverse())),edge:top})};
+    clipArc(a0,a1,90,270).forEach(([s,e])=>wall(DC.RO,s,e,'out',false));
+    clipArc(a0,a1,-90,90).forEach(([s,e])=>wall(DC.RI,s,e,'in',false));
+    if(glass){clipArc(a0,a1,-90,90).forEach(([s,e])=>wall(DC.RO,s,e,'out',true));clipArc(a0,a1,90,270).forEach(([s,e])=>wall(DC.RI,s,e,'in',true))}
+    [[a0,Math.sin(a0*Math.PI/180)<0],[a1,Math.sin(a1*Math.PI/180)>0]].forEach(([a,vis])=>{if(!vis&&!glass)return;const q=[pr3(DC.RI,a,0,ox,oy),pr3(DC.RO,a,0,ox,oy),pr3(DC.RO,a,H,ox,oy),pr3(DC.RI,a,H,ox,oy)];
+      F.push({k,kind:'cap',back:!vis,depth:Y(a)*.8+(vis?0:-.5),d:P(q)})});
+    const top=arcPts(DC.RO,a0,a1,0,ox,oy).concat(arcPts(DC.RI,a0,a1,0,ox,oy).reverse());
+    F.push({k,kind:'top',depth:10+Y(mid)*.1+(d?1:0),d:P(top),mid,ox,oy});
+    if(glass)F.push({k,kind:'glow',depth:-10,mid,ox,oy})});
+  return F.sort((x,y)=>x.depth-y.depth)}
+function paintRing(){const G=$('ringG');if(!G)return;const glass=chartStyle()==='glass',F=ringFaces(glass);let html='';
+  F.forEach(f=>{const dim=focusSeg&&focusSeg!==f.k?' dim':'',c=PAL3[f.k]||['#999','#777','#555'],a=`data-s="${f.k}" class="f3 ${f.kind}${f.back?' back':''}${dim}"`;
+    if(!glass){
+      if(f.kind==='top')html+=`<path ${a} d="${f.d}" fill="url(#g3t-${f.k})"/>`;
+      else if(f.kind==='out')html+=`<path ${a} d="${f.d}" fill="url(#g3o-${f.k})"/><path class="f3 hl${dim}" data-s="${f.k}" d="M${f.edge.map(p=>p[0].toFixed(1)+' '+(p[1]+.9).toFixed(1)).join('L')}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.1"/>`;
+      else if(f.kind==='in')html+=`<path ${a} d="${f.d}" fill="url(#g3i-${f.k})"/>`;
+      else if(f.kind==='cap')html+=`<path ${a} d="${f.d}" fill="${c[2]}"/>`;
+    }else{
+      if(f.kind==='glow'){const [gx,gy]=pr3((DC.RO+DC.RI)/2,f.mid,DC.H+10,f.ox,f.oy);html+=`<ellipse ${a} cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" rx="46" ry="16" fill="url(#gg-${f.k})"/>`}
+      else if(f.kind==='top')html+=`<path ${a} d="${f.d}" fill="url(#gt-${f.k})"/><path class="f3 spec${dim}" data-s="${f.k}" d="${f.d}" fill="url(#gspec)"/><path class="f3 rim${dim}" data-s="${f.k}" d="${f.d}" fill="none" stroke="${c[0]}" stroke-opacity=".85" stroke-width="1"/>`;
+      else if(f.kind==='out'||f.kind==='in')html+=`<path ${a} d="${f.d}" fill="url(#gw-${f.k})" fill-opacity="${f.back?.35:1}"/>`+(f.back?'':`<path class="f3 hl${dim}" data-s="${f.k}" d="M${f.edge.map(p=>p[0].toFixed(1)+' '+(p[1]+1.6).toFixed(1)).join('L')}" fill="none" stroke="${c[0]}" stroke-opacity=".9" stroke-width="1.3" stroke-linecap="round"/>`);
+      else if(f.kind==='cap')html+=`<path ${a} d="${f.d}" fill="${c[1]}" fill-opacity="${f.back?.12:.28}" stroke="${c[0]}" stroke-opacity="${f.back?.25:.6}" stroke-width=".8"/>`}});
+  G.innerHTML=html}
 function drawRing(g,L,total){const svg=$('ring');const vis=L.filter(([k])=>g[k]>0);
-  if(!svg.querySelector('#ringG')){svg.setAttribute('viewBox','0 0 240 240');svg.innerHTML='<defs id="ringD"></defs><circle class="rbg" cx="120" cy="120" r="87"/><g id="ringG"></g>'}
-  const D=svg.querySelector('#ringD'),G=svg.querySelector('#ringG');
-  const PAL={bills:['#ff9ae0','#ff3fb4','#c22bff'],loan:['#ffe680','#ffc233','#ff8a1f'],save:['#8bffd9','#2fe0a8','#13b8e6'],wants:['#c9a8ff','#9b6bff','#5b4dff'],main:['#a9c4ff','#5b8cff','#3a4fe0']};
-  D.innerHTML=L.map(([k,,c])=>{const p=PAL[k]||[shade(cssColor(c),1.3),cssColor(c),shade(cssColor(c),.8)];return `<linearGradient id="rg-${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${p[0]}"/><stop offset=".5" stop-color="${p[1]}"/><stop offset="1" stop-color="${p[2]}"/></linearGradient><filter id="gl-${k}" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="${p[1]}" flood-opacity=".75"/></filter>`}).join('')
-    +'<radialGradient id="rg-gloss" cx="120" cy="120" r="104" gradientUnits="userSpaceOnUse"><stop offset=".67" stop-color="#000" stop-opacity=".28"/><stop offset=".8" stop-color="#fff" stop-opacity="0"/><stop offset=".95" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity=".05"/></radialGradient>'
-    +'<linearGradient id="rg-sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>';
-  let a=0;ringSegs=vis.map(([k,n,c])=>{const sw=g[k]/total*360,s0={k,a0:a+GAP/2,a1:a+sw-GAP/2,mid:a+sw/2};a+=sw;return s0});
-  G.innerHTML=ringSegs.map(sg=>{const d=arcPath(sg.a0,Math.max(sg.a1,sg.a0+.5));return `<g class="wd${focusSeg?(focusSeg===sg.k?' pop':' dim'):''}" data-s="${sg.k}"><path class="wf" d="${d}" fill="url(#rg-${sg.k})" ${focusSeg===sg.k?`filter="url(#gl-${sg.k})"`:''}/><path class="wg" d="${d}" fill="url(#rg-gloss)"/><path class="ws" d="${d}" fill="url(#rg-sheen)"/></g>`}).join('');
-  if(!vis.length)G.innerHTML='';
+  if(!svg.querySelector('#ringG')){svg.setAttribute('viewBox','0 0 260 196');svg.innerHTML='<defs id="ringD"></defs><ellipse class="rsh" cx="130" cy="126" rx="118" ry="52"/><g id="ringG"></g>'}
+  const D=svg.querySelector('#ringD');
+  D.innerHTML=Object.entries(PAL3).map(([k,[l,m,d]])=>`<linearGradient id="g3t-${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${l}"/><stop offset="1" stop-color="${m}"/></linearGradient>
+    <linearGradient id="g3o-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${m}"/><stop offset="1" stop-color="${d}"/></linearGradient>
+    <linearGradient id="g3i-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${d}"/><stop offset="1" stop-color="${m}" stop-opacity=".9"/></linearGradient>`).join('')
+    +Object.entries(PAL3).map(([k,[l,m,d]])=>`<linearGradient id="gt-${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${l}" stop-opacity=".55"/><stop offset=".6" stop-color="${m}" stop-opacity=".32"/><stop offset="1" stop-color="${d}" stop-opacity=".45"/></linearGradient>
+      <linearGradient id="gw-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${m}" stop-opacity=".6"/><stop offset=".5" stop-color="${m}" stop-opacity=".28"/><stop offset="1" stop-color="${l}" stop-opacity=".5"/></linearGradient>
+      <radialGradient id="gg-${k}"><stop offset="0" stop-color="${m}" stop-opacity=".55"/><stop offset="1" stop-color="${m}" stop-opacity="0"/></radialGradient>`).join('')
+    +'<radialGradient id="gspec" cx="30%" cy="15%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
+    +'<linearGradient id="g3streak" x1="0" y1="0" x2="1" y2=".35"><stop offset=".28" stop-color="#fff" stop-opacity="0"/><stop offset=".4" stop-color="#fff" stop-opacity=".45"/><stop offset=".48" stop-color="#fff" stop-opacity="0"/><stop offset=".62" stop-color="#fff" stop-opacity=".18"/><stop offset=".68" stop-color="#fff" stop-opacity="0"/></linearGradient>'
+    +'<radialGradient id="g3sh"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>';
+  let a=0;ringSegs=vis.map(([k])=>{const sw=g[k]/total*360,o={k,a0:a+.9,a1:a+sw-.9};a+=sw;return o});
   const f=focusSeg&&ringSegs.find(x=>x.k===focusSeg);
-  if(f){let target=180-f.mid,diff=((target-ringRot)%360+540)%360-180;ringRot+=diff}
-  G.style.transform=`rotate(${ringRot}deg)`;
-  ringSegs.forEach(sg=>{const el=G.querySelector(`[data-s="${sg.k}"]`);if(!el)return;const [dx,dy]=sg.k===focusSeg?[Math.sin(sg.mid*Math.PI/180)*12,-Math.cos(sg.mid*Math.PI/180)*12]:[0,0];el.style.transform=`translate(${dx}px,${dy}px)`});
-}
+  if(f){const mid=(f.a0+f.a1)/2;let target=180-mid,diff=((target-ringRot)%360+540)%360-180;spinTo(ringRot+diff)}else paintRing()}
+function spinTo(target){cancelAnimationFrame(ringAnim);const from=ringRot,t0=performance.now();
+  const step=t=>{const p=Math.min(1,(t-t0)/650),e=1-Math.pow(1-p,4);ringRot=from+(target-from)*e;paintRing();if(p<1)ringAnim=requestAnimationFrame(step)};ringAnim=requestAnimationFrame(step)}
 function countUp(el){const txt=el.textContent,m=/([\d,]+(?:\.\d+)?)/.exec(txt);if(!m||el.dataset.last===txt)return;el.dataset.last=txt;const target=parseFloat(m[1].replace(/,/g,'')),dec=(m[1].split('.')[1]||'').length,t0=performance.now();
   const step=t=>{const p=Math.min(1,(t-t0)/450),e=1-Math.pow(1-p,3),v=target*e;el.textContent=txt.replace(m[1],v.toLocaleString('en-PH',{minimumFractionDigits:dec,maximumFractionDigits:dec}));if(p<1)requestAnimationFrame(step);else el.textContent=txt};requestAnimationFrame(step)}
 (function(){const wrap=$('ring').closest('.ring-wrap'),svg=$('ring');let st=null;
-  const ang=(x,y)=>{const r=svg.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;return Math.atan2(x-cx,-(y-cy))*180/Math.PI};
-  const tilt=(x,y)=>{const r=wrap.getBoundingClientRect(),px=(x-r.left)/r.width-.5,py=(y-r.top)/r.height-.5;wrap.style.setProperty('--rx',(-py*14).toFixed(2)+'deg');wrap.style.setProperty('--ry',(px*14).toFixed(2)+'deg');wrap.style.setProperty('--hx',((px+.5)*100).toFixed(1)+'%');wrap.style.setProperty('--hy',((py+.5)*100).toFixed(1)+'%')};
-  wrap.addEventListener('pointerdown',e=>{const wd=e.target.closest('.wd');st={x:e.clientX,y:e.clientY,a:ang(e.clientX,e.clientY),rot:ringRot,wd,mode:null,id:e.pointerId,t:Date.now()};wrap.classList.add('touching');tilt(e.clientX,e.clientY)});
-  wrap.addEventListener('pointermove',e=>{if(!st){if(e.pointerType==='mouse')tilt(e.clientX,e.clientY);return}tilt(e.clientX,e.clientY);
-    const dx=e.clientX-st.x,dy=e.clientY-st.y,da=((ang(e.clientX,e.clientY)-st.a+540)%360)-180;
-    if(!st.mode&&Math.hypot(dx,dy)>12){const r=svg.getBoundingClientRect(),rx=st.x-(r.left+r.width/2),ry=st.y-(r.top+r.height/2),rl=Math.hypot(rx,ry)||1,rad=(dx*rx+dy*ry)/rl,tan=(dx*ry-dy*rx)/rl;
-      st.mode=Math.abs(tan)>Math.abs(rad)?'spin':'magnet';try{wrap.setPointerCapture(st.id)}catch(_){}}
-    if(st.mode==='spin'){ringRot=st.rot+da;const G=$('ringG');G.style.transition='none';G.style.transform=`rotate(${ringRot}deg)`}
-    else if(st.mode==='magnet'&&st.wd){const k=Math.min(1,22/Math.max(1,Math.hypot(dx,dy))),r=svg.getBoundingClientRect(),sc=240/r.width,
-      t=ringRot*Math.PI/180,ux=(dx*Math.cos(t)+dy*Math.sin(t))*sc*k,uy=(-dx*Math.sin(t)+dy*Math.cos(t))*sc*k;st.wd.style.transition='none';st.wd.style.transform=`translate(${ux}px,${uy}px)`}});
-  const end=e=>{if(!st)return;const s0=st;st=null;wrap.classList.remove('touching');
-    if(s0.mode==='spin'){$('ringG').style.transition='';return}
-    if(s0.wd){s0.wd.style.transition='';s0.wd.style.transform=''}
-    if(!s0.mode||s0.mode==='magnet'){const k=s0.wd&&s0.wd.dataset.s;focusSeg=k?(focusSeg===k?null:k):null;segTap();renderHome()}
-    if(e.pointerType!=='mouse'){wrap.style.setProperty('--rx','0deg');wrap.style.setProperty('--ry','0deg')}};
-  wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',end);
-  wrap.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&!st){wrap.style.setProperty('--rx','0deg');wrap.style.setProperty('--ry','0deg')}})})();
+  const toSvg=(x,y)=>{const r=svg.getBoundingClientRect(),sx=260/r.width;return [(x-r.left)*sx,(y-r.top)*sx]};
+  const ang=(x,y)=>{const [sx,sy]=toSvg(x,y);return Math.atan2(sx-DC.cx,-(sy-DC.cy)/ringTilt)*180/Math.PI};
+  wrap.addEventListener('pointerdown',e=>{const wd=e.target.closest('[data-s]');cancelAnimationFrame(ringAnim);st={x:e.clientX,y:e.clientY,a:ang(e.clientX,e.clientY),rot:ringRot,k:wd&&wd.dataset.s,mode:null,id:e.pointerId}});
+  wrap.addEventListener('pointermove',e=>{if(!st)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;
+    if(!st.mode&&Math.hypot(dx,dy)>12){const [sx,sy]=toSvg(st.x,st.y),rx=sx-DC.cx,ry=(sy-DC.cy)/ringTilt,rl=Math.hypot(rx,ry)||1,rad=(dx*rx+dy*ry)/rl,tan=(dx*ry-dy*rx)/rl;
+      st.mode=Math.abs(tan)>Math.abs(rad)?'spin':'pull';try{wrap.setPointerCapture(st.id)}catch(_){}}
+    if(st.mode==='spin'){const da=((ang(e.clientX,e.clientY)-st.a+540)%360)-180;ringRot=st.rot+da;paintRing()}
+    else if(st.mode==='pull'&&st.k){const kk=Math.min(1,20/Math.max(1,Math.hypot(dx,dy))),sc=260/svg.getBoundingClientRect().width;$('ringG').querySelectorAll(`[data-s="${st.k}"]`).forEach(el=>{el.style.transform=`translate(${dx*sc*kk}px,${dy*sc*kk}px)`})}});
+  const end=()=>{if(!st)return;const s0=st;st=null;if(s0.mode==='spin')return;
+    if(s0.k)$('ringG').querySelectorAll(`[data-s="${s0.k}"]`).forEach(el=>{el.style.transform=''});
+    focusSeg=s0.k?(focusSeg===s0.k?null:s0.k):null;segTap();renderHome()};
+  wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',()=>{st=null})})();
 /* what makes up the focused slice */
 function segItems(k){const mult=range==='year'?12:1,cuts=range==='pay'?[s.payday]:['15th','30th'],out={};
   const add=(n,v)=>{if(v>0)out[n]=(out[n]||0)+v*mult};
@@ -2006,6 +2033,9 @@ function dgEnd(){clearTimeout(dgTimer);if(!dg)return;const d=dg;dg=null;if(!d.on
 document.addEventListener('touchend',dgEnd,{passive:true});document.addEventListener('touchcancel',dgEnd,{passive:true});
 document.addEventListener('contextmenu',e=>{if(e.target.closest(Object.keys(DRAG).join(',')))e.preventDefault()});
 /* ========== SETTINGS ========== */
+function syncChartChips(){const v=chartStyle();document.querySelectorAll('[data-cs]').forEach(b=>b.classList.toggle('on',b.dataset.cs===v))}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-cs]');if(!b)return;try{localStorage.setItem('dc_bud_chart',b.dataset.cs)}catch(_){}syncChartChips();paintRing();toast(b.dataset.cs==='glass'?'Glass chart':'Solid chart')});
+setTimeout(syncChartChips,0);
 function renderSettings(){const lb=store('dc_bud_lastbk',null),days=lb?Math.floor((Date.now()-new Date(lb))/864e5):null;
   const el=$('bkLast');if(el){el.textContent=lb?'Last backup: '+dShort(new Date(lb))+(days>=14?' · it has been '+days+' days, export a new one':''):'No backup yet. Export one so you never lose your data.';el.className='bk-last'+(!lb||days>=14?' warn':'')}
   const n=(x,k)=>x+' '+k+(x===1?'':'s'),subs=s.bank.reduce((a,b)=>a+(hasSubs(b)?b.subs.length:0),0),ents=s.log.reduce((a,p)=>a+p.items.length,0);
