@@ -664,6 +664,59 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
   .tabbar button svg{width:26px;height:26px}
   #miniToast{bottom:calc(var(--tab-h) + var(--sb) + 22px)}
 }
+/* settings extras (all sizes) */
+.bk-last{font-size:13px;color:var(--sub);margin:-2px 6px 8px}
+.bk-last.warn{color:#ffcc00}
+.data-card{background:var(--card);border-radius:var(--r);padding:4px 16px}
+.data-card div{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.data-card div:first-child{border-top:0}
+.data-card span{color:var(--sub);font-size:14px}
+.data-card b{font-size:14px;font-weight:500;text-align:right}
+
+/* ===================== DESKTOP: use the full width ===================== */
+@media(min-width:900px){
+  .app{padding:32px 0 40px calc(var(--side) + 16px)}
+  .scr{width:100%;max-width:1640px;margin:0;padding:0 36px 0 28px}
+  .ph h1,.hd h1{font-size:34px}
+  /* Home: hero card + wide right side with accounts and goals side by side */
+  .pg[data-pg=home].on{grid-template-columns:minmax(380px,440px) minmax(0,1fr);gap:0 24px;align-items:start}
+  .home-r{min-height:0}
+  .hx{display:grid;grid-template-columns:repeat(var(--hxc,2),minmax(0,1fr));grid-auto-flow:column;grid-template-rows:auto auto;gap:0 20px;margin-top:22px}
+  .hx .sec-h{grid-row:1;margin-top:0}
+  .hx>.list{grid-row:2;align-self:start}
+  /* Payday checklist: summary pinned on the left, items on the right */
+  .pg[data-pg=payday] [data-yp=check]{max-width:none}
+  #ckBody{display:grid;grid-template-columns:minmax(320px,400px) minmax(0,1fr);gap:0 24px;align-items:start}
+  #ckBody>.ck-hero{grid-column:1;grid-row:1/span 30;position:sticky;top:24px}
+  #ckBody>*:not(.ck-hero){grid-column:2}
+  #ckBody>.cap:first-of-type,#ckBody>.note:first-of-type{margin-top:0}
+  #pyTop{max-width:520px}
+  /* Money and Debts: two columns */
+  .cols2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:0 24px;align-items:start}
+  .cols2 .c2h{margin-top:0!important}
+  .cols2 .col>.sec-h:first-child{margin-top:0}
+  .pg[data-pg=bills] .cols2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pg[data-pg=wallet] [data-wp],.pg[data-pg=wallet] .seg{max-width:none}
+  /* Settings: three columns of cards */
+  .pg[data-pg=settings] .set{columns:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
+  .pg[data-pg=settings] .set-g{display:block;width:auto}
+  .pg[data-pg=settings] .set .foot{grid-column:1/-1;text-align:left;margin:0}
+  .pg[data-pg=settings] .list-t{margin-top:0}
+  .data-card{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.07)}
+  /* Me: a wide centered panel instead of a narrow phone sheet */
+  #meSheet .sh{width:min(92vw,900px);max-height:90vh;padding:0 24px 24px}
+  #meSheet .me-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  #meSheet .me-c.wide{grid-column:span 2}
+  #meSheet .me-c.ring{grid-row:span 2}
+  #meSheet .me-c.row{grid-column:span 2}
+  #meSheet .me-acts{grid-template-columns:repeat(6,minmax(0,1fr))}
+  #meSheet .me-hero{padding:22px}
+}
+@media(min-width:900px){
+  #meSheet .me-c.row{grid-column:span 1;display:block}
+  #meSheet .me-c.row b{font-size:20px;margin-top:2px}
+  #meSheet .me-grid>.me-c:nth-child(3){grid-row:span 2}
+}
 
 </style>
 </head>
@@ -774,32 +827,47 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
 <!-- ===== MONEY ===== -->
 <section class="pg" data-pg="wallet" aria-label="Money">
   <header class="ph"><div><h1>Money</h1><p id="walletSub"></p></div></header>
-  <div class="money-a">
+  <div class="cols2 money">
+  <div class="col"><div class="money-a">
     <div class="tiles" id="aSum"></div>
     <div class="list" id="bankList"></div>
     <div id="fxBox"><label class="fld" style="margin-top:12px"><span>USD to PHP rate</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" id="usdRate" placeholder="e.g. 58.00"><button type="button" class="pst" id="fxRefresh">Refresh</button></div></label>
     <p class="note" id="fxNote" style="margin:6px 4px 0"></p><button class="lnk" type="button" id="fxLook" style="margin:6px 4px 0;font-size:14px">Look up rate ↗</button></div>
     <p class="note" style="margin:8px 4px 0">Update balances after each payday. The Home balance adds them all up.</p>
   </div>
-  <div class="sec-h" style="margin-top:22px"><h2>Savings goals</h2></div>
+  </div>
+  <div class="col">
+  <div class="sec-h c2h"><h2>Savings goals</h2></div>
   <div class="list" id="goals"></div>
+  </div>
+  </div>
 </section>
 
 <!-- ===== BILLS & DEBTS ===== -->
 <section class="pg" data-pg="bills" aria-label="Bills and debts">
   <header class="ph"><div><h1>Debts</h1><p id="billsSub"></p></div></header>
+  <div class="cols2">
+  <div class="col">
   <div class="sec-h"><h2>From each payday</h2><b id="debtSum" class="sec-v"></b></div>
   <div class="list" id="debts"></div>
-        <p class="note" id="loanNote" style="margin:8px 4px 0"></p>
-  <div class="sec-h" style="margin-top:22px"><h2>Due-date trackers</h2></div>
+  <p class="note" id="loanNote" style="margin:8px 4px 0"></p>
+  </div>
+  <div class="col">
+  <div class="sec-h c2h"><h2>Due-date trackers</h2></div>
   <div class="tiles" id="tSum"></div>
-    <div class="list" id="tList"></div>
+  <div class="list" id="tList"></div>
+  </div>
+  </div>
 </section>
 
 <!-- ===== SETTINGS ===== -->
 <section class="pg" data-pg="settings" aria-label="Settings">
   <header class="ph"><h1>Settings</h1></header>
   <div class="set">
+    <div class="set-g set-data">
+    <p class="list-t">Your data</p>
+    <div class="data-card" id="dataCard"></div>
+    </div>
     <div class="set-g">
     <p class="list-t">Display</p>
     <div class="list">
@@ -808,6 +876,7 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
     </div>
     <div class="set-g">
     <p class="list-t">Backup</p>
+    <p class="bk-last" id="bkLast"></p>
     <div class="list">
       <button class="it" type="button" id="bdExport"><i class="ic" style="--c:var(--green)" data-icon="down"></i><span><b>Export all data</b><small>Plan, debts, goals, accounts, payday log and payment trackers in one file</small></span></button>
       <button class="it" type="button" id="bdImport"><i class="ic" style="--c:var(--blue);color:#fff" data-icon="up"></i><span><b>Import backup</b><small>Restores everything from a backup file (older backups work too)</small></span></button>
@@ -898,6 +967,7 @@ function store(key,fallback){try{const v=localStorage.getItem(key);return v?JSON
 function persist(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch(e){}}
 function dlFile(name,data,type){try{const u=URL.createObjectURL(new Blob([data],{type})),l=document.createElement('a');l.href=u;l.download=name;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}catch(e){}}
 function toast(msg){let t=$('miniToast');if(!t){t=document.createElement('div');t.id='miniToast';t.setAttribute('role','status');document.body.appendChild(t)}t.textContent=msg;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
+const ICONS_D='M193 193H306A112 112 0 0 1 306 417H262Q250 417 250 405V361H306A56 56 0 0 0 306 249H205Q193 249 193 237ZM193 317Q193 305 205 305H237Q249 305 249 317V361H205Q193 361 193 349Z';
 const ICONS={
   pie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg>',
   gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
@@ -1085,7 +1155,8 @@ function renderPdCard(){const c=$('pdCard');if(!c)return;const p=pdRec(false),{L
 function renderHomeX(){const box=$('homeX');if(!box)return;const mask=v=>hidden?'••••••':v;
   const acc=s.bank.length?`<div class="sec-h"><h2>Accounts</h2><button class="lnk" type="button" data-go="wallet:accts">Manage</button></div><div class="list">${s.bank.map((a,i)=>`<button class="it" type="button" data-go="wallet:accts"><i class="ic" style="--c:#5ac8fa">${ICONS.bank}</i><span><b>${escapeHTML(a.n||'Untitled account')}</b><small>${escapeHTML(hasSubs(a)?a.subs.length+' sub-accounts':(a.role||(a.cur==='USD'?'Dollar account':'Peso account')))}</small></span><span class="val">${mask(money(a,acctBal(a)))}</span></button>`).join('')}</div>`:'';
   const gl=s.accts.length?`<div class="sec-h"><h2>Goals</h2><button class="lnk" type="button" data-go="wallet:goals">Manage</button></div><div class="list">${s.accts.map(g=>{const pr=num(g.g)?Math.min(num(g.b)/num(g.g),1):0;return `<button class="it hg" type="button" data-go="wallet:goals"><span><b>${escapeHTML(g.n||'Untitled goal')}</b><small>${mask(peso(g.b))} of ${peso(g.g)}</small><i class="bar" style="--c:var(--green)"><i style="width:${pr*100}%"></i></i></span><span class="val">${Math.round(pr*100)}%</span></button>`}).join('')}</div>`:'';
-  box.innerHTML=acc+gl;box.hidden=!(acc||gl)}
+  const dt=s.loans.length?`<div class="sec-h"><h2>Debts</h2><button class="lnk" type="button" data-go="bills">Manage</button></div><div class="list">${s.loans.map(l=>{const t=num(l.total),pr=t?Math.min(num(l.paid)/t,1):0,i=debtInfo(l);return `<button class="it hg" type="button" data-go="bills"><span><b>${escapeHTML(l.n||'Debt')}</b><small>${i?mask(peso(Math.round(i.amt)))+' left · done '+i.last.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):'Paid off ✓'}</small><i class="bar" style="--c:var(--yellow)"><i style="width:${pr*100}%"></i></i></span><span class="val">${t?Math.round(pr*100)+'%':''}</span></button>`}).join('')}</div>`:'';
+  box.innerHTML=acc+gl+dt;box.hidden=!(acc||gl||dt);box.style.setProperty('--hxc',[acc,gl,dt].filter(Boolean).length||1)}
 $('legend').addEventListener('click',e=>{const b=e.target.closest('[data-seg]');if(!b)return;focusSeg=focusSeg===b.dataset.seg?null:b.dataset.seg;renderHome()});
 
 /* ========== PLAN ========== */
@@ -1645,7 +1716,7 @@ function renderMe(){const m=meData(),hr=new Date().getHours(),greet=hr<12?'Good 
   const mask=v=>hidden?'••••••':v,CIR=2*Math.PI*26;
   const badges=[['First payday logged',s.log.length>0],['Accounts set up',s.bank.length>=3],['Emergency fund 50%',m.efp>=.5],['Emergency fund 75%',m.efp>=.75],['Emergency fund full',m.efp>=1],['A debt paid off',m.anyDone],['Debt-free',s.loans.length>0&&s.loans.every(l=>debtLeft(l)===0)]];
   const got=badges.filter(b=>b[1]).length;
-  $('meBody').innerHTML=`<div class="me-hero"><div class="me-av">${$('meBtn').innerHTML}</div><div><small>${greet},</small><b>Diyelo</b><span>Next payday <em>${dLong(m.next)}</em> · ${m.days===0?'today':m.days===1?'tomorrow':'in '+m.days+' days'}</span></div></div>
+  $('meBody').innerHTML=`<div class="me-hero"><div class="me-av"><svg viewBox="193 193 225 224" aria-hidden="true"><path d="${ICONS_D}" fill="#fff"/></svg></div><div><small>${greet},</small><b>Diyelo</b><span>Next payday <em>${dLong(m.next)}</em> · ${m.days===0?'today':m.days===1?'tomorrow':'in '+m.days+' days'}</span></div></div>
   <div class="me-grid">
     <div class="me-c wide"><span>Net worth</span><b>${mask(peso2(m.worth))}</b><small>${s.bank.length?'All '+s.bank.length+' accounts'+(s.balAt?' · as of '+dShort(T.parse(s.balAt)):''):'Add accounts in Wallet to see this'}</small></div>
     <div class="me-c ring"><div class="rw"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26"/><circle cx="32" cy="32" r="26" stroke-dasharray="${CIR}" stroke-dashoffset="${CIR*(1-m.efp)}"/></svg><b>${Math.round(m.efp*100)}%</b></div><span>Emergency fund</span><small>${m.ef?mask(peso(m.efSaved))+' of '+peso(m.ef.g):'Add an Emergency fund goal'}</small>${m.efFrom?`<small class="from">${escapeHTML(m.efFrom)}</small>`:''}</div>
@@ -1673,9 +1744,14 @@ $('meBody').addEventListener('click',e=>{const b=e.target.closest('[data-me]');i
   if(k==='log'){show('payday');pyPane('check')}else if(k==='acct'){show('wallet');wallet('accts');setTimeout(addAcct,60)}else if(k==='settings')show('settings');else if(k==='plan')show('plan')});
 
 /* ========== SETTINGS ========== */
+function renderSettings(){const lb=store('dc_bud_lastbk',null),days=lb?Math.floor((Date.now()-new Date(lb))/864e5):null;
+  const el=$('bkLast');if(el){el.textContent=lb?'Last backup: '+dShort(new Date(lb))+(days>=14?' · it has been '+days+' days, export a new one':''):'No backup yet. Export one so you never lose your data.';el.className='bk-last'+(!lb||days>=14?' warn':'')}
+  const n=(x,k)=>x+' '+k+(x===1?'':'s'),subs=s.bank.reduce((a,b)=>a+(hasSubs(b)?b.subs.length:0),0),ents=s.log.reduce((a,p)=>a+p.items.length,0);
+  const rows=[['Accounts',n(s.bank.length,'account')+(subs?' · '+n(subs,'sub-account'):'')],['Savings goals',n(s.accts.length,'goal')],['Debts',n(s.loans.length,'debt')+' · '+n(ts.trackers.length,'tracker')],['Payday history',n(s.log.length,'payday')+' · '+n(ents,'entry').replace('entrys','entries')],['Bills in plan',n(s.bills.length,'bill')],['Stored on','This device and browser only']];
+  const dc=$('dataCard');if(dc)dc.innerHTML=rows.map(([k,v])=>`<div><span>${k}</span><b>${escapeHTML(v)}</b></div>`).join('')}
 /* one backup file for everything; older budget-only or trackers-only files still import */
 function afterImport(){fillInputs();splitRows();changed();tsave()}
-$('bdExport').addEventListener('click',()=>{const d=iso(new Date());dlFile('budget-backup-'+d+'.json',JSON.stringify({app:'diyelo-budget',version:3,exported:new Date().toISOString(),budget:s,trackers:ts}),'application/json');toast('Backup saved')});
+$('bdExport').addEventListener('click',()=>{const d=iso(new Date());persist('dc_bud_lastbk',new Date().toISOString());if(document.querySelector('.pg.on[data-pg=settings]'))renderSettings();dlFile('budget-backup-'+d+'.json',JSON.stringify({app:'diyelo-budget',version:3,exported:new Date().toISOString(),budget:s,trackers:ts}),'application/json');toast('Backup saved')});
 $('bdImport').addEventListener('click',()=>$('bdFile').click());
 $('bdFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();
   r.onload=()=>{let j;try{j=JSON.parse(r.result)}catch(x){toast('That file is not a valid backup');return}
@@ -1692,7 +1768,7 @@ $('bdReset').addEventListener('click',()=>{ask('Erase all data?','Plan, debts, g
 
 /* ========== RENDER ========== */
 function render(){setTimeout(()=>addPasteBtns(),0);const p=(document.querySelector('.pg.on')||{dataset:{}}).dataset.pg;
-  if(p==='home')renderHome();else if(p==='payday'){fillInputs();renderPlan();renderLog();renderCheck()}else if(p==='wallet')renderWallet();else if(p==='bills')renderBills();else setEye()}
+  if(p==='home')renderHome();else if(p==='payday'){fillInputs();renderPlan();renderLog();renderCheck()}else if(p==='wallet')renderWallet();else if(p==='bills')renderBills();else if(p==='settings'){setEye();renderSettings()}else setEye()}
 fillInputs();splitRows();planTab('pay');pyPane('check');
 setTimeout(()=>fxUpdate(),1500);
 /* tab bar shrinks while scrolling down and grows back when scrolling up (like Instagram) */
