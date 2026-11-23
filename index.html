@@ -595,6 +595,75 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
 .me-c.ring .rw b{position:absolute;top:0;left:0;right:0;bottom:0;display:grid;place-items:center;font-size:18px;line-height:1;margin:0}
 .me-c.ring small{white-space:normal}
 .me-c.ring small.from{font-size:11px;opacity:.8}
+/* ===================== Restructure: Payday / Money / Debts ===================== */
+.home-l #status{display:none}
+.pdcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;border-radius:20px;margin-bottom:16px;
+  background:linear-gradient(150deg,#2c55d6,#14246b 60%,#0d1430);border:1px solid rgba(122,162,255,.25);box-shadow:0 14px 30px rgba(20,40,120,.3);transition:transform .15s}
+.pdcard:active{transform:scale(.98)}
+.pdcard .pc-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.14);flex:none}
+.pdcard .pc-ic svg{width:22px;height:22px}
+.pdcard>span{flex:1;min-width:0}
+.pdcard b{display:block;font-size:16px;font-weight:600}
+.pdcard small{display:block;font-size:13px;color:rgba(255,255,255,.75);margin-top:1px}
+.pdcard .bar{display:block;height:4px;margin-top:8px;background:rgba(0,0,0,.3)}
+.pdcard .bar i{background:#74e0b4}
+.pdcard em{font-style:normal;font-size:22px;color:rgba(255,255,255,.7)}
+.ph p#pySub{margin-top:2px}
+#pyTop{margin-bottom:14px}
+.ck-hero{padding:16px;border-radius:22px;background:linear-gradient(165deg,#1b2a52,#0f1630 55%,#0b0f1d);border:1px solid rgba(122,162,255,.18);transition:background .4s}
+.ck-hero.win{background:linear-gradient(165deg,#145c46,#0d2f27 60%,#0a1512);border-color:rgba(116,224,180,.3)}
+.ck-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.ck-top small{display:block;font-size:12px;color:rgba(255,255,255,.65)}
+.ck-top b{display:block;font-size:24px;font-weight:700;letter-spacing:-.4px}
+.ck-ring{position:relative;width:52px;height:52px}
+.ck-ring svg{width:52px;height:52px;transform:rotate(-90deg)}
+.ck-ring circle{fill:none;stroke-width:5;stroke:rgba(255,255,255,.12)}
+.ck-ring circle+circle{stroke:#74e0b4;stroke-linecap:round;transition:stroke-dashoffset .5s cubic-bezier(.2,.8,.2,1)}
+.ck-ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;font-weight:600}
+.ck-hero .in{background:rgba(0,0,0,.28)}
+.ck-m{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.ck-m div{background:rgba(0,0,0,.25);border-radius:12px;padding:8px 10px}
+.ck-m span{display:block;font-size:11px;color:rgba(255,255,255,.65)}
+.ck-m b{display:block;font-size:15px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+.ck-m b.neg{color:var(--red)}
+.ckl{margin-bottom:6px}
+.ckr{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:9px 14px;text-align:left;border-top:1px solid var(--line);transition:background .15s}
+.ckr:first-child{border-top:0}
+.ckr span{flex:1;min-width:0}
+.ckr b{display:block;font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s}
+.ckr small{display:block;font-size:12px;color:var(--sub);margin-top:1px}
+.ckr em{font-style:normal;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.ckb{width:26px;height:26px;border-radius:50%;border:2px solid #3a3a40;display:grid;place-items:center;flex:none;color:transparent;transition:all .2s cubic-bezier(.2,.8,.2,1)}
+.ckb svg{width:15px;height:15px}
+.ckr.done .ckb{background:var(--green);border-color:var(--green);color:#04150e;transform:scale(1.05)}
+.ckr.done b{color:var(--sub)}
+.ckr.done em{color:var(--green)}
+.ckr:active{background:var(--card2)}
+.it.add.solo{border-radius:var(--r);background:var(--card);border-top:0;margin-top:4px}
+.ck-done{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:18px;margin-top:12px;border-radius:20px;background:rgba(116,224,180,.08);border:1px solid rgba(116,224,180,.25)}
+.ck-done b{font-size:18px}.ck-done span{font-size:14px;color:var(--sub)}.ck-done .pill{margin-top:6px}
+.sec-v{font-size:14px;font-weight:600;color:var(--sub)}
+.money-a .tiles{margin-top:0}
+@media(min-width:900px){
+  .pg[data-pg=payday] [data-yp=check]{max-width:720px}
+  .pg[data-pg=bills] .list,.pg[data-pg=bills] .tiles{max-width:none}
+  .home-l .pdcard{margin:14px 0 0}
+}
+/* ===== Floating glass tab bar (phone), Instagram-style: shrinks while scrolling down, grows back scrolling up ===== */
+@media(max-width:899px){
+  :root{--tab-h:64px}
+  .app{padding-bottom:calc(var(--tab-h) + var(--sb) + 30px)}
+  .tabbar{left:50%;right:auto;bottom:calc(var(--sb) + 8px);width:calc(100% - 36px);max-width:430px;height:var(--tab-h);padding:6px;gap:4px;
+    justify-content:space-between;border-radius:999px;transform:translateX(-50%);transform-origin:50% 100%;
+    background:rgba(30,30,36,.62);-webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%);
+    border:1px solid rgba(255,255,255,.1);box-shadow:0 14px 34px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);
+    transition:transform .45s cubic-bezier(.2,.9,.25,1),box-shadow .45s}
+  .tabbar.mini{transform:translateX(-50%) scale(.84) translateY(6px);box-shadow:0 8px 22px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08)}
+  .tabbar button{flex:1;width:auto;height:52px;border-radius:999px;color:#9a9aa2;transition:background .3s,color .3s,transform .15s}
+  .tabbar button.on{background:rgba(255,255,255,.12);color:#5b8cff}
+  .tabbar button svg{width:26px;height:26px}
+  #miniToast{bottom:calc(var(--tab-h) + var(--sb) + 22px)}
+}
 
 </style>
 </head>
@@ -636,19 +705,26 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
       <button type="button" role="tab" data-r="year" aria-selected="false">Year</button>
     </div>
     <button class="status" id="status" type="button"></button>
+    <button class="pdcard" id="pdCard" type="button"></button>
   </div>
   <div class="home-r">
-    <div class="sec-h"><h2>Upcoming Payments</h2><button class="lnk" type="button" data-go="wallet:pay">See all</button></div>
+    <div class="sec-h"><h2>Upcoming Payments</h2><button class="lnk" type="button" data-go="bills">See all</button></div>
     <div class="up" id="upList"></div>
     <div class="hx" id="homeX"></div>
   </div>
 </section>
 
-<!-- ===== PLAN ===== -->
-<section class="pg" data-pg="plan" aria-label="Plan">
-  <header class="ph"><h1>Plan</h1>
+<section class="pg" data-pg="payday" aria-label="Payday">
+  <header class="ph"><div><h1>Payday</h1><p id="pySub"></p></div>
     <div class="seg sm" id="pdSeg" role="tablist" aria-label="Which payday"><button type="button" data-v="15th">15th</button><button type="button" data-v="30th">30th</button></div>
   </header>
+  <div class="seg" id="pyTop" role="tablist" aria-label="Payday view">
+    <button type="button" role="tab" data-y="check" class="on" aria-selected="true">Checklist</button>
+    <button type="button" role="tab" data-y="plan" aria-selected="false">Plan</button>
+    <button type="button" role="tab" data-y="hist" aria-selected="false">History</button>
+  </div>
+  <div data-yp="check"><div id="ckBody"></div></div>
+  <div data-yp="plan" hidden>
   <div class="plan-cols">
     <div class="plan-side">
       <div class="sum">
@@ -662,7 +738,7 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
       <div class="seg" id="planSeg" role="tablist" aria-label="Plan section">
         <button type="button" role="tab" data-p="pay" class="on" aria-selected="true">Pay</button>
         <button type="button" role="tab" data-p="bills" aria-selected="false">Bills</button>
-        <button type="button" role="tab" data-p="loan" aria-selected="false">Debts</button>
+        
         <button type="button" role="tab" data-p="split" aria-selected="false">Split</button>
       </div>
       <div data-pp="pay" class="grp">
@@ -676,11 +752,6 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
         <div class="grp-h" style="margin:0 4px 8px"><h3 style="font-size:16px;font-weight:600">This cutoff</h3><b id="billsSum"></b></div>
         <div class="list" id="bills"></div>
       </div>
-      <div data-pp="loan" hidden>
-        <div class="grp-h" style="margin:0 4px 8px"><h3 style="font-size:16px;font-weight:600">This cutoff</h3><b id="debtSum"></b></div>
-        <div class="list" id="debts"></div>
-        <p class="note" id="loanNote" style="margin:8px 4px 0"></p>
-      </div>
       <div data-pp="split" class="grp split" hidden>
         <div class="g2">
           <label class="fld"><span style="--c:var(--green)">Scheduled savings</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" min="0" step="0.01" data-k="sched" placeholder="0"></div></label>
@@ -692,35 +763,37 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
       </div>
     </div>
   </div>
+  </div>
+  <div data-yp="hist" hidden>
+    <div class="tiles" id="logSum"></div>
+  <div class="list" id="logList"></div>
+    <button class="it add solo" type="button" id="logNew">+ Log a past payday</button>
+  </div>
 </section>
 
-<!-- ===== WALLET ===== -->
-<section class="pg" data-pg="wallet" aria-label="Wallet">
-  <header class="ph"><div><h1>Wallet</h1><p id="walletSub"></p></div></header>
-  <div class="seg" id="wSeg" role="tablist" aria-label="Wallet view">
-    <button type="button" role="tab" data-w="accts" class="on" aria-selected="true">Accounts</button>
-    <button type="button" role="tab" data-w="goals" aria-selected="false">Goals</button>
-    <button type="button" role="tab" data-w="pay" aria-selected="false">Payments</button>
-  </div>
-  <div data-wp="accts">
+<!-- ===== MONEY ===== -->
+<section class="pg" data-pg="wallet" aria-label="Money">
+  <header class="ph"><div><h1>Money</h1><p id="walletSub"></p></div></header>
+  <div class="money-a">
     <div class="tiles" id="aSum"></div>
     <div class="list" id="bankList"></div>
     <div id="fxBox"><label class="fld" style="margin-top:12px"><span>USD to PHP rate</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" id="usdRate" placeholder="e.g. 58.00"><button type="button" class="pst" id="fxRefresh">Refresh</button></div></label>
     <p class="note" id="fxNote" style="margin:6px 4px 0"></p><button class="lnk" type="button" id="fxLook" style="margin:6px 4px 0;font-size:14px">Look up rate ↗</button></div>
     <p class="note" style="margin:8px 4px 0">Update balances after each payday. The Home balance adds them all up.</p>
   </div>
-  <div data-wp="goals" hidden><div class="list" id="goals"></div></div>
-  <div data-wp="pay" hidden>
-    <div class="tiles" id="tSum"></div>
-    <div class="list" id="tList"></div>
-  </div>
+  <div class="sec-h" style="margin-top:22px"><h2>Savings goals</h2></div>
+  <div class="list" id="goals"></div>
 </section>
 
-<!-- ===== PAYDAY LOG ===== -->
-<section class="pg" data-pg="log" aria-label="Payday log">
-  <header class="ph"><div><h1>Payday Log</h1><p id="logSub"></p></div><button class="pill" id="logNew" type="button">New payday</button></header>
-  <div class="tiles" id="logSum"></div>
-  <div class="list" id="logList"></div>
+<!-- ===== BILLS & DEBTS ===== -->
+<section class="pg" data-pg="bills" aria-label="Bills and debts">
+  <header class="ph"><div><h1>Debts</h1><p id="billsSub"></p></div></header>
+  <div class="sec-h"><h2>From each payday</h2><b id="debtSum" class="sec-v"></b></div>
+  <div class="list" id="debts"></div>
+        <p class="note" id="loanNote" style="margin:8px 4px 0"></p>
+  <div class="sec-h" style="margin-top:22px"><h2>Due-date trackers</h2></div>
+  <div class="tiles" id="tSum"></div>
+    <div class="list" id="tList"></div>
 </section>
 
 <!-- ===== SETTINGS ===== -->
@@ -750,9 +823,9 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
 <nav class="tabbar" id="tabbar" aria-label="Sections">
   <button class="tb-brand" type="button" id="meBtn2" aria-label="Open your profile"><span class="av tb-av" aria-hidden="true"><svg viewBox="193 193 225 224"><defs><linearGradient id="avG2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe8ff"/></linearGradient></defs><path d="M193 193H306A112 112 0 0 1 306 417H262Q250 417 250 405V361H306A56 56 0 0 0 306 249H205Q193 249 193 237ZM193 317Q193 305 205 305H237Q249 305 249 317V361H205Q193 361 193 349Z" fill="url(#avG2)"/></svg></span><div><b>Budget</b><small>Diyelo Dulay</small></div></button>
   <button type="button" data-tab="home" class="on" aria-current="page" aria-label="Home"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.2 2.6l3.4 3.4-3.4 3.4L3.8 6zM16.8 2.6l3.4 3.4-3.4 3.4L13.4 6zM7.2 12.2l3.4 3.4-3.4 3.4-3.4-3.4zM16.8 12.2l3.4 3.4-3.4 3.4-3.4-3.4z" transform="translate(0 1.2)"/></svg><small>Home</small></button>
-  <button type="button" data-tab="plan" aria-label="Plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg><small>Plan</small></button>
-  <button type="button" data-tab="log" aria-label="Log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><small>Log</small></button>
-  <button type="button" data-tab="wallet" aria-label="Wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 9h18M15 14.5h3"/></svg><small>Wallet</small></button>
+  <button type="button" data-tab="payday" aria-label="Payday"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17M9 15l2 2 4-4"/></svg><small>Payday</small></button>
+    <button type="button" data-tab="wallet" aria-label="Money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M3 9h18M15 14.5h3"/></svg><small>Money</small></button>
+  <button type="button" data-tab="bills" aria-label="Debts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><small>Debts</small></button>
   <button type="button" data-tab="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><small>Settings</small></button>
   <p class="tb-foot" aria-hidden="true">Saved on this device only</p>
 </nav>
@@ -764,7 +837,7 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
     <div class="list">
       <button class="it" type="button" data-add="bill"><i class="ic" style="--c:var(--pink)" data-icon="bill"></i><span><b>Bill</b><small>Rent, internet, fare, groceries</small></span><i class="chev"></i></button>
       <button class="it" type="button" data-add="goal"><i class="ic" style="--c:var(--green)" data-icon="target"></i><span><b>Savings goal</b><small>A fund with a target amount</small></span><i class="chev"></i></button>
-      <button class="it" type="button" data-add="payday"><i class="ic" style="--c:var(--blue);color:#fff" data-icon="log"></i><span><b>Payday log</b><small>Record what you moved and spent</small></span><i class="chev"></i></button>
+      <button class="it" type="button" data-add="payday"><i class="ic" style="--c:var(--blue);color:#fff" data-icon="log"></i><span><b>Payday checklist</b><small>Check off transfers and bills as you do them</small></span><i class="chev"></i></button>
       <button class="it" type="button" data-add="debt"><i class="ic" style="--c:var(--yellow)" data-icon="card"></i><span><b>Debt</b><small>Coop loan, phone loan, deducted each payday</small></span><i class="chev"></i></button>
       <button class="it" type="button" data-add="acct"><i class="ic" style="--c:#5ac8fa" data-icon="bank"></i><span><b>Account</b><small>A bank or e-wallet and its balance</small></span><i class="chev"></i></button>
       <button class="it" type="button" data-add="tracker"><i class="ic" style="--c:var(--yellow)" data-icon="card"></i><span><b>Payment tracker</b><small>Loans, installments, contributions</small></span><i class="chev"></i></button>
@@ -928,6 +1001,7 @@ const DEBTC='var(--yellow)';
 /* ========== NAVIGATION ========== */
 const pages=[...document.querySelectorAll('.pg')];
 function show(tab){
+  if(tab==='plan'||tab==='log'){pyPane(tab==='plan'?'plan':'hist');tab='payday'}
   pages.forEach(p=>p.classList.toggle('on',p.dataset.pg===tab));
   document.querySelectorAll('#tabbar button').forEach(b=>{const on=b.dataset.tab===tab;b.classList.toggle('on',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});
   window.scrollTo(0,0);render();
@@ -998,9 +1072,16 @@ function renderHome(){
   $('ringL').textContent=f?f[1]:(g.net?'Net pay':'No pay yet');{const rv=$('ringV'),v=f?g[f[0]]:g.net,txt=range==='pay'?peso(v):peso(Math.round(v));rv.textContent=txt;rv.style.fontSize=(txt.length<=8?25:txt.length<=10?22:txt.length<=12?19:16)+'px'}$('ringS').textContent=f?Math.round(g[f[0]]/total*100)+'% of pay':(g.net?lbl:'Set it in Plan');
   $('legend').innerHTML=L.map(([k,n,c])=>`<li><button type="button" data-seg="${k}" class="${focusSeg===k?'on':''}" style="--c:${c}" aria-pressed="${focusSeg===k}"><span>${n}</span><b>${peso(range==='pay'?g[k]:Math.round(g[k]))}</b></button></li>`).join('');
   setStatus($('status'),calc(s.payday));
-  renderUpcoming();renderHomeX();
+  renderUpcoming();renderHomeX();renderPdCard();
 }
-/* desktop home: accounts and goals at a glance (hidden on phones to keep Home short) */
+function renderPdCard(){const c=$('pdCard');if(!c)return;const p=pdRec(false),{L}=ckPlan(),n=p?L.filter(x=>p.items.find(y=>y.key===x.key)).length:0,d=T.parse(curPd()),fut=pdFuture();
+  const dn=Math.round((d-new Date(new Date().toDateString()))/864e5);let t,sub,pr=L.length?n/L.length:0;c.dataset.to='check';
+  if(!num(s.net)&&!L.length){t='Set up your payday plan';sub='Add your pay, bills and savings once';c.dataset.to='plan'}
+  else if(L.length&&n===L.length){t='Payday done ✓';sub=dShort(d)+' · all '+L.length+' items checked off'}
+  else if(fut){t='Next payday '+dShort(d);sub=(dn<=1?'Tomorrow':'In '+dn+' days')+' · '+L.length+' things to do'}
+  else{t=dn===0?"It's payday!":'Payday checklist · '+dShort(d);sub=n+' of '+L.length+' done · tap to continue'}
+  c.innerHTML=`<i class="pc-ic">${ICONS.logi}</i><span><b>${t}</b><small>${sub}</small><i class="bar"><i style="width:${pr*100}%"></i></i></span><em aria-hidden="true">›</em>`
+}/* desktop home: accounts and goals at a glance (hidden on phones to keep Home short) */
 function renderHomeX(){const box=$('homeX');if(!box)return;const mask=v=>hidden?'••••••':v;
   const acc=s.bank.length?`<div class="sec-h"><h2>Accounts</h2><button class="lnk" type="button" data-go="wallet:accts">Manage</button></div><div class="list">${s.bank.map((a,i)=>`<button class="it" type="button" data-go="wallet:accts"><i class="ic" style="--c:#5ac8fa">${ICONS.bank}</i><span><b>${escapeHTML(a.n||'Untitled account')}</b><small>${escapeHTML(hasSubs(a)?a.subs.length+' sub-accounts':(a.role||(a.cur==='USD'?'Dollar account':'Peso account')))}</small></span><span class="val">${mask(money(a,acctBal(a)))}</span></button>`).join('')}</div>`:'';
   const gl=s.accts.length?`<div class="sec-h"><h2>Goals</h2><button class="lnk" type="button" data-go="wallet:goals">Manage</button></div><div class="list">${s.accts.map(g=>{const pr=num(g.g)?Math.min(num(g.b)/num(g.g),1):0;return `<button class="it hg" type="button" data-go="wallet:goals"><span><b>${escapeHTML(g.n||'Untitled goal')}</b><small>${mask(peso(g.b))} of ${peso(g.g)}</small><i class="bar" style="--c:var(--green)"><i style="width:${pr*100}%"></i></i></span><span class="val">${Math.round(pr*100)}%</span></button>`}).join('')}</div>`:'';
@@ -1009,7 +1090,7 @@ $('legend').addEventListener('click',e=>{const b=e.target.closest('[data-seg]');
 
 /* ========== PLAN ========== */
 let ptab='pay';
-function planTab(p){ptab=p;segSet($('planSeg'),'p',p);document.querySelectorAll('[data-pp]').forEach(x=>x.hidden=x.dataset.pp!==p)}
+function planTab(p){if(p==='loan'){show('bills');return}ptab=p;segSet($('planSeg'),'p',p);document.querySelectorAll('[data-pp]').forEach(x=>x.hidden=x.dataset.pp!==p)}
 $('planSeg').addEventListener('click',e=>{const b=e.target.closest('button[data-p]');if(b)planTab(b.dataset.p)});
 $('pdSeg').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;s.payday=b.dataset.v;changed()});
 function fillInputs(){document.querySelectorAll('[data-pg=plan] [data-k]').forEach(el=>{if(document.activeElement!==el){const v=get(el.dataset.k);el.value=(v===0&&!el.dataset.k.startsWith('pct'))?'':v}})}
@@ -1018,6 +1099,7 @@ function billRows(){
   $('bills').innerHTML=s.bills.map((b,i)=>`<button class="it" type="button" data-eb="${i}"><i class="dot" style="--c:var(--pink)"></i><span><b>${escapeHTML(b.n||'Untitled bill')}</b><small>${peso(b.a)} · ${escapeHTML(b.w)}</small></span><span class="val">${peso(r.bills[i])}</span><i class="chev"></i></button>`).join('')
     +'<button class="it add" type="button" id="addBill">+ Add bill</button>';
 }
+
 function debtRows(r){const CIR=2*Math.PI*16;
   $('debts').innerHTML=s.loans.map((l,i)=>{const t=num(l.total),pd=Math.min(num(l.paid),t||Infinity),left=debtLeft(l),pr=t?pd/t:0;
     const sub=peso(l.a)+' · '+escapeHTML(l.w)+(t?' · '+(left?left+' left':'done'):'');
@@ -1048,8 +1130,7 @@ function renderPlan(){
 $('bdOpen').addEventListener('click',()=>openSheet('bdSheet'));
 
 /* ========== WALLET ========== */
-function wallet(w){if(!['accts','goals','pay'].includes(w))w='accts';setTimeout(walletSubSet,0);segSet($('wSeg'),'w',w);document.querySelectorAll('[data-wp]').forEach(p=>p.hidden=p.dataset.wp!==w);try{localStorage.setItem('dc_bud_w',w)}catch(e){}if(w==='pay')renderTrackers()}
-$('wSeg').addEventListener('click',e=>{const b=e.target.closest('button[data-w]');if(b)wallet(b.dataset.w)});
+function wallet(w){if(w==='pay'){show('bills');return}if(w==='goals')setTimeout(()=>{const g=$('goals');g&&g.scrollIntoView({behavior:'smooth',block:'center'})},80)}
 function renderWallet(){
   const r=calc(s.payday),CIR=2*Math.PI*16;
   $('goals').innerHTML=s.accts.map((a,i)=>{const g=num(a.g),b=num(a.b),pr=g?Math.min(b/g,1):0,k=r.parts[a.k]||0,need=Math.max(g-b,0),c=C.acc[a.k]||'var(--sub)';
@@ -1061,11 +1142,8 @@ function renderWallet(){
   walletSubSet();
 }
 
-function walletSubSet(){const w=(document.querySelector('#wSeg .on')||{dataset:{}}).dataset.w||'accts',n=(k,x)=>x+' '+k+(x===1?'':'s');let t='';
-  if(w==='accts')t=s.bank.length?n('account',s.bank.length)+(hidden?'':' · '+peso(Math.round(bankTotal())))+' total':'Your banks and e-wallets, in one place.';
-  else if(w==='goals'){const tot=s.accts.reduce((a,x)=>a+num(x.b),0);t=s.accts.length?(hidden?n('savings goal',s.accts.length):peso2(tot)+' saved in '+n('goal',s.accts.length)):'Set targets and watch them fill up.'}
-  else t=ts.trackers.length?n('payment tracker',ts.trackers.length):'Loans, installments and contributions.';
-  $('walletSub').textContent=t}
+function walletSubSet(){const n=(k,x)=>x+' '+k+(x===1?'':'s');
+  $('walletSub').textContent=s.bank.length?n('account',s.bank.length)+(hidden?'':' · '+peso(Math.round(bankTotal()))+' total')+(s.accts.length?' · '+n('goal',s.accts.length):''):'Your banks, e-wallets and savings goals.'}
 function renderBank(){
   const tot=bankTotal(),usd=s.bank.filter(a=>a.cur==='USD'),miss=usd.length&&!num(s.usd);
   $('aSum').innerHTML=`<div><span>Total</span><b>${hidden?'••••••':peso(Math.round(tot))}</b></div><div><span>Accounts</span><b>${s.bank.length}</b></div><div><span>Updated</span><b>${s.balAt?dShort(T.parse(s.balAt)):'—'}</b></div>`;
@@ -1246,10 +1324,10 @@ $('addNew').addEventListener('click',()=>openSheet('addSheet'));
 document.addEventListener('click',e=>{const a=e.target.closest('[data-add]');if(!a)return;const k=a.dataset.add;closeSheet(true);
   if(k==='bill'){show('plan');planTab('bills');setTimeout(addBill,60)}
   else if(k==='goal'){show('wallet');wallet('goals');setTimeout(addGoal,60)}
-  else if(k==='tracker'){show('wallet');wallet('pay');setTimeout(()=>tEdit(null),60)}
-  else if(k==='debt'){show('plan');planTab('loan');setTimeout(addDebt,60)}
+  else if(k==='tracker'){show('bills');setTimeout(()=>tEdit(null),60)}
+  else if(k==='debt'){show('bills');setTimeout(addDebt,60)}
   else if(k==='acct'){show('wallet');wallet('accts');setTimeout(addAcct,60)}
-  else if(k==='payday'){show('log');setTimeout(logNew,60)}});
+  else if(k==='payday'){show('payday');pyPane('check')}});
 
 /* ========== PAYMENT TRACKERS (native; same saved format as the old tracker) ========== */
 const TKEY='dc_budget_payments_v2';
@@ -1257,7 +1335,7 @@ const SYM={PHP:'₱',USD:'$',EUR:'€',GBP:'£',INR:'₹'};
 let ts=store(TKEY,null);if(!ts||!Array.isArray(ts.trackers))ts={version:1,currency:'PHP',trackers:[]};
 function tnorm(t){t.payments=t.payments||{};t.paid=t.paid||{};t.type=t.type||'fixed';t.frequency=t.frequency||'monthly';t.category=t.category||'Other';t.periods=t.periods?Number(t.periods):null;t.amount=Number(t.amount)||0;t.targetTotal=Number(t.targetTotal)||0;t.customPerMonth=Number(t.customPerMonth)||1;t.day1=Number(t.day1)||15;t.day2=Number(t.day2)||30;t.method=t.method||'';t.bank=t.bank||'';t.notes=t.notes||'';return t}
 ts.trackers.forEach(tnorm);
-function tsave(){persist(TKEY,ts);renderUpcoming();if(document.querySelector('.pg.on[data-pg=wallet]')){renderTrackers();walletSubSet()}}
+function tsave(){persist(TKEY,ts);renderUpcoming();if(document.querySelector('.pg.on[data-pg=bills]'))renderBills()}
 const sym=()=>SYM[ts.currency]||'₱';
 const tm=(n,dec)=>sym()+(Number(n)||0).toLocaleString('en-PH',{minimumFractionDigits:dec?2:0,maximumFractionDigits:2});
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1319,7 +1397,7 @@ function renderTrackers(){
     return `<button class="it" type="button" data-tid="${escapeHTML(t.id)}"><span class="gring" style="--c:${c}"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16"/><circle cx="20" cy="20" r="16" stroke-dasharray="${CIR}" stroke-dashoffset="${CIR*(1-pr)}"/></svg><b>${escapeHTML((t.name||'?').charAt(0).toUpperCase())}</b></span><span><b>${escapeHTML(t.name)}</b><small class="${st&&st[0]==='late'?'red':''}">${sub}</small></span><span class="val">${f.total?f.paid+'/'+f.total:f.paid}<small>paid</small></span><i class="chev"></i></button>`}).join('')
     +'<button class="it add" type="button" data-tnew>+ Add payment tracker</button>';
 }
-document.addEventListener('click',e=>{const b=e.target.closest('[data-tid]');if(b&&!b.closest('#tSheet')){const id=b.dataset.tid;if(b.closest('#upList')){show('wallet');wallet('pay')}tDetail(id);return}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tid]');if(b&&!b.closest('#tSheet')){const id=b.dataset.tid;if(b.closest('#upList'))show('bills');tDetail(id);return}
   if(e.target.closest('[data-tnew]'))tEdit(null)});
 
 /* sheet navigation: detail → period / edit */
@@ -1422,7 +1500,7 @@ function defDate(){const d=new Date();let y=d.getFullYear(),m=d.getMonth();const
 const sortedLog=()=>s.log.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
 function renderLog(){
   const L=sortedLog(),last=L[0],saved=s.log.reduce((a,p)=>a+(lTot(p).by['Savings']||0),0);
-  $('logSub').textContent=L.length?L.length+' payday'+(L.length===1?'':'s')+' recorded':'Record each payday: what came in and where it went.';
+  /* history pane has no subtitle of its own */
   $('logSum').innerHTML=`<div><span>Saved, all paydays</span><b>${peso(Math.round(saved))}</b></div><div><span>Last payday</span><b>${last?dShort(T.parse(last.date)||new Date()):'—'}</b></div><div class="${last&&lTot(last).left<0?'bad':''}"><span>Left last time</span><b>${last?peso(Math.round(lTot(last).left)):'—'}</b></div>`;
   $('logSum').hidden=!L.length;
   $('logList').innerHTML=L.length?L.map(p=>{const t=lTot(p),sv=t.by['Savings']||0;
@@ -1490,6 +1568,62 @@ $('lBody').addEventListener('click',e=>{if(!lv)return;const p=lget(lv.id);if(!p)
   const ls=e.target.closest('[data-ls]');if(ls){x.acct=ls.dataset.ls;$('lAc').value=x.acct;$('lSubs').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===ls));save();return}
   if(e.target.closest('#lDelE')){const go=()=>{p.items.splice(lv.i,1);save();lDetail(p.id)};if(lv.isNew)go();else ask('Delete this entry?').then(ok=>{if(ok)go()})}});
 
+/* ========== PAYDAY: checklist / plan / history ========== */
+let pyCur='check';
+function pyPane(v){pyCur=v;$('pdSeg').hidden=v!=='plan';segSet($('pyTop'),'y',v);document.querySelectorAll('[data-yp]').forEach(x=>x.hidden=x.dataset.yp!==v);if(v==='check')renderCheck();if(v==='hist')renderLog()}
+$('pyTop').addEventListener('click',e=>{const b=e.target.closest('button[data-y]');if(b)pyPane(b.dataset.y)});
+/* the payday being worked on: the latest 15th / end-of-month on or before today */
+/* within 6 days after a payday, work on that one; otherwise get ready for the next one */
+const curPd=()=>{const last=defDate(),since=Math.round((new Date(new Date().toDateString())-T.parse(last))/864e5);return since<=6?last:iso(paydaysFrom(new Date(Date.now()+864e5),1)[0])};
+const pdFuture=()=>T.parse(curPd())>new Date(new Date().toDateString());
+function pdRec(create){const d=curPd();let p=s.log.find(x=>x.date===d);if(!p&&create){p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:d,net:num(s.net),items:[]};s.log.push(p)}return p}
+function ckPlan(){const d=T.parse(curPd()),which=d&&d.getDate()===15?'15th':'30th',r=calc(which),L=[];
+  s.loans.forEach((l,i)=>{if(r.loans[i]>0)L.push({key:'l'+i,t:'Loan & Coop',n:l.n||'Debt',a:r2(r.loans[i]),dl:i})});
+  if(r.sched>0)L.push({key:'sv',t:'Savings',n:'Scheduled savings',a:r2(r.sched)});
+  r.parts.forEach((v,i)=>{if(v>0)L.push({key:'g'+i,t:'Savings',n:'Save to '+splitName(i),a:r2(v)})});
+  s.bills.forEach((b,i)=>{if(r.bills[i]>0)L.push({key:'b'+i,t:'Living cost',n:b.n||'Bill',a:r2(r.bills[i])})});
+  return {which,L}}
+function renderCheck(){const box=$('ckBody');if(!box)return;const p=pdRec(false),{which,L}=ckPlan(),d=T.parse(curPd());
+  const done=k=>p&&p.items.find(x=>x.key===k),n=L.filter(x=>done(x.key)).length,pr=L.length?n/L.length:0;
+  const extras=p?p.items.filter(x=>!x.key):[],net=p?num(p.net):num(s.net),t=p?lTot(p):{inc:net,out:0,left:net,by:{}};
+  const next=paydaysFrom(new Date(Date.now()+864e5),1)[0],dn=Math.round((next-new Date(new Date().toDateString()))/864e5);
+  const all=L.length&&n===L.length;
+  $('pySub').textContent=dLong(d)+' · '+which+' cutoff';
+  const row=x=>{const dd=done(x.key);return `<button class="ckr${dd?' done':''}" type="button" data-ck="${x.key}"><i class="ckb" aria-hidden="true">${ICONS.ok}</i><span><b>${escapeHTML(x.n)}</b><small>${escapeHTML(x.t)}${dd&&dd.acct?' · '+escapeHTML(dd.acct):''}</small></span><em>${peso2(dd?dd.a:x.a)}</em></button>`};
+  const grp=(title,keys)=>{const R=L.filter(x=>keys.includes(x.t));return R.length?`<p class="cap">${title}</p><div class="list ckl">${R.map(row).join('')}</div>`:''};
+  box.innerHTML=`<div class="ck-hero${all?' win':''}">
+      <div class="ck-top"><div><small>${all?'Payday complete':pdFuture()?'Upcoming payday · get ready':'Payday checklist'}</small><b>${all?'All done 🎉':n+' of '+L.length+' done'}</b></div>
+      <div class="ck-ring"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="18"/><circle cx="22" cy="22" r="18" stroke-dasharray="${2*Math.PI*18}" stroke-dashoffset="${2*Math.PI*18*(1-pr)}"/></svg><span>${Math.round(pr*100)}%</span></div></div>
+      <label class="fld"><span>Net pay received</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" id="ckNet" value="${net||''}" placeholder="0.00"></div></label>
+      <div class="ck-m"><div><span>Moved / spent</span><b id="ckOut">${peso2(t.out)}</b></div><div><span>Left in pay account</span><b id="ckLeft" class="${t.left<0?'neg':''}">${peso2(t.left)}</b></div></div>
+    </div>
+    ${L.length?'<p class="note" style="margin:10px 4px 0">Tap an item once it\'s done. To change an amount, open the payday in History.</p>':'<div class="empty" style="margin-top:12px">Nothing planned yet.<br>Add your pay, bills and savings in the Plan tab, then come back here on payday.<br><button class="pill" type="button" data-y-go="plan">Open Plan</button></div>'}
+    ${grp('Debts & contributions',['Loan & Coop'])}${grp('Savings',['Savings'])}${grp('Bills & living costs',['Living cost'])}
+    ${extras.length?`<p class="cap">Also this payday</p><div class="list ckl">${extras.map(x=>`<div class="ckr done extra"><i class="ckb" aria-hidden="true">${ICONS.ok}</i><span><b>${escapeHTML(x.n||x.t)}</b><small>${escapeHTML(x.t)}</small></span><em>${x.t==='Income'?'+':''}${peso2(x.a)}</em></div>`).join('')}</div>`:''}
+    <button class="it add solo" type="button" id="ckAdd">+ Add something else</button>
+    ${all?`<div class="ck-done"><b>Nice work!</b><span>You saved ${peso2(t.by['Savings']||0)}${t.inc?' · '+Math.round((t.by['Savings']||0)/t.inc*100)+'% of your pay':''}.</span><button class="pill" type="button" data-go="wallet">Update balances</button></div>`:''}
+    <p class="note" style="text-align:center;margin-top:14px">Next payday: ${dLong(next)} · ${dn<=1?'tomorrow':'in '+dn+' days'}</p>`;
+}
+$('pdCard').addEventListener('click',()=>{const to=$('pdCard').dataset.to||'check';show('payday');pyPane(to)});
+$('ckBody').addEventListener('click',e=>{
+  const yg=e.target.closest('[data-y-go]');if(yg){pyPane(yg.dataset.yGo);return}
+  if(e.target.closest('#ckAdd')){const p=pdRec(true);p.items.push({t:'Living cost',n:'',acct:'',a:0,note:''});save();lEntry(p.id,p.items.length-1,true);return}
+  const b=e.target.closest('[data-ck]');if(!b)return;const k=b.dataset.ck,{L}=ckPlan(),x=L.find(y=>y.key===k);if(!x)return;
+  const p=pdRec(true),ix=p.items.findIndex(y=>y.key===k);
+  if(ix>=0){const it=p.items[ix];p.items.splice(ix,1);if(it.dl!=null&&s.loans[it.dl]){s.loans[it.dl].paid=Math.max(0,num(s.loans[it.dl].paid)-1)}}
+  else{p.items.push({key:k,t:x.t,n:x.n,a:x.a,acct:'',note:'',...(x.dl!=null?{dl:x.dl}:{})});
+    if(x.dl!=null&&s.loans[x.dl]){const l=s.loans[x.dl];l.paid=num(l.paid)+1;if(num(l.total))l.paid=Math.min(l.paid,num(l.total))}
+    if(navigator.vibrate)try{navigator.vibrate(8)}catch(_){}}
+  if(!p.items.length&&!num(p.net))s.log=s.log.filter(y=>y!==p);
+  save();renderCheck();
+  const {L:L2}=ckPlan(),p2=pdRec(false);if(p2&&L2.length&&L2.every(y=>p2.items.find(z=>z.key===y.key)))toast('Payday complete! 🎉')});
+$('ckBody').addEventListener('input',e=>{if(e.target.id!=='ckNet')return;const p=pdRec(true);p.net=num(e.target.value);save();const t=lTot(p);$('ckOut').textContent=peso2(t.out);const l=$('ckLeft');l.textContent=peso2(t.left);l.className=t.left<0?'neg':''});
+/* Debts page */
+function renderBills(){const r=calc(s.payday);debtRows(r);$('debtSum').textContent=r.loan?peso2(r.loan)+' this cutoff':'';
+  $('loanNote').textContent=s.loans.length?'Checking a debt off in the payday checklist counts the payment automatically.':'Add loans and coop deductions that come out of each payday.';
+  renderTrackers();let left=0;s.loans.forEach(l=>{const i=debtInfo(l);if(i)left+=i.amt});
+  $('billsSub').textContent=s.loans.length||ts.trackers.length?(left?peso(Math.round(left))+' left to pay':'All paid up')+' · '+(s.loans.length+ts.trackers.length)+' item'+(s.loans.length+ts.trackers.length===1?'':'s'):'Loans, installments and contributions.'}
+
 /* ========== ME (profile sheet from the logo) ========== */
 const pdEnd=(y,m)=>Math.min(30,new Date(y,m+1,0).getDate());
 function paydaysFrom(start,count){const out=[];let y=start.getFullYear(),m=start.getMonth();const t0=new Date(start.getFullYear(),start.getMonth(),start.getDate()).getTime();
@@ -1523,7 +1657,7 @@ function renderMe(){const m=meData(),hr=new Date().getHours(),greet=hr<12?'Good 
   <div class="me-badges">${badges.map(([t,ok])=>`<span class="${ok?'ok':''}">${ok?'★':'☆'} ${t}</span>`).join('')}</div>
   <p class="cap">Quick actions</p>
   <div class="me-acts">
-    <button type="button" data-me="log"><i>${ICONS.logi}</i>Log payday</button>
+    <button type="button" data-me="log"><i>${ICONS.logi}</i>Payday checklist</button>
     <button type="button" data-me="acct"><i>${ICONS.bank}</i>Add account</button>
     <button type="button" data-me="hide"><i>${ICONS[hidden?'eye':'eyeoff']||ICONS.eyeoff}</i>${hidden?'Show balance':'Hide balance'}</button>
     <button type="button" data-me="plan"><i>${ICONS.pie||ICONS.target}</i>Payday plan</button>
@@ -1536,7 +1670,7 @@ $('meBody').addEventListener('click',e=>{const b=e.target.closest('[data-me]');i
   if(k==='hide'){toggleHide();renderMe();return}
   if(k==='export'){$('bdExport').click();return}
   closeSheet(true);
-  if(k==='log'){show('log');setTimeout(logNew,60)}else if(k==='acct'){show('wallet');wallet('accts');setTimeout(addAcct,60)}else if(k==='settings')show('settings');else if(k==='plan')show('plan')});
+  if(k==='log'){show('payday');pyPane('check')}else if(k==='acct'){show('wallet');wallet('accts');setTimeout(addAcct,60)}else if(k==='settings')show('settings');else if(k==='plan')show('plan')});
 
 /* ========== SETTINGS ========== */
 /* one backup file for everything; older budget-only or trackers-only files still import */
@@ -1558,10 +1692,17 @@ $('bdReset').addEventListener('click',()=>{ask('Erase all data?','Plan, debts, g
 
 /* ========== RENDER ========== */
 function render(){setTimeout(()=>addPasteBtns(),0);const p=(document.querySelector('.pg.on')||{dataset:{}}).dataset.pg;
-  if(p==='home')renderHome();else if(p==='plan'){fillInputs();renderPlan()}else if(p==='wallet'){renderWallet();renderTrackers()}else if(p==='log')renderLog();else setEye()}
-fillInputs();splitRows();planTab('pay');
+  if(p==='home')renderHome();else if(p==='payday'){fillInputs();renderPlan();renderLog();renderCheck()}else if(p==='wallet')renderWallet();else if(p==='bills')renderBills();else setEye()}
+fillInputs();splitRows();planTab('pay');pyPane('check');
 setTimeout(()=>fxUpdate(),1500);
-(function(){let w='accts';try{w=localStorage.getItem('dc_bud_w')||'accts'}catch(e){}wallet(w);show('home')})();
+/* tab bar shrinks while scrolling down and grows back when scrolling up (like Instagram) */
+(function(){let last=0,ticking=false;const tb=$('tabbar');
+  /* the page may scroll on window or on <body>; sheets scroll too, so ignore scrolling inside them */
+  document.addEventListener('scroll',e=>{const t=e.target;if(t&&t.closest&&t.closest('.sheet'))return;if(ticking)return;ticking=true;requestAnimationFrame(()=>{const y=Math.max(scrollY,document.body.scrollTop,document.documentElement.scrollTop),d=y-last;
+    if(y<40||d<-6)tb.classList.remove('mini');else if(d>6)tb.classList.add('mini');
+    if(Math.abs(d)>6)last=y;ticking=false})},{passive:true,capture:true});
+  document.addEventListener('click',e=>{if(e.target.closest('[data-tab]'))tb.classList.remove('mini')},true)})();
+show('home');
 
 /* ========== BOOT: logo and loading bar, then straight into the app ========== */
 (function(){
