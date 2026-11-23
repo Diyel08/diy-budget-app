@@ -738,6 +738,11 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
 .swp-act svg{width:22px;height:22px;flex:none;transition:transform .2s}
 .swp-act.full{justify-content:flex-start;padding-left:22px}
 .list .swp+.it,.list .swp+.swp{border-top:1px solid var(--line)}
+/* long-press drag */
+[data-ea],[data-eg],[data-eb],[data-ed],[data-tid],[data-li]{-webkit-touch-callout:none}
+.lifted{position:relative;z-index:5;border-radius:16px;box-shadow:0 18px 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08);background:var(--card3)!important;transition:box-shadow .2s}
+body.dragging{overflow:hidden;touch-action:none}
+body.dragging .list{overflow:visible}
 
 </style>
 </head>
@@ -1848,7 +1853,7 @@ function swipeReset(){if(!swOpen)return;const {row,wrap}=swOpen;row.style.transi
 document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const row=e.target.closest(SWIPE_SEL);
   if(swOpen&&!e.target.closest('.swp')){swipeReset();swEat=true;return}
   if(!row||e.target.closest('.swp-act'))return;if(swOpen&&swOpen.row!==row)swipeReset();sw={row,x:e.clientX,y:e.clientY,dx:0,on:false,id:e.pointerId}},true);
-document.addEventListener('pointermove',e=>{if(!sw||e.pointerId!==sw.id)return;const dx=e.clientX-sw.x,dy=e.clientY-sw.y;
+document.addEventListener('pointermove',e=>{if(!sw||e.pointerId!==sw.id||(dg&&dg.on))return;const dx=e.clientX-sw.x,dy=e.clientY-sw.y;
   if(!sw.on){if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){sw=null;return}if(dx<-10&&Math.abs(dx)>Math.abs(dy)){sw.on=true;
       let wrap=sw.row.parentNode.classList.contains('swp')?sw.row.parentNode:null;
       if(!wrap){wrap=document.createElement('div');wrap.className='swp';sw.row.parentNode.insertBefore(wrap,sw.row);wrap.appendChild(sw.row);const a=document.createElement('button');a.type='button';a.className='swp-act';a.setAttribute('aria-label','Delete');a.innerHTML=ICONS.trash||'🗑';wrap.appendChild(a)}
@@ -1863,6 +1868,43 @@ function swEnd(){if(!sw)return;const s2=sw;sw=null;if(!s2.on)return;swEat=true;c
 document.addEventListener('pointerup',swEnd,true);document.addEventListener('pointercancel',swEnd,true);
 document.addEventListener('click',e=>{const a=e.target.closest('.swp-act');if(a){e.preventDefault();e.stopPropagation();const r=a.parentNode.querySelector(SWIPE_SEL);swOpen=null;a.parentNode.parentNode.insertBefore(r,a.parentNode);a.parentNode.remove();r.style.transform='';swipeDelete(r);return}
   if(swEat){swEat=false;e.preventDefault();e.stopPropagation()}},true);
+
+/* ========== LONG-PRESS TO REARRANGE: hold a row, then drag it up or down ========== */
+function remapIdx(prefix,map){s.log.forEach(p=>p.items.forEach(x=>{if(x.key&&x.key[0]===prefix&&/^\w\d+$/.test(x.key)){const o=+x.key.slice(1);if(map[o]!=null)x.key=prefix+map[o]}
+  if(prefix==='l'&&x.dl!=null&&map[x.dl]!=null)x.dl=map[x.dl]}))}
+const DRAG={
+  '[data-ea]':{arr:()=>s.bank,done:()=>changed()},
+  '[data-eg]':{arr:()=>s.accts,done:()=>{splitRows();changed()}},
+  '[data-eb]':{arr:()=>s.bills,remap:'b',done:()=>changed()},
+  '[data-ed]':{arr:()=>s.loans,remap:'l',done:()=>changed()},
+  '[data-tid]':{arr:()=>ts.trackers,done:()=>tsave()},
+  '[data-li]':{arr:()=>{const p=lv&&lget(lv.id);return p?p.items:null},done:()=>{save();lv&&lDetail(lv.id)}}};
+let dg=null,dgTimer=null;
+function dgSel(row){return Object.keys(DRAG).find(k=>row.matches(k))}
+document.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const row=e.target.closest(Object.keys(DRAG).join(','));if(!row||row.closest('.swp'))return;
+  const k=dgSel(row),list=row.parentNode,rows=[...list.children].filter(r=>r.matches(k));if(rows.length<2)return;
+  const t=e.touches[0];dg={row,k,list,rows,y0:t.clientY,x0:t.clientX,on:false};
+  clearTimeout(dgTimer);dgTimer=setTimeout(()=>{if(!dg||sw&&sw.on)return;dg.on=true;swEat=true;sw=null;
+    dg.from=dg.rows.indexOf(row);dg.to=dg.from;dg.tops=dg.rows.map(r=>r.getBoundingClientRect().top);dg.hs=dg.rows.map(r=>r.getBoundingClientRect().height);
+    document.body.classList.add('dragging');row.classList.add('lifted');dg.rows.forEach(r=>{if(r!==row)r.style.transition='transform .22s cubic-bezier(.2,.8,.2,1)'});
+    if(navigator.vibrate)try{navigator.vibrate(12)}catch(_){}},420)},{passive:true});
+document.addEventListener('touchmove',e=>{if(!dg)return;const t=e.touches[0];
+  if(!dg.on){if(Math.hypot(t.clientX-dg.x0,t.clientY-dg.y0)>8){clearTimeout(dgTimer);dg=null}return}
+  e.preventDefault();const dy=t.clientY-dg.y0;dg.row.style.transform=`translateY(${dy}px) scale(1.03)`;
+  const mid=dg.tops[dg.from]+dg.hs[dg.from]/2+dy;let to=dg.from;
+  dg.rows.forEach((r,i)=>{const c=dg.tops[i]+dg.hs[i]/2;if(i<dg.from&&mid<c)to=Math.min(to,i);if(i>dg.from&&mid>c)to=Math.max(to,i)});
+  if(to!==dg.to){dg.to=to;if(navigator.vibrate)try{navigator.vibrate(5)}catch(_){}
+    const H=dg.hs[dg.from];dg.rows.forEach((r,i)=>{if(r===dg.row)return;let y=0;if(dg.from<to&&i>dg.from&&i<=to)y=-H;if(dg.from>to&&i<dg.from&&i>=to)y=H;r.style.transform=y?`translateY(${y}px)`:''})}},{passive:false});
+function dgEnd(){clearTimeout(dgTimer);if(!dg)return;const d=dg;dg=null;if(!d.on)return;document.body.classList.remove('dragging');setTimeout(()=>{swEat=false},400);
+  const H=d.hs[d.from],target=d.tops[d.to]-d.tops[d.from]+(d.to>d.from?d.hs[d.to]-H:0);
+  d.row.style.transition='transform .22s cubic-bezier(.2,.8,.2,1)';d.row.style.transform=`translateY(${target}px)`;
+  setTimeout(()=>{d.row.classList.remove('lifted');d.rows.forEach(r=>{r.style.transition='';r.style.transform=''});
+    if(d.to===d.from)return;const conf=DRAG[d.k],arr=conf.arr();if(!arr)return;
+    const idx=arr.map((_,i)=>i),[m]=idx.splice(d.from,1);idx.splice(d.to,0,m);const [item]=arr.splice(d.from,1);arr.splice(d.to,0,item);
+    if(conf.remap){const map={};idx.forEach((old,nw)=>map[old]=nw);remapIdx(conf.remap,map)}
+    conf.done();toast('Order saved')},230)}
+document.addEventListener('touchend',dgEnd,{passive:true});document.addEventListener('touchcancel',dgEnd,{passive:true});
+document.addEventListener('contextmenu',e=>{if(e.target.closest(Object.keys(DRAG).join(',')))e.preventDefault()});
 /* ========== SETTINGS ========== */
 function renderSettings(){const lb=store('dc_bud_lastbk',null),days=lb?Math.floor((Date.now()-new Date(lb))/864e5):null;
   const el=$('bkLast');if(el){el.textContent=lb?'Last backup: '+dShort(new Date(lb))+(days>=14?' · it has been '+days+' days, export a new one':''):'No backup yet. Export one so you never lose your data.';el.className='bk-last'+(!lb||days>=14?' warn':'')}
