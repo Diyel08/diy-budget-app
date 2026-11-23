@@ -722,6 +722,14 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
 .hrow .why.add{color:var(--blue);opacity:.8}
 .hrow .hwhy{display:block;width:100%;margin-top:8px;height:38px;padding:0 12px;border-radius:10px;background:var(--card3);color:#fff;font:400 16px var(--sf);border:1px solid rgba(91,140,255,.45)}
 .hrow.open{align-items:flex-start}
+/* money flow bits */
+.paypick{margin-top:12px;padding:12px 14px;border-radius:16px;background:var(--card);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.paypick>span{font-size:14px;color:var(--sub)}.paypick b{color:#fff;font-weight:600}
+.paypick.need{border:1px solid rgba(255,204,0,.35);background:rgba(255,204,0,.06)}
+.paypick .chips{flex-basis:100%;margin-top:4px}
+.flowtip{margin-top:12px;padding:12px 14px;border-radius:16px;background:var(--card);font-size:14px;color:var(--sub)}
+.ckr small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#aMvTo{margin-top:6px}
 
 </style>
 </head>
@@ -1000,7 +1008,7 @@ document.addEventListener('dragstart',e=>e.preventDefault());
 const KEY='dc_budget_plan_v2';
 const WHEN=['Daily','Every payday','Split','15th only','30th only'];
 const WHEN_HINT={'Daily':'Amount per work day','Every payday':'Full amount each cutoff','Split':'Monthly amount, half each cutoff','15th only':'Only on the 15th cutoff','30th only':'Only on the 30th cutoff'};
-const blank=()=>({payday:new Date().getDate()<=15?'15th':'30th',net:0,days:0,bills:[],loans:[],sched:0,cushion:0,pct:[50,30,20],accts:[],bank:[],usd:0,balAt:'',log:[]});
+const blank=()=>({payday:new Date().getDate()<=15?'15th':'30th',net:0,days:0,bills:[],loans:[],sched:0,cushion:0,pct:[50,30,20],accts:[],bank:[],usd:0,balAt:'',log:[],payAcct:null});
 const DWHEN=['Every payday','15th only','30th only','Split'];
 const LTYPES=[['Savings','var(--green)'],['Loan & Coop','var(--yellow)'],['Living cost','var(--pink)'],['Income','#5ac8fa'],['Other','var(--white)']];
 const LTC=Object.fromEntries(LTYPES);
@@ -1279,6 +1287,7 @@ function editGoal(i,isNew){
     <label class="fld"><span>Goal</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" min="0" step="0.01" data-eg-f="g" value="${a.g||''}" placeholder="0"></div></label></div>
     <p class="cap">Gets from the extra each payday</p><div class="chips" id="kChips">${[0,1,2].map(k=>`<button type="button" data-kk="${k}" class="${a.k===k?'on':''}">Split ${k+1} · ${num(s.pct[k])}%</button>`).join('')}<button type="button" data-kk="-1" class="${a.k<0||a.k>2?'on':''}">None</button></div>
     <p class="note">Change the percentages in Plan › Split.</p>
+    ${s.bank.length?`<p class="cap">Kept in (where payday savings for this goal go)</p><div class="chips sm" id="gAcct"><button type="button" data-ga="" class="${a.acct?'':'on'}">Auto</button>${s.bank.flatMap(b=>hasSubs(b)?b.subs.map(u=>`<button type="button" data-ga="${escapeHTML(b.n)}" data-gs="${escapeHTML(u.n||'')}" class="${a.acct===b.n&&a.sub===u.n?'on':''}">${escapeHTML(refLabel(refOf(b.n,u.n)))}</button>`):[`<button type="button" data-ga="${escapeHTML(b.n)}" class="${a.acct===b.n?'on':''}">${escapeHTML(refLabel(refOf(b.n,null)))}</button>`]).join('')}</div>`:''}
     <button class="del" type="button" id="edDel">${isNew?'Cancel':'Delete goal'}</button>`;
   openSheet('editSheet');
 }
@@ -1330,6 +1339,7 @@ function editAcct(i,isNew,histAll){
     ${subs?`<div class="chips sm" id="aMvSub">${a.subs.map((u,j)=>`<button type="button" data-msub="${j}" class="${ed.msub===j?'on':''}">${escapeHTML(u.n||'Sub '+(j+1))}</button>`).join('')}</div>`:''}
     <div class="g2"><label class="fld"><span>Amount</span><div class="in"><i class="aSym">${sy}</i><input type="text" inputmode="decimal" autocomplete="off" id="aMv" placeholder="0.00"></div></label>
     <label class="fld"><span>Date</span><div class="in"><input type="date" id="aMvD" value="${ed.mvd||iso(new Date())}"></div></label></div>
+    <p class="cap" style="margin-top:10px">If withdrawing, move it to (optional)</p><div class="chips sm" id="aMvTo"><button type="button" data-mto="" class="on">Spent / cash</button>${s.bank.flatMap((b,bi)=>bi===i?[]:hasSubs(b)?b.subs.map(u=>`<button type="button" data-mto="${escapeHTML(b.n)}" data-msu="${escapeHTML(u.n||'')}">${escapeHTML(refLabel(refOf(b.n,u.n)))}</button>`):[`<button type="button" data-mto="${escapeHTML(b.n)}">${escapeHTML(refLabel(refOf(b.n,null)))}</button>`]).join('')}</div>
     <label class="fld" style="margin-top:10px"><span>What for (optional)</span><div class="in"><input id="aMvWhy" placeholder="e.g. Groceries, rent, sent to Maya" autocomplete="off" enterkeyhint="done"></div></label>
     <div class="g2" style="margin-top:10px"><button class="btn ghost" type="button" id="aWd">− Withdraw</button><button class="btn" type="button" id="aDep">+ Deposit</button></div>
     <p class="note">Adds to or takes from the balance and saves it in the history below.</p>
@@ -1359,17 +1369,22 @@ $('editBody').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classL
   if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();const ins=[...$('editBody').querySelectorAll('input')],i=ins.indexOf(e.target);if(ins[i+1])ins[i+1].focus();else e.target.blur()}});
 $('editBody').addEventListener('click',e=>{if(!ed)return;const w=e.target.closest('[data-when]'),k=e.target.closest('[data-kk]');
   const dw=e.target.closest('[data-dw]'),cur=e.target.closest('[data-cur]');
+  const ga=e.target.closest('[data-ga]');if(ga&&ed.type==='goal'){const g=s.accts[ed.i];g.acct=ga.dataset.ga||null;g.sub=ga.dataset.gs||null;$('gAcct').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===ga));changed();return}
   if(dw){s.loans[ed.i].w=dw.dataset.dw;$('dWhen').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===dw));updDebtSheet();changed()}
   else if(cur){s.bank[ed.i].cur=cur.dataset.cur;$('aCur').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===cur));if(cur.dataset.cur==='USD'&&s.usdAuto!==false&&!num(s.usd))setTimeout(()=>fxUpdate(true),0);$('editBody').querySelectorAll('.aSym').forEach(x=>x.textContent=cur.dataset.cur==='USD'?'$':'₱');const t=$('aTot');if(t)t.textContent=money(s.bank[ed.i],acctBal(s.bank[ed.i]));changed()}
   else if(e.target.closest('[data-msub]')){ed.msub=+e.target.closest('[data-msub]').dataset.msub;$('aMvSub').querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.msub===ed.msub))}
   else if(e.target.closest('#aDep')||e.target.closest('#aWd')){const a=s.bank[ed.i],v=num($('aMv').value),d=$('aMvD').value||iso(new Date()),dep=!!e.target.closest('#aDep');
     if(!(v>0)){toast('Enter the amount first');return}if(!T.parse(d)){toast('Pick a date');return}ed.mvd=d;
-    if(!(a.hist||[]).length)recBal(a,'Starting balance',d);
-    const amt=dep?v:-v,sub=hasSubs(a)?a.subs[ed.msub]:null;if(sub)sub.bal=r2(num(sub.bal)+amt);else a.bal=r2(num(a.bal)+amt);
-    recBal(a,(dep?'Deposit':'Withdrawal')+(sub?' · '+(sub.n||'Sub '+(ed.msub+1)):''),d,amt);{const w=($('aMvWhy')||{}).value||'';const last=a.hist[a.hist.length-1];if(w.trim()&&last)last.why=w.trim()}s.balAt=iso(new Date());changed();reAcct();toast((dep?'Deposited ':'Withdrew ')+money(a,v)+' · now '+money(a,acctBal(a)))}
+    const me={i:ed.i,sj:hasSubs(a)?ed.msub:null},why=(($('aMvWhy')||{}).value||'').trim(),to=!dep&&ed.mvTo?refOf(ed.mvTo.a,ed.mvTo.sub):null;
+    if(dep)moveMoney({to:me,amt:v,d,why,t:'Income',noLog:true});
+    else moveMoney({from:me,to,amt:v,d,why:why||(to?'Moved to '+refLabel(to):'Withdrawal'),t:to?'Savings':'Living cost'});
+    ed.mvTo=null;changed();reAcct();toast(dep?'Deposited '+money(a,v)+' · now '+money(a,acctBal(a)):to?'Moved '+money(a,v)+' to '+refLabel(to)+' · logged in Payday':'Withdrew '+money(a,v)+' · logged in Payday')}
+  else if(e.target.closest('[data-mto]')){const b2=e.target.closest('[data-mto]'),v2=b2.dataset.mto;ed.mvTo=v2?{a:v2,sub:b2.dataset.msu||null}:null;$('aMvTo').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b2))}
   else if(e.target.closest('#aHistAll'))reAcct(true)
   else if(e.target.closest('[data-hrow]')&&!e.target.closest('[data-hx]')&&!e.target.closest('.hwhy')){const k=+e.target.closest('[data-hrow]').dataset.hrow;ed.hedit=ed.hedit===k?null:k;const hb=$('aHist');hb.innerHTML=histRows(s.bank[ed.i],true);const inp=hb.querySelector('.hwhy');if(inp)inp.focus()}
-  else if(e.target.closest('[data-hx]')){const a=s.bank[ed.i],k=+e.target.closest('[data-hx]').dataset.hx;ask('Remove this history line?','Your current balance stays the same.','Remove').then(ok=>{if(!ok)return;a.hist.splice(k,1);save();reAcct()})}
+  else if(e.target.closest('[data-hx]')){const a=s.bank[ed.i],k=+e.target.closest('[data-hx]').dataset.hx,ln=a.hist[k];
+    if(ln&&ln.mv)ask('Undo this?','The balance goes back, and any linked account and payday entry are undone too.','Undo').then(ok=>{if(!ok)return;undoMove(ln.mv);changed();reAcct();toast('Undone')});
+    else ask('Remove this history line?','Your current balance stays the same.','Remove').then(ok=>{if(!ok)return;a.hist.splice(k,1);save();reAcct()})}
   else if(e.target.closest('#aSubAdd')){const a=s.bank[ed.i];if(!hasSubs(a)){a.subs=[];a.subs.push({n:'',bal:num(a.bal)})}else a.subs.push({n:'',bal:0});a.bal=0;changed();reAcct()}
   else if(e.target.closest('[data-sub-x]')){const a=s.bank[ed.i],j=+e.target.closest('[data-sub-x]').dataset.subX,u=a.subs[j];
     const go=()=>{a.subs.splice(j,1);if(!a.subs.length){delete a.subs}changed();reAcct()};
@@ -1629,7 +1644,7 @@ $('lAct').addEventListener('click',()=>{if(!lv)return;if(lv.v==='entry'){lCleanE
 $('lBack').addEventListener('click',()=>{if(!lv)return;if(lv.v==='entry'){lCleanEntry();lDetail(lv.id)}else closeSheet()});
 $('lBody').addEventListener('input',e=>{if(!lv)return;const p=lget(lv.id);if(!p)return;const el=e.target;
   if(lv.v==='detail'){if(el.id==='lDate'){p.date=el.value;save()}else if(el.id==='lNet'){p.net=num(el.value);save();lTiles(p)}return}
-  const x=p.items[lv.i];if(!x)return;if(el.id==='lN')x.n=el.value;else if(el.id==='lA')x.a=num(el.value);else if(el.id==='lNote')x.note=el.value;
+  const x=p.items[lv.i];if(!x)return;if(el.id==='lN')x.n=el.value;else if(el.id==='lA'){x.a=num(el.value);if(x.mv)setMoveAmt(x.mv,x.a)}else if(el.id==='lNote')x.note=el.value;
   else if(el.id==='lAc'){x.acct=el.value;const c=$('lAccts');c&&c.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.la===el.value))}save()});
 $('lBody').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();const ins=[...$('lBody').querySelectorAll('input')],i=ins.indexOf(e.target);if(ins[i+1]&&lv&&lv.v==='entry')ins[i+1].focus();else e.target.blur()}});
 $('lBody').addEventListener('click',e=>{if(!lv)return;const p=lget(lv.id);if(!p)return;
@@ -1647,7 +1662,41 @@ $('lBody').addEventListener('click',e=>{if(!lv)return;const p=lget(lv.id);if(!p)
   const lt=e.target.closest('[data-lt]');if(lt){x.t=lt.dataset.lt;save();const y=$('lN').value,a=$('lA').value,ac=$('lAc').value;lEntry(p.id,lv.i,lv.isNew);return}
   const la=e.target.closest('[data-la]');if(la){x.acct=la.dataset.la;$('lAc').value=x.acct;$('lAccts').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===la));$('lSubs').innerHTML=lv.subChips();save();return}
   const ls=e.target.closest('[data-ls]');if(ls){x.acct=ls.dataset.ls;$('lAc').value=x.acct;$('lSubs').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===ls));save();return}
-  if(e.target.closest('#lDelE')){const go=()=>{p.items.splice(lv.i,1);save();lDetail(p.id)};if(lv.isNew)go();else ask('Delete this entry?').then(ok=>{if(ok)go()})}});
+  if(e.target.closest('#lDelE')){const it=p.items[lv.i],go=()=>{if(it&&it.mv)undoMove(it.mv);else p.items.splice(lv.i,1);if(it&&it.dl!=null&&s.loans[it.dl])s.loans[it.dl].paid=Math.max(0,num(s.loans[it.dl].paid)-1);save();lDetail(p.id)};
+    if(lv.isNew)go();else ask('Delete this entry?',it&&it.mv?'The account balances it changed will go back too.':'').then(ok=>{if(ok)go()})}});
+
+/* ========== MONEY FLOW: one action updates balances, history and the payday log together ========== */
+const accIx=n=>s.bank.findIndex(a=>a.n===n);
+function refOf(name,sub){const i=accIx(name);if(i<0)return null;const a=s.bank[i];let sj=null;if(hasSubs(a)){sj=a.subs.findIndex(u=>u.n===sub);if(sj<0)sj=0}return {i,sj}}
+function refLabel(r){if(!r||!s.bank[r.i])return '';const a=s.bank[r.i],u=r.sj!=null&&hasSubs(a)?a.subs[r.sj]:null;return String(a.n||'Account').replace(/\s*\(.*\)\s*/,'')+(u?' › '+(u.n||'Sub '+(r.sj+1)):'')}
+/* the account your pay lands in: the one you picked, else the one marked Salary/Pay */
+function payRef(){const pa=s.payAcct||{};let r=pa.a?refOf(pa.a,pa.sub):null;if(r)return r;const i=s.bank.findIndex(a=>/salary|pay(roll)?\b|income|sweldo/i.test(a.role||''));return i<0?null:refOf(s.bank[i].n,null)}
+/* where a planned savings item goes: the goal's chosen account, else an account whose name/role matches the goal */
+function destRef(x){if(x.t!=='Savings')return null;let g=null;if(/^g\d+$/.test(x.key)){const k=+x.key.slice(1);g=s.accts.find(a=>a.k===k)||null}
+  if(x.key==='sv'){g=s.accts.find(a=>/emerg/i.test(a.n||''))||s.accts[0]||{n:'emergency'}}
+  if(g&&g.acct){const r=refOf(g.acct,g.sub);if(r)return r}
+  const words=String(g?g.n:x.n).toLowerCase().replace(/save to|savings?|fund|goal/g,' ').split(/\W+/).filter(w=>w.length>2);
+  for(let i=0;i<s.bank.length;i++){const a=s.bank[i],hay=((a.role||'')+' '+(a.n||'')).toLowerCase();if(words.some(w=>hay.includes(w))){let sj=null;if(hasSubs(a)){sj=a.subs.findIndex(u=>words.some(w=>String(u.n||'').toLowerCase().includes(w)));if(sj<0)sj=0}return {i,sj}}
+    if(hasSubs(a)){const sj=a.subs.findIndex(u=>words.some(w=>String(u.n||'').toLowerCase().includes(w)));if(sj>=0)return {i,sj}}}
+  return null}
+function adjBal(r,delta){const a=s.bank[r.i];if(!a)return;if(r.sj!=null&&hasSubs(a)&&a.subs[r.sj])a.subs[r.sj].bal=r2(num(a.subs[r.sj].bal)+delta);else a.bal=r2(num(a.bal)+delta)}
+function lineFor(r,delta,d,note,why,mv){const a=s.bank[r.i];if(!(a.hist||[]).length)recBal(a,'Starting balance',d);adjBal(r,delta);
+  a.hist.push({d,bal:r2(acctBal(a)),note,amt:r2(delta),why:why||'',mv,sj:r.sj})}
+/* the payday a date belongs to: latest 15th / end-of-month on or before it */
+function pdOn(ds){const d=T.parse(ds)||new Date();let y=d.getFullYear(),m=d.getMonth();const e=pdEnd(y,m);if(d.getDate()>=e)return iso(new Date(y,m,e));if(d.getDate()>=15)return iso(new Date(y,m,15));m--;if(m<0){m=11;y--}return iso(new Date(y,m,pdEnd(y,m)))}
+function recFor(pd){let p=s.log.find(x=>x.date===pd);if(!p){p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:pd,net:pd===curPd()?num(s.net):0,items:[]};s.log.push(p)}return p}
+function moveMoney(o){const mv='m'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),d=o.d||iso(new Date()),amt=r2(o.amt);
+  if(o.from)lineFor(o.from,-amt,d,o.to?'Sent to '+refLabel(o.to):(o.t==='Loan & Coop'?'Payment':'Spent'),o.why,mv);
+  if(o.to)lineFor(o.to,amt,d,o.from?'From '+refLabel(o.from):(o.t==='Income'?'Pay received':'Deposit'),o.why,mv);
+  if(o.from||o.to)s.balAt=iso(new Date());
+  if(!o.noLog){const p=o.rec||recFor(pdOn(d));p.items.push({key:o.key,t:o.t,n:o.why||o.t,a:amt,acct:o.to?refLabel(o.to):o.from?refLabel(o.from):'',note:'',mv,...(o.dl!=null?{dl:o.dl}:{})})}
+  return mv}
+function undoMove(mv){if(!mv)return;s.bank.forEach(a=>{const H=a.hist||[];for(let k=H.length-1;k>=0;k--){const e=H[k];if(e.mv!==mv)continue;
+    adjBal({i:s.bank.indexOf(a),sj:e.sj},-num(e.amt));for(let j=k+1;j<H.length;j++)H[j].bal=r2(num(H[j].bal)-num(e.amt));H.splice(k,1)}});
+  s.log.forEach(p=>{p.items=p.items.filter(x=>x.mv!==mv)})}
+/* change the amount of a linked move: balances and later history lines shift by the difference */
+function setMoveAmt(mv,newAmt){s.bank.forEach(a=>{const H=a.hist||[];H.forEach((e,k)=>{if(e.mv!==mv)return;const sign=num(e.amt)<0?-1:1,delta=sign*r2(newAmt)-num(e.amt);if(!delta)return;
+    adjBal({i:s.bank.indexOf(a),sj:e.sj},delta);e.amt=r2(num(e.amt)+delta);for(let j=k;j<H.length;j++)H[j].bal=r2(num(H[j].bal)+delta)})})}
 
 /* ========== PAYDAY: checklist / plan / history ========== */
 let pyCur='check';
@@ -1659,18 +1708,27 @@ const curPd=()=>{const last=defDate(),since=Math.round((new Date(new Date().toDa
 const pdFuture=()=>T.parse(curPd())>new Date(new Date().toDateString());
 function pdRec(create){const d=curPd();let p=s.log.find(x=>x.date===d);if(!p&&create){p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:d,net:num(s.net),items:[]};s.log.push(p)}return p}
 function ckPlan(){const d=T.parse(curPd()),which=d&&d.getDate()===15?'15th':'30th',r=calc(which),L=[];
+  const pr=payRef(),pdx=s.log.find(x=>x.date===curPd()),net=pdx?num(pdx.net):num(s.net);if(pr&&net>0)L.push({key:'pay',t:'Income',n:'Pay received',a:r2(net)});
   s.loans.forEach((l,i)=>{if(r.loans[i]>0)L.push({key:'l'+i,t:'Loan & Coop',n:l.n||'Debt',a:r2(r.loans[i]),dl:i})});
   if(r.sched>0)L.push({key:'sv',t:'Savings',n:'Scheduled savings',a:r2(r.sched)});
   r.parts.forEach((v,i)=>{if(v>0)L.push({key:'g'+i,t:'Savings',n:'Save to '+splitName(i),a:r2(v)})});
   s.bills.forEach((b,i)=>{if(r.bills[i]>0)L.push({key:'b'+i,t:'Living cost',n:b.n||'Bill',a:r2(r.bills[i])})});
   return {which,L}}
+function flowTxt(x){const pr=payRef(),from=pr?refLabel(pr):'',to=destRef(x);
+  if(x.t==='Income')return 'Into '+(from||'your pay account');
+  if(x.t==='Savings')return (from||'Pay')+' → '+(to?refLabel(to):'not linked to an account (only logged)');
+  return 'From '+(from||'pay')+' · '+x.t}
+function payBox(){const pr=payRef(),opts=[];s.bank.forEach(a=>{if(hasSubs(a))a.subs.forEach(u=>opts.push([a.n,u.n]));else opts.push([a.n,null])});
+  if(!s.bank.length)return '<div class="flowtip">Add your accounts in <b>Money</b> so checking items here also updates their balances.</div>';
+  return `<div class="paypick${pr?'':' need'}"><span>${pr?'Pay goes into <b>'+escapeHTML(refLabel(pr))+'</b>':'Which account does your pay go into?'}</span><button type="button" class="lnk" id="payPickT">${pr?'Change':'Choose'}</button>
+    <div class="chips sm" id="payPick" ${pr?'hidden':''}>${opts.map(([n,u])=>{const r=refOf(n,u),on=pr&&r&&r.i===pr.i&&r.sj===pr.sj;return `<button type="button" data-pa="${escapeHTML(n)}" data-pu="${escapeHTML(u||'')}" class="${on?'on':''}">${escapeHTML(refLabel(r))}</button>`}).join('')}</div></div>`}
 function renderCheck(){const box=$('ckBody');if(!box)return;const p=pdRec(false),{which,L}=ckPlan(),d=T.parse(curPd());
-  const done=k=>p&&p.items.find(x=>x.key===k),n=L.filter(x=>done(x.key)).length,pr=L.length?n/L.length:0;
+  const done=k=>p&&(k==='pay'?(p.payMv?{a:num(p.net),acct:refLabel(payRef())}:null):p.items.find(x=>x.key===k)),n=L.filter(x=>done(x.key)).length,pr=L.length?n/L.length:0;
   const extras=p?p.items.filter(x=>!x.key):[],net=p?num(p.net):num(s.net),t=p?lTot(p):{inc:net,out:0,left:net,by:{}};
   const next=paydaysFrom(new Date(Date.now()+864e5),1)[0],dn=Math.round((next-new Date(new Date().toDateString()))/864e5);
   const all=L.length&&n===L.length;
   $('pySub').textContent=dLong(d)+' · '+which+' cutoff';
-  const row=x=>{const dd=done(x.key);return `<button class="ckr${dd?' done':''}" type="button" data-ck="${x.key}"><i class="ckb" aria-hidden="true">${ICONS.ok}</i><span><b>${escapeHTML(x.n)}</b><small>${escapeHTML(x.t)}${dd&&dd.acct?' · '+escapeHTML(dd.acct):''}</small></span><em>${peso2(dd?dd.a:x.a)}</em></button>`};
+  const row=x=>{const dd=done(x.key);return `<button class="ckr${dd?' done':''}" type="button" data-ck="${x.key}"><i class="ckb" aria-hidden="true">${ICONS.ok}</i><span><b>${escapeHTML(x.n)}</b><small>${escapeHTML(flowTxt(x))}</small></span><em>${peso2(dd?dd.a:x.a)}</em></button>`};
   const grp=(title,keys)=>{const R=L.filter(x=>keys.includes(x.t));return R.length?`<p class="cap">${title}</p><div class="list ckl">${R.map(row).join('')}</div>`:''};
   box.innerHTML=`<div class="ck-hero${all?' win':''}">
       <div class="ck-top"><div><small>${all?'Payday complete':pdFuture()?'Upcoming payday · get ready':'Payday checklist'}</small><b>${all?'All done 🎉':n+' of '+L.length+' done'}</b></div>
@@ -1679,8 +1737,8 @@ function renderCheck(){const box=$('ckBody');if(!box)return;const p=pdRec(false)
       <div class="ck-m"><div><span>Moved / spent</span><b id="ckOut">${peso2(t.out)}</b></div><div><span>Left in pay account</span><b id="ckLeft" class="${t.left<0?'neg':''}">${peso2(t.left)}</b></div></div>
     </div>
     ${L.length?'<p class="note" style="margin:10px 4px 0">Tap an item once it\'s done. To change an amount, open the payday in History.</p>':'<div class="empty" style="margin-top:12px">Nothing planned yet.<br>Add your pay, bills and savings in the Plan tab, then come back here on payday.<br><button class="pill" type="button" data-y-go="plan">Open Plan</button></div>'}
-    ${grp('Debts & contributions',['Loan & Coop'])}${grp('Savings',['Savings'])}${grp('Bills & living costs',['Living cost'])}
-    ${extras.length?`<p class="cap">Also this payday</p><div class="list ckl">${extras.map(x=>`<div class="ckr done extra"><i class="ckb" aria-hidden="true">${ICONS.ok}</i><span><b>${escapeHTML(x.n||x.t)}</b><small>${escapeHTML(x.t)}</small></span><em>${x.t==='Income'?'+':''}${peso2(x.a)}</em></div>`).join('')}</div>`:''}
+    ${payBox()}${grp('Pay',['Income'])}${grp('Debts & contributions',['Loan & Coop'])}${grp('Savings',['Savings'])}${grp('Bills & living costs',['Living cost'])}
+    ${extras.length?`<p class="cap">Also this payday · not in your plan</p><div class="list ckl">${extras.map(x=>`<button type="button" class="ckr done extra" data-cx="${p.items.indexOf(x)}"><i class="ckb" aria-hidden="true">${ICONS.ok}</i><span><b>${escapeHTML(x.n||x.t)}</b><small>${escapeHTML(x.t)}${x.acct?' · '+escapeHTML(x.acct):''} · tap to edit or remove</small></span><em>${x.t==='Income'?'+':''}${peso2(x.a)}</em></button>`).join('')}</div>`:''}
     <button class="it add solo" type="button" id="ckAdd">+ Add something else</button>
     ${all?`<div class="ck-done"><b>Nice work!</b><span>You saved ${peso2(t.by['Savings']||0)}${t.inc?' · '+Math.round((t.by['Savings']||0)/t.inc*100)+'% of your pay':''}.</span><button class="pill" type="button" data-go="wallet">Update balances</button></div>`:''}
     <p class="note" style="text-align:center;margin-top:14px">Next payday: ${dLong(next)} · ${dn<=1?'tomorrow':'in '+dn+' days'}</p>`;
@@ -1688,14 +1746,19 @@ function renderCheck(){const box=$('ckBody');if(!box)return;const p=pdRec(false)
 $('pdCard').addEventListener('click',()=>{const to=$('pdCard').dataset.to||'check';show('payday');pyPane(to)});
 $('ckBody').addEventListener('click',e=>{
   const yg=e.target.closest('[data-y-go]');if(yg){pyPane(yg.dataset.yGo);return}
+  const cx=e.target.closest('[data-cx]');if(cx){const p=pdRec(false);if(p)lEntry(p.id,+cx.dataset.cx,false);return}
   if(e.target.closest('#ckAdd')){const p=pdRec(true);p.items.push({t:'Living cost',n:'',acct:'',a:0,note:''});save();lEntry(p.id,p.items.length-1,true);return}
+  if(e.target.closest('#payPickT')){const c=$('payPick');c.hidden=!c.hidden;return}
+  const pa=e.target.closest('[data-pa]');if(pa){s.payAcct={a:pa.dataset.pa,sub:pa.dataset.pu||null};save();renderCheck();toast('Pay account set');return}
   const b=e.target.closest('[data-ck]');if(!b)return;const k=b.dataset.ck,{L}=ckPlan(),x=L.find(y=>y.key===k);if(!x)return;
-  const p=pdRec(true),ix=p.items.findIndex(y=>y.key===k);
-  if(ix>=0){const it=p.items[ix];p.items.splice(ix,1);if(it.dl!=null&&s.loans[it.dl]){s.loans[it.dl].paid=Math.max(0,num(s.loans[it.dl].paid)-1)}}
-  else{p.items.push({key:k,t:x.t,n:x.n,a:x.a,acct:'',note:'',...(x.dl!=null?{dl:x.dl}:{})});
+  const p=pdRec(true),pr=payRef();
+  if(k==='pay'){if(p.payMv){undoMove(p.payMv);p.payMv=null}else{p.payMv=moveMoney({to:pr,amt:x.a,why:'Salary',t:'Income',noLog:true});if(navigator.vibrate)try{navigator.vibrate(8)}catch(_){}}}
+  else{const ix=p.items.findIndex(y=>y.key===k);
+  if(ix>=0){const it=p.items[ix];if(it.mv)undoMove(it.mv);else p.items.splice(ix,1);if(it.dl!=null&&s.loans[it.dl]){s.loans[it.dl].paid=Math.max(0,num(s.loans[it.dl].paid)-1)}}
+  else{moveMoney({from:pr,to:destRef(x),amt:x.a,why:x.n,t:x.t,key:k,rec:p,dl:x.dl});
     if(x.dl!=null&&s.loans[x.dl]){const l=s.loans[x.dl];l.paid=num(l.paid)+1;if(num(l.total))l.paid=Math.min(l.paid,num(l.total))}
-    if(navigator.vibrate)try{navigator.vibrate(8)}catch(_){}}
-  if(!p.items.length&&!num(p.net))s.log=s.log.filter(y=>y!==p);
+    if(navigator.vibrate)try{navigator.vibrate(8)}catch(_){}}}
+  if(!p.items.length&&!num(p.net)&&!p.payMv)s.log=s.log.filter(y=>y!==p);
   save();renderCheck();
   const {L:L2}=ckPlan(),p2=pdRec(false);if(p2&&L2.length&&L2.every(y=>p2.items.find(z=>z.key===y.key)))toast('Payday complete! 🎉')});
 $('ckBody').addEventListener('input',e=>{if(e.target.id!=='ckNet')return;const p=pdRec(true);p.net=num(e.target.value);save();const t=lTot(p);$('ckOut').textContent=peso2(t.out);const l=$('ckLeft');l.textContent=peso2(t.left);l.className=t.left<0?'neg':''});
