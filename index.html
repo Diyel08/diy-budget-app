@@ -935,6 +935,7 @@ body.dragging .list{overflow:visible}
     <p class="list-t">Display</p>
     <div class="list">
       <button class="it" type="button" role="switch" id="setHide" aria-checked="false"><i class="ic" style="--c:#8e8e93" data-icon="eyeoff"></i><span><b>Hide balance</b><small>Mask the balance on Home</small></span><i class="tg" aria-hidden="true"></i></button>
+      <button class="it" type="button" role="switch" id="setSnd" aria-checked="true"><i class="ic" style="--c:#5ac8fa;color:#fff" data-icon="pie"></i><span><b>Glass sound</b><small>A soft "ting" when you tap the chart</small></span><i class="tg" aria-hidden="true"></i></button>
       <div class="it" id="setChart"><i class="ic" style="--c:#4f7dff;color:#fff" data-icon="pie"></i><span><b>Chart style</b><small>How the donut on Home looks</small></span><div class="chips sm"><button type="button" data-cs="glass">Glass</button><button type="button" data-cs="solid">Solid</button></div></div>
     </div>
     </div>
@@ -1222,53 +1223,53 @@ function renderHomeX(){const box=$('homeX');if(!box)return;const mask=v=>hidden?
   const gl=s.accts.length?`<div class="sec-h"><h2>Goals</h2><button class="lnk" type="button" data-go="wallet:goals">Manage</button></div><div class="list">${s.accts.map(g=>{const pr=num(g.g)?Math.min(num(g.b)/num(g.g),1):0;return `<button class="it hg" type="button" data-go="wallet:goals"><span><b>${escapeHTML(g.n||'Untitled goal')}</b><small>${mask(peso(g.b))} of ${peso(g.g)}</small><i class="bar" style="--c:var(--green)"><i style="width:${pr*100}%"></i></i></span><span class="val">${Math.round(pr*100)}%</span></button>`}).join('')}</div>`:'';
   const dt=s.loans.length?`<div class="sec-h"><h2>Debts</h2><button class="lnk" type="button" data-go="bills">Manage</button></div><div class="list">${s.loans.map(l=>{const t=num(l.total),pr=t?Math.min(num(l.paid)/t,1):0,i=debtInfo(l);return `<button class="it hg" type="button" data-go="bills"><span><b>${escapeHTML(l.n||'Debt')}</b><small>${i?mask(peso(Math.round(i.amt)))+' left · done '+i.last.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):'Paid off ✓'}</small><i class="bar" style="--c:var(--yellow)"><i style="width:${pr*100}%"></i></i></span><span class="val">${t?Math.round(pr*100)+'%':''}</span></button>`}).join('')}</div>`:'';
   box.innerHTML=acc+gl+dt;box.hidden=!(acc||gl||dt);box.style.setProperty('--hxc',[acc,gl,dt].filter(Boolean).length||1)}
-$('legend').addEventListener('click',e=>{const b=e.target.closest('[data-seg]');if(!b)return;focusSeg=focusSeg===b.dataset.seg?null:b.dataset.seg;segTap();renderHome()});
+$('legend').addEventListener('click',e=>{const b=e.target.closest('[data-seg]');if(!b)return;{const g=segments(),tot=['bills','loan','save','wants','main'].reduce((a,k)=>a+g[k],0)||1;glassTing(g[b.dataset.seg]/tot)}focusSeg=focusSeg===b.dataset.seg?null:b.dataset.seg;segTap();renderHome()});
 /* tap a slice of the donut to focus it; tap the middle or the same slice again to go back */
 function segTap(){if(navigator.vibrate)try{navigator.vibrate(6)}catch(_){}}
 
 /* ========== 3D DONUT (extruded, like an infographic): tap a slice to slide it out; drag around to spin ========== */
 const DC={cx:130,cy:84,RO:112,RI:64,H:26,k:.56};let ringRot=0,ringSegs=[],ringAnim=null,ringTilt=.56;
-const PAL3={bills:['#ff8ad8','#e83fb8','#a3127d'],loan:['#ffd86b','#ffb020','#c97800'],save:['#6ff2c6','#22c79a','#0d8a69'],wants:['#c3a2ff','#8f5cff','#5b2fd1'],main:['#8fb3ff','#4f7dff','#2747c9']};
+const PAL3={empty:['#ffffff','#9aa6ba','#4d5668'],bills:['#ff8ad8','#e83fb8','#a3127d'],loan:['#ffd86b','#ffb020','#c97800'],save:['#6ff2c6','#22c79a','#0d8a69'],wants:['#c3a2ff','#8f5cff','#5b2fd1'],main:['#8fb3ff','#4f7dff','#2747c9']};
 function pr3(r,a,z,ox,oy){const t=a*Math.PI/180;return [DC.cx+ox+r*Math.sin(t),DC.cy+oy-r*Math.cos(t)*ringTilt+z]}
 function arcPts(r,a0,a1,z,ox,oy){const n=Math.max(2,Math.ceil((a1-a0)/4)),out=[];for(let i=0;i<=n;i++)out.push(pr3(r,a0+(a1-a0)*i/n,z,ox,oy));return out}
 const P=pts=>'M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')+'Z';
 /* visible part of [a0,a1] inside a window [w0,w1] (degrees, any turn) */
 function clipArc(a0,a1,w0,w1){const out=[];for(let off=-720;off<=720;off+=360){const s=Math.max(a0,w0+off),e=Math.min(a1,w1+off);if(e>s)out.push([s,e])}return out}
 const chartStyle=()=>{let v='glass';try{v=localStorage.getItem('dc_bud_chart')||'glass'}catch(e){}return v};
-/* Build every visible face of every slice, then draw them back-to-front so nothing pokes through */
-function ringFaces(glass){const H=DC.H,F=[];
-  ringSegs.forEach(sg=>{const k=sg.k,a0=sg.a0+ringRot,a1=sg.a1+ringRot,mid=(a0+a1)/2,d=k===focusSeg?14:0,t=mid*Math.PI/180,ox=Math.sin(t)*d,oy=-Math.cos(t)*d*ringTilt;
-    const Y=a=>-Math.cos(a*Math.PI/180);
-    const wall=(r,s,e,kind,back)=>{const top=arcPts(r,s,e,0,ox,oy),bot=arcPts(r,s,e,H,ox,oy);
-      F.push({k,kind,back,depth:(kind==='in'?-2:0)+Y((s+e)/2)*(r/DC.RO)+(back?-.5:0),d:P(top.concat(bot.slice().reverse())),edge:top})};
-    clipArc(a0,a1,90,270).forEach(([s,e])=>wall(DC.RO,s,e,'out',false));
-    clipArc(a0,a1,-90,90).forEach(([s,e])=>wall(DC.RI,s,e,'in',false));
-    if(glass){clipArc(a0,a1,-90,90).forEach(([s,e])=>wall(DC.RO,s,e,'out',true));clipArc(a0,a1,90,270).forEach(([s,e])=>wall(DC.RI,s,e,'in',true))}
-    [[a0,Math.sin(a0*Math.PI/180)<0],[a1,Math.sin(a1*Math.PI/180)>0]].forEach(([a,vis])=>{if(!vis&&!glass)return;const q=[pr3(DC.RI,a,0,ox,oy),pr3(DC.RO,a,0,ox,oy),pr3(DC.RO,a,H,ox,oy),pr3(DC.RI,a,H,ox,oy)];
-      F.push({k,kind:'cap',back:!vis,depth:Y(a)*.8+(vis?0:-.5),d:P(q)})});
-    const top=arcPts(DC.RO,a0,a1,0,ox,oy).concat(arcPts(DC.RI,a0,a1,0,ox,oy).reverse());
-    F.push({k,kind:'top',depth:10+Y(mid)*.1+(d?1:0),d:P(top),mid,ox,oy});
-    if(glass)F.push({k,kind:'glow',depth:-10,mid,ox,oy})});
-  return F.sort((x,y)=>x.depth-y.depth)}
-function paintRing(){const G=$('ringG');if(!G)return;const glass=chartStyle()==='glass',F=ringFaces(glass);let html='';
-  F.forEach(f=>{const dim=focusSeg&&focusSeg!==f.k?' dim':'',c=PAL3[f.k]||['#999','#777','#555'],a=`data-s="${f.k}" class="f3 ${f.kind}${f.back?' back':''}${dim}"`;
-    if(!glass){
-      if(f.kind==='top')html+=`<path ${a} d="${f.d}" fill="url(#g3t-${f.k})"/>`;
-      else if(f.kind==='out')html+=`<path ${a} d="${f.d}" fill="url(#g3o-${f.k})"/><path class="f3 hl${dim}" data-s="${f.k}" d="M${f.edge.map(p=>p[0].toFixed(1)+' '+(p[1]+.9).toFixed(1)).join('L')}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.1"/>`;
-      else if(f.kind==='in')html+=`<path ${a} d="${f.d}" fill="url(#g3i-${f.k})"/>`;
-      else if(f.kind==='cap')html+=`<path ${a} d="${f.d}" fill="${c[2]}"/>`;
-    }else{
-      if(f.kind==='glow'){const [gx,gy]=pr3((DC.RO+DC.RI)/2,f.mid,DC.H+10,f.ox,f.oy);html+=`<ellipse ${a} cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" rx="46" ry="16" fill="url(#gg-${f.k})"/>`}
-      else if(f.kind==='top')html+=`<path ${a} d="${f.d}" fill="url(#gt-${f.k})"/><path class="f3 spec${dim}" data-s="${f.k}" d="${f.d}" fill="url(#gspec)"/><path class="f3 rim${dim}" data-s="${f.k}" d="${f.d}" fill="none" stroke="${c[0]}" stroke-opacity=".85" stroke-width="1"/>`;
-      else if(f.kind==='out'||f.kind==='in')html+=`<path ${a} d="${f.d}" fill="url(#gw-${f.k})" fill-opacity="${f.back?.35:1}"/>`+(f.back?'':`<path class="f3 hl${dim}" data-s="${f.k}" d="M${f.edge.map(p=>p[0].toFixed(1)+' '+(p[1]+1.6).toFixed(1)).join('L')}" fill="none" stroke="${c[0]}" stroke-opacity=".9" stroke-width="1.3" stroke-linecap="round"/>`);
-      else if(f.kind==='cap')html+=`<path ${a} d="${f.d}" fill="${c[1]}" fill-opacity="${f.back?.12:.28}" stroke="${c[0]}" stroke-opacity="${f.back?.25:.6}" stroke-width=".8"/>`}});
+/* Each slice is drawn in small steps from back to front (painter's order), inside its own group so
+   see-through effects apply to the whole slice at once and never show inner seams */
+function sliceSVG(sg,glass){const H=DC.H,k=sg.k,c=PAL3[k],a0=sg.a0+ringRot,a1=sg.a1+ringRot,full=sg.a1-sg.a0>=359,mid=(a0+a1)/2,
+    d=k===focusSeg?14:0,t=mid*Math.PI/180,ox=Math.sin(t)*d,oy=-Math.cos(t)*d*ringTilt,Y=a=>-Math.cos(a*Math.PI/180),F=[];
+  const q=pts=>P(pts),n=Math.max(1,Math.ceil((a1-a0)/4)),st=(a1-a0)/n;
+  for(let i=0;i<n;i++){const x=a0+i*st,y=x+st,m=(x+y)/2,dp=Y(m);
+    if(dp<0)F.push([dp-.001,'in',q(arcPts(DC.RI,x,y,0,ox,oy).concat(arcPts(DC.RI,x,y,H,ox,oy).reverse()))]);
+    else F.push([dp-.001,'out',q(arcPts(DC.RO,x,y,0,ox,oy).concat(arcPts(DC.RO,x,y,H,ox,oy).reverse()))]);
+    F.push([dp+.002,'top',q(arcPts(DC.RO,x,y,0,ox,oy).concat(arcPts(DC.RI,x,y,0,ox,oy).reverse()))])}
+  if(!full)[[a0,Math.sin(a0*Math.PI/180)<0],[a1,Math.sin(a1*Math.PI/180)>0]].forEach(([a,vis])=>{if(vis)F.push([Y(a)+.001,'cap',q([pr3(DC.RI,a,0,ox,oy),pr3(DC.RO,a,0,ox,oy),pr3(DC.RO,a,H,ox,oy),pr3(DC.RI,a,H,ox,oy)])])});
+  F.sort((x,y)=>x[0]-y[0]);
+  const fill={top:`url(#g3t-${k})`,out:`url(#g3o-${k})`,in:`url(#g3i-${k})`,cap:c[2]};
+  let s=F.map(([,kind,dd])=>`<path d="${dd}" fill="${fill[kind]}" stroke="${fill[kind]}" stroke-width=".7" stroke-linejoin="round"/>`).join('');
+  const topAll=q(arcPts(DC.RO,a0,a1,0,ox,oy).concat(arcPts(DC.RI,a0,a1,0,ox,oy).reverse()));
+  const front=clipArc(a0,a1,90,270).map(([x,y])=>arcPts(DC.RO,x,y,0,ox,oy));
+  s+=front.map(e=>`<path d="M${e.map(p=>p[0].toFixed(1)+' '+(p[1]+1).toFixed(1)).join('L')}" fill="none" stroke="#fff" stroke-opacity="${glass?.75:.45}" stroke-width="1.1" stroke-linecap="round"/>`).join('');
+  if(glass)s+=`<path d="${topAll}" fill="url(#gspec)"/>`+(full?`<path d="M${arcPts(DC.RO,a0,a1,0,ox,oy).map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')}" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1"/>`:`<path d="${topAll}" fill="none" stroke="${c[0]}" stroke-opacity=".9" stroke-width="1"/>`);
+  return s}
+function paintRing(){const G=$('ringG');if(!G)return;const glass=chartStyle()==='glass';
+  /* slices nearer the front are drawn last */
+  const near=sg=>{const a0=sg.a0+ringRot,a1=sg.a1+ringRot;let best=-2;for(let a=a0;a<=a1;a+=3)best=Math.max(best,-Math.cos(a*Math.PI/180));return best+(sg.k===focusSeg?.5:0)};
+  const order=ringSegs.slice().sort((x,y)=>near(x)-near(y));let html='';
+  const f=focusSeg&&ringSegs.find(x=>x.k===focusSeg);
+  if(glass&&f){const mid=(f.a0+f.a1)/2+ringRot,[gx,gy]=pr3((DC.RO+DC.RI)/2,mid,DC.H+14,0,0);html+=`<ellipse cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" rx="54" ry="15" fill="url(#gg-${f.k})" pointer-events="none"/>`}
+  order.forEach(sg=>{const empty=sg.k==='empty',dim=focusSeg&&focusSeg!==sg.k;
+    const op=empty?.32:glass?(dim?.22:.82):(dim?.3:1);
+    html+=`<g class="wd${empty?' empty':''}" data-s="${sg.k}" opacity="${op}">${sliceSVG(sg,glass||empty)}</g>`});
   G.innerHTML=html}
 function drawRing(g,L,total){const svg=$('ring');const vis=L.filter(([k])=>g[k]>0);
   if(!svg.querySelector('#ringG')){svg.setAttribute('viewBox','0 0 260 196');svg.innerHTML='<defs id="ringD"></defs><ellipse class="rsh" cx="130" cy="126" rx="118" ry="52"/><g id="ringG"></g>'}
   const D=svg.querySelector('#ringD');
-  D.innerHTML=Object.entries(PAL3).map(([k,[l,m,d]])=>`<linearGradient id="g3t-${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${l}"/><stop offset="1" stop-color="${m}"/></linearGradient>
-    <linearGradient id="g3o-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${m}"/><stop offset="1" stop-color="${d}"/></linearGradient>
-    <linearGradient id="g3i-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${d}"/><stop offset="1" stop-color="${m}" stop-opacity=".9"/></linearGradient>`).join('')
+  D.innerHTML=Object.entries(PAL3).map(([k,[l,m,d]])=>`<linearGradient id="g3t-${k}" gradientUnits="userSpaceOnUse" x1="20" y1="20" x2="240" y2="150"><stop offset="0" stop-color="${l}"/><stop offset="1" stop-color="${m}"/></linearGradient>
+    <linearGradient id="g3o-${k}" gradientUnits="userSpaceOnUse" x1="0" y1="96" x2="0" y2="176"><stop offset="0" stop-color="${m}"/><stop offset="1" stop-color="${d}"/></linearGradient>
+    <linearGradient id="g3i-${k}" gradientUnits="userSpaceOnUse" x1="0" y1="44" x2="0" y2="122"><stop offset="0" stop-color="${d}"/><stop offset="1" stop-color="${m}" stop-opacity=".9"/></linearGradient>`).join('')
     +Object.entries(PAL3).map(([k,[l,m,d]])=>`<linearGradient id="gt-${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${l}" stop-opacity=".55"/><stop offset=".6" stop-color="${m}" stop-opacity=".32"/><stop offset="1" stop-color="${d}" stop-opacity=".45"/></linearGradient>
       <linearGradient id="gw-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${m}" stop-opacity=".6"/><stop offset=".5" stop-color="${m}" stop-opacity=".28"/><stop offset="1" stop-color="${l}" stop-opacity=".5"/></linearGradient>
       <radialGradient id="gg-${k}"><stop offset="0" stop-color="${m}" stop-opacity=".55"/><stop offset="1" stop-color="${m}" stop-opacity="0"/></radialGradient>`).join('')
@@ -1276,6 +1277,7 @@ function drawRing(g,L,total){const svg=$('ring');const vis=L.filter(([k])=>g[k]>
     +'<linearGradient id="g3streak" x1="0" y1="0" x2="1" y2=".35"><stop offset=".28" stop-color="#fff" stop-opacity="0"/><stop offset=".4" stop-color="#fff" stop-opacity=".45"/><stop offset=".48" stop-color="#fff" stop-opacity="0"/><stop offset=".62" stop-color="#fff" stop-opacity=".18"/><stop offset=".68" stop-color="#fff" stop-opacity="0"/></linearGradient>'
     +'<radialGradient id="g3sh"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>';
   let a=0;ringSegs=vis.map(([k])=>{const sw=g[k]/total*360,o={k,a0:a+.9,a1:a+sw-.9};a+=sw;return o});
+  if(!ringSegs.length)ringSegs=[{k:'empty',a0:0,a1:360}];
   const f=focusSeg&&ringSegs.find(x=>x.k===focusSeg);
   if(f){const mid=(f.a0+f.a1)/2;let target=180-mid,diff=((target-ringRot)%360+540)%360-180;spinTo(ringRot+diff)}else paintRing()}
 function spinTo(target){cancelAnimationFrame(ringAnim);const from=ringRot,t0=performance.now();
@@ -1285,7 +1287,7 @@ function countUp(el){const txt=el.textContent,m=/([\d,]+(?:\.\d+)?)/.exec(txt);i
 (function(){const wrap=$('ring').closest('.ring-wrap'),svg=$('ring');let st=null;
   const toSvg=(x,y)=>{const r=svg.getBoundingClientRect(),sx=260/r.width;return [(x-r.left)*sx,(y-r.top)*sx]};
   const ang=(x,y)=>{const [sx,sy]=toSvg(x,y);return Math.atan2(sx-DC.cx,-(sy-DC.cy)/ringTilt)*180/Math.PI};
-  wrap.addEventListener('pointerdown',e=>{const wd=e.target.closest('[data-s]');cancelAnimationFrame(ringAnim);st={x:e.clientX,y:e.clientY,a:ang(e.clientX,e.clientY),rot:ringRot,k:wd&&wd.dataset.s,mode:null,id:e.pointerId}});
+  wrap.addEventListener('pointerdown',e=>{let wd=e.target.closest('[data-s]'),emp=false;if(wd&&wd.dataset.s==='empty'){wd=null;emp=true}cancelAnimationFrame(ringAnim);st={x:e.clientX,y:e.clientY,a:ang(e.clientX,e.clientY),rot:ringRot,k:wd&&wd.dataset.s,empty:emp,mode:null,id:e.pointerId}});
   wrap.addEventListener('pointermove',e=>{if(!st)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;
     if(!st.mode&&Math.hypot(dx,dy)>12){const [sx,sy]=toSvg(st.x,st.y),rx=sx-DC.cx,ry=(sy-DC.cy)/ringTilt,rl=Math.hypot(rx,ry)||1,rad=(dx*rx+dy*ry)/rl,tan=(dx*ry-dy*rx)/rl;
       st.mode=Math.abs(tan)>Math.abs(rad)?'spin':'pull';try{wrap.setPointerCapture(st.id)}catch(_){}}
@@ -1293,8 +1295,24 @@ function countUp(el){const txt=el.textContent,m=/([\d,]+(?:\.\d+)?)/.exec(txt);i
     else if(st.mode==='pull'&&st.k){const kk=Math.min(1,20/Math.max(1,Math.hypot(dx,dy))),sc=260/svg.getBoundingClientRect().width;$('ringG').querySelectorAll(`[data-s="${st.k}"]`).forEach(el=>{el.style.transform=`translate(${dx*sc*kk}px,${dy*sc*kk}px)`})}});
   const end=()=>{if(!st)return;const s0=st;st=null;if(s0.mode==='spin')return;
     if(s0.k)$('ringG').querySelectorAll(`[data-s="${s0.k}"]`).forEach(el=>{el.style.transform=''});
+    const hitK=s0.k||(s0.empty?'empty':null);
+    if(hitK){const g=segments(),tot=['bills','loan','save','wants','main'].reduce((a,k)=>a+g[k],0)||1;glassTing(hitK==='empty'?0:g[hitK]/tot)}
     focusSeg=s0.k?(focusSeg===s0.k?null:s0.k):null;segTap();renderHome()};
   wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',()=>{st=null})})();
+
+/* ========== GLASS "TING" ==========
+   A struck wine glass: a few inharmonic partials that ring and fade. The fuller the slice, the lower the note
+   (like adding water to a glass); an empty glass rings high and bright. */
+let AC=null;const soundOn=()=>{try{return localStorage.getItem('dc_bud_snd')!=='off'}catch(e){return true}};
+function glassTing(fill){if(!soundOn())return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+  const t=AC.currentTime,f0=1568*Math.pow(2,-(Math.max(0,Math.min(1,fill))*1.25)),out=AC.createGain();out.gain.value=.22;out.connect(AC.destination);
+  [[1,1,2.4],[2.32,.45,1.3],[4.25,.22,.7],[6.8,.09,.35]].forEach(([r,a,dur])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f0*r;
+    o.frequency.setValueAtTime(f0*r*1.003,t);o.frequency.exponentialRampToValueAtTime(f0*r,t+.08);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(a,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+dur*(fill>0?.85:1.15));
+    o.connect(g);g.connect(out);o.start(t);o.stop(t+dur*1.2)});
+  /* soft click of the strike */
+  const n=AC.createBufferSource(),b=AC.createBuffer(1,AC.sampleRate*.02,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,4);
+  const hp=AC.createBiquadFilter(),ng=AC.createGain();hp.type='highpass';hp.frequency.value=3000;ng.gain.value=.15;n.buffer=b;n.connect(hp);hp.connect(ng);ng.connect(out);n.start(t)}catch(e){}}
 /* what makes up the focused slice */
 function segItems(k){const mult=range==='year'?12:1,cuts=range==='pay'?[s.payday]:['15th','30th'],out={};
   const add=(n,v)=>{if(v>0)out[n]=(out[n]||0)+v*mult};
@@ -2033,7 +2051,8 @@ function dgEnd(){clearTimeout(dgTimer);if(!dg)return;const d=dg;dg=null;if(!d.on
 document.addEventListener('touchend',dgEnd,{passive:true});document.addEventListener('touchcancel',dgEnd,{passive:true});
 document.addEventListener('contextmenu',e=>{if(e.target.closest(Object.keys(DRAG).join(',')))e.preventDefault()});
 /* ========== SETTINGS ========== */
-function syncChartChips(){const v=chartStyle();document.querySelectorAll('[data-cs]').forEach(b=>b.classList.toggle('on',b.dataset.cs===v))}
+function syncChartChips(){const v=chartStyle();document.querySelectorAll('[data-cs]').forEach(b=>b.classList.toggle('on',b.dataset.cs===v));const sn=$('setSnd');if(sn)sn.setAttribute('aria-checked',soundOn())}
+document.addEventListener('click',e=>{if(!e.target.closest('#setSnd'))return;try{localStorage.setItem('dc_bud_snd',soundOn()?'off':'on')}catch(_){}syncChartChips();if(soundOn())glassTing(.3)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cs]');if(!b)return;try{localStorage.setItem('dc_bud_chart',b.dataset.cs)}catch(_){}syncChartChips();paintRing();toast(b.dataset.cs==='glass'?'Glass chart':'Solid chart')});
 setTimeout(syncChartChips,0);
 function renderSettings(){const lb=store('dc_bud_lastbk',null),days=lb?Math.floor((Date.now()-new Date(lb))/864e5):null;
