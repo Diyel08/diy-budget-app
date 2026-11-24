@@ -129,6 +129,9 @@ body *{visibility:hidden!important}
 /* when the last stroke lands, go straight into the original breathing glow */
 .boot-mark{animation:none}
 .boot-mark.lit{animation:bglow 2.6s ease-in-out infinite}
+/* the progress bar waits until the Di is fully written */
+.boot-bar{animation:none;opacity:0;transition:opacity .45s ease}
+.boot.loading .boot-bar{opacity:1}
 
 [hidden]{display:none!important}
 /* ========== BUDGET APP: dark redesign ========== */
@@ -2107,18 +2110,19 @@ show('home');
   let bt=null,booted=false;
   function finish(){if(booted)return;booted=true;clearInterval(bt);fill.style.width='100%';boot.classList.add('out');setTimeout(()=>{boot.hidden=true},520);render()}
   /* write the Di stroke by stroke. Done in JS (not CSS) because iPhone Safari does not repaint animated masks */
-  function writeDi(){const mk=boot.querySelector('.boot-mark');if(!mk)return;const ps=[...mk.querySelectorAll('.dm')];mk.classList.remove('lit');
+  function writeDi(done0){const mk=boot.querySelector('.boot-mark');if(!mk)return;const ps=[...mk.querySelectorAll('.dm')];mk.classList.remove('lit');
     const plan=[[250,700],[950,850],[1850,250]],ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2,t0=performance.now();
     /* real lengths in drawing units: iPhone Safari ignores pathLength on dashes, which left a faint full logo showing */
     const L=ps.map(p=>{let l=0;try{l=p.getTotalLength()}catch(e){}return (l||3000)+20});
     const CAP=90;ps.forEach((p,i)=>{p.setAttribute('stroke-dasharray',L[i]+' '+(L[i]+CAP*2));p.setAttribute('stroke-dashoffset',L[i]+CAP);p.style.visibility='visible'});
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches){ps.forEach(p=>p.setAttribute('stroke-dashoffset','0'));mk.classList.add('lit');return}
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){ps.forEach(p=>p.setAttribute('stroke-dashoffset','0'));mk.classList.add('lit');done0&&done0();return}
     const step=now=>{const t=now-t0;let done=true;ps.forEach((p,i)=>{const [st,du]=plan[i]||[0,1],k=Math.max(0,Math.min(1,(t-st)/du));if(k<1)done=false;p.setAttribute('stroke-dashoffset',((L[i]+CAP)*(1-ease(k))).toFixed(1))});
-      if(done)mk.classList.add('lit');else requestAnimationFrame(step)};requestAnimationFrame(step)}
+      if(done){mk.classList.add('lit');done0&&done0()}else requestAnimationFrame(step)};requestAnimationFrame(step)}
   function run(){
-    booted=false;boot.hidden=false;boot.classList.remove('out','card');fill.style.width='0';writeDi();
+    booted=false;boot.hidden=false;boot.classList.remove('out','card','loading');fill.style.width='0';clearInterval(bt);writeDi(()=>{if(booted)return;boot.classList.add('loading');startLoad()});return}
+  function startLoad(){
     if(matchMedia('(prefers-reduced-motion: reduce)').matches){bl.textContent='Ready';fill.style.width='100%';setTimeout(finish,300);return}
-    let i=0;clearInterval(bt);bt=setInterval(()=>{bl.textContent=LINES[Math.min(LINES.length-1,Math.floor(i/P.length*LINES.length))];fill.style.width=P[i]+'%';if(++i>=P.length){clearInterval(bt);setTimeout(finish,450)}},330);
+    let i=0;clearInterval(bt);bt=setInterval(()=>{bl.textContent=LINES[Math.min(LINES.length-1,Math.floor(i/P.length*LINES.length))];fill.style.width=P[i]+'%';if(++i>=P.length){clearInterval(bt);setTimeout(finish,400)}},190);
   }
   boot.addEventListener('click',finish);
   addEventListener('keydown',e=>{if(!booted&&(e.key==='Enter'||e.key==='Escape'||e.key===' ')){e.preventDefault();finish()}});
