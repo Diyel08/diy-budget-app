@@ -905,6 +905,26 @@ html[data-theme=light] .legend button.on{background:#fff}
 html[data-theme=light] .boot-bar i{background:#0066cc}
 html[data-theme=light] .boot-mark.lit{animation:none}
 
+/* ===== Light/Dark fit fixes ===== */
+/* 1. Plan summary tiles and the "Extra" row were tinted for the old navy card */
+.sum-m div,.sum .status{background:var(--card2)!important}
+/* 2. Text links: Science Blue on light, a lighter tint of it on dark so it stays readable */
+.lnk,.it.add,.sum-t .lnk,#payPickT,.paypick .lnk{color:var(--blue-l)}
+html[data-theme=light] .lnk,html[data-theme=light] .it.add,html[data-theme=light] .sum-t .lnk,html[data-theme=light] #payPickT{color:#0066cc}
+/* 3. Selected chips: white on dark, Shark on light */
+html[data-theme=light] .chips button.on{background:#1d1d1f;color:#fff}
+/* 4. Backup warning readable on white */
+html[data-theme=light] .bk-last.warn{color:#a86a00}
+/* 5. No leftover focus box after tapping buttons (keyboard focus still shows) */
+button:focus:not(:focus-visible),input:focus:not(:focus-visible){outline:none}
+/* 6. Blue pill buttons on dark: keep white text; Paste chip readable in both */
+.in .pst{background:rgba(0,102,204,.16);color:var(--blue-l)}
+html[data-theme=light] .in .pst{background:rgba(0,102,204,.1);color:#0066cc}
+html[data-theme=light] .in .pst.clr{background:rgba(0,0,0,.08);color:#6e6e73}
+/* 7. Tag colours (Overdue etc.) on white */
+html[data-theme=light] .ckr small,html[data-theme=light] .it small{color:var(--sub)}
+#cfm button:focus{outline:none}
+
 </style>
 </head>
 <body>
