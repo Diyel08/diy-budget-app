@@ -125,14 +125,10 @@ body *{visibility:hidden!important}
 @keyframes bbar{to{opacity:1}}
 @keyframes lkin{from{opacity:0;transform:translateY(14px)}}/* baybayin "Di" writes itself, stroke by stroke, then breathes */
 .boot-mark{width:clamp(110px,14vw,150px);height:clamp(110px,14vw,150px);opacity:1;animation:bglow 2.6s ease-in-out 2.1s infinite;filter:drop-shadow(0 0 8px rgba(255,255,255,.18))}
-.boot-mark .dm{stroke-dasharray:1 1;stroke-dashoffset:1}
-.boot-mark .dm1{animation:dmw .7s cubic-bezier(.45,.05,.35,1) .25s forwards}
-.boot-mark .dm2{animation:dmw .85s cubic-bezier(.45,.05,.35,1) .95s forwards}
-.boot-mark .dm3{animation:dmw .25s ease-out 1.85s forwards}
 @keyframes dmw{to{stroke-dashoffset:0}}
-@media(prefers-reduced-motion:reduce){.boot-mark .dm{animation:none;stroke-dashoffset:0}}
 /* when the last stroke lands, go straight into the original breathing glow */
-.boot-mark{animation:bglow 2.6s ease-in-out 2.05s infinite}
+.boot-mark{animation:none}
+.boot-mark.lit{animation:bglow 2.6s ease-in-out infinite}
 
 [hidden]{display:none!important}
 /* ========== BUDGET APP: dark redesign ========== */
@@ -798,7 +794,7 @@ body.dragging .list{overflow:visible}
   <div class="wall boot-wall" aria-hidden="true"></div>
   <div class="boot-win">
     <svg class="boot-mark" viewBox="-20 -40 1199 1123" aria-hidden="true"><defs><mask id="diMask" maskUnits="userSpaceOnUse" x="-100" y="-100" width="1400" height="1300"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
-<path class="dm dm1" d="M5,211 L35,271 L95,303 L205,303 L335,275 L505,221 L695,161 L885,129 L1015,141 L1085,191 L1155,256" stroke-width="150" pathLength="1"/><path class="dm dm2" d="M300,351 L235,421 L185,511 L155,621 L155,721 L185,801 L245,881 L355,956 L505,1001 L655,971 L855,886 L975,851 L1075,901 L1155,976" stroke-width="150" pathLength="1"/><path class="dm dm3" d="M500,6 L625,61" stroke-width="90" pathLength="1"/></g></mask></defs>
+<path class="dm dm1" d="M5,211 L35,271 L95,303 L205,303 L335,275 L505,221 L695,161 L885,129 L1015,141 L1085,191 L1155,256" stroke-width="150" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/><path class="dm dm2" d="M300,351 L235,421 L185,511 L155,621 L155,721 L185,801 L245,881 L355,956 L505,1001 L655,971 L855,886 L975,851 L1075,901 L1155,976" stroke-width="150" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/><path class="dm dm3" d="M500,6 L625,61" stroke-width="90" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/></g></mask></defs>
 <path d="M1129,205 1019,138 960,116 877,115 793,127 695,150 597,178 343,258 273,276 201,290 152,295 101,293 66,282 38,258 16,210 12,207 6,207 1,211 0,216 20,264 28,278 70,318 127,345 188,357 240,359 207,404 175,469 153,537 140,608 139,674 149,729 171,780 198,821 238,862 280,895 353,946 406,978 461,1007 513,1028 557,1039 599,1042 641,1038 686,1027 736,1010 923,936 979,918 1025,908 1034,908 1040,920 1044,924 1144,982 1152,981 1156,973 1141,927 1112,900 997,833 953,819 902,821 854,832 796,852 735,877 576,946 536,959 503,965 463,964 428,955 382,935 319,899 281,864 252,824 236,785 227,739 226,682 231,630 246,555 258,513 276,464 307,401 334,361 345,351 423,338 509,318 794,239 901,215 993,202 1051,203 1146,260 1153,260 1157,256 1158,250ZM500,7 503,22 508,32 526,44 551,43 580,50 613,65 618,65 624,60 624,53 617,46 603,39 582,32 511,0 504,1Z" fill="#fff" mask="url(#diMask)"/></svg>
     <div class="boot-bar" aria-hidden="true"><i id="bootFill"></i></div>
     <div class="boot-log" id="bootLog" aria-live="off"></div>
@@ -2110,8 +2106,15 @@ show('home');
   const P=[7,17,26,38,47,61,70,83,92,100];
   let bt=null,booted=false;
   function finish(){if(booted)return;booted=true;clearInterval(bt);fill.style.width='100%';boot.classList.add('out');setTimeout(()=>{boot.hidden=true},520);render()}
+  /* write the Di stroke by stroke. Done in JS (not CSS) because iPhone Safari does not repaint animated masks */
+  function writeDi(){const mk=boot.querySelector('.boot-mark');if(!mk)return;const ps=[...mk.querySelectorAll('.dm')];mk.classList.remove('lit');
+    const plan=[[250,700],[950,850],[1850,250]],ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2,t0=performance.now();
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){ps.forEach(p=>p.setAttribute('stroke-dashoffset','0'));mk.classList.add('lit');return}
+    ps.forEach(p=>p.setAttribute('stroke-dashoffset','1'));
+    const step=now=>{const t=now-t0;let done=true;ps.forEach((p,i)=>{const [st,du]=plan[i]||[0,1],k=Math.max(0,Math.min(1,(t-st)/du));if(k<1)done=false;p.setAttribute('stroke-dashoffset',(1-ease(k)).toFixed(4))});
+      if(done)mk.classList.add('lit');else requestAnimationFrame(step)};requestAnimationFrame(step)}
   function run(){
-    booted=false;boot.hidden=false;boot.classList.remove('out','card');fill.style.width='0';
+    booted=false;boot.hidden=false;boot.classList.remove('out','card');fill.style.width='0';writeDi();
     if(matchMedia('(prefers-reduced-motion: reduce)').matches){bl.textContent='Ready';fill.style.width='100%';setTimeout(finish,300);return}
     let i=0;clearInterval(bt);bt=setInterval(()=>{bl.textContent=LINES[Math.min(LINES.length-1,Math.floor(i/P.length*LINES.length))];fill.style.width=P[i]+'%';if(++i>=P.length){clearInterval(bt);setTimeout(finish,450)}},330);
   }
