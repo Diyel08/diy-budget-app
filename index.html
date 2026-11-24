@@ -1301,6 +1301,7 @@ const DEBTC='var(--yellow)';
 /* ========== NAVIGATION ========== */
 const pages=[...document.querySelectorAll('.pg')];
 function show(tab){
+  if((tab==='payday'||tab==='plan')&&!pdPicked&&typeof curPd==='function'){const d=T.parse(curPd());if(d){const w=d.getDate()===15?'15th':'30th';if(s.payday!==w){s.payday=w;save()}}}
   if(tab==='plan'||tab==='log'){pyPane(tab==='plan'?'plan':'hist');tab='payday'}
   pages.forEach(p=>p.classList.toggle('on',p.dataset.pg===tab));
   document.querySelectorAll('#tabbar button').forEach(b=>{const on=b.dataset.tab===tab;b.classList.toggle('on',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});
@@ -1498,7 +1499,8 @@ document.addEventListener('click',e=>{if(e.target.closest('#segX')){focusSeg=nul
 let ptab='pay';
 function planTab(p){if(p==='loan'){show('bills');return}ptab=p;segSet($('planSeg'),'p',p);document.querySelectorAll('[data-pp]').forEach(x=>x.hidden=x.dataset.pp!==p)}
 $('planSeg').addEventListener('click',e=>{const b=e.target.closest('button[data-p]');if(b)planTab(b.dataset.p)});
-$('pdSeg').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;s.payday=b.dataset.v;changed()});
+let pdPicked=false;
+$('pdSeg').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;pdPicked=true;s.payday=b.dataset.v;changed()});
 function fillInputs(){document.querySelectorAll('[data-pg=plan] [data-k]').forEach(el=>{if(document.activeElement!==el){const v=get(el.dataset.k);el.value=(v===0&&!el.dataset.k.startsWith('pct'))?'':v}})}
 function billRows(){
   const r=calc(s.payday);
@@ -1516,7 +1518,9 @@ function splitRows(){
   $('splitIn').innerHTML=[0,1,2].map(i=>`<label class="fld"><span style="--c:${C.acc[i]}">${escapeHTML(splitName(i))}</span><div class="in"><input type="number" inputmode="numeric" min="0" max="100" data-k="pct.${i}" value="${s.pct[i]}"><em>%</em></div></label>`).join('');
 }
 function breakdown(r){
-  return [['Bills',r.sub,C.bills],['Debts',r.loan,C.loan],['Left after bills',r.left],['Scheduled savings',r.sched,C.save],['Extra to save',r.extra]].map(([l,v,c])=>`<div class="ln"><span>${c?`<i style="--c:${c}"></i>`:''}${l}</span><b>${peso2(v)}</b></div>`).join('')
+  const anyGoal=[0,1,2].some(i=>hasSplit(i));
+  return [['Net pay',r.net,null,''],['Bills',r.sub,C.bills,'− '],['Debts',r.loan,C.loan,'− '],['Left after bills and debts',r.left,null,'= '],['Scheduled savings',r.sched,C.save,'− '],
+    [anyGoal?'Extra, split to your goals':'Extra (no goal linked yet, so it stays)',r.extra,null,'']].map(([l,v,c,op])=>`<div class="ln"><span>${c?`<i style="--c:${c}"></i>`:''}${l}</span><b>${op}${peso2(v)}</b></div>`).join('')
     +[0,1,2].map(i=>hasSplit(i)?`<div class="ln"><span><i style="--c:${C.acc[i]}"></i>→ ${escapeHTML(splitName(i))}</span><b>${peso2(r.parts[i])}</b></div>`:'').join('')
     +`<div class="ln big"><span>Stays in main account</span><b>${peso2(r.stay)}</b></div>`;
 }
