@@ -924,6 +924,14 @@ html[data-theme=light] .in .pst.clr{background:rgba(0,0,0,.08);color:#6e6e73}
 /* 7. Tag colours (Overdue etc.) on white */
 html[data-theme=light] .ckr small,html[data-theme=light] .it small{color:var(--sub)}
 #cfm button:focus{outline:none}
+/* Me quick actions: labels follow the theme */
+.me-acts button{color:var(--ink)}
+/* list icons: white symbol on coloured tiles, dark symbol on the light tiles (mint, amber) */
+.it .ic{color:#fff}
+.it .ic[style*="--green"],.it .ic[style*="--yellow"],.it .ic[style*="--mint"],.it .ic[style*="98ff98"],.it .ic[style*="ffb547"]{color:#1d1d1f}
+/* glass chart on a light page: deeper colour and a soft shadow so it doesn't wash out */
+html[data-theme=light] .ring-wrap .rsh{opacity:.5}
+html[data-theme=light] #ringG .wd:not(.empty){filter:none}
 
 </style>
 </head>
@@ -1416,7 +1424,7 @@ function paintRing(){const G=$('ringG');if(!G)return;const glass=chartStyle()===
   const f=focusSeg&&ringSegs.find(x=>x.k===focusSeg);
   if(glass&&f){const mid=(f.a0+f.a1)/2+ringRot,[gx,gy]=pr3((DC.RO+DC.RI)/2,mid,DC.H+14,0,0);html+=`<ellipse cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" rx="54" ry="15" fill="url(#gg-${f.k})" pointer-events="none"/>`}
   order.forEach(sg=>{const empty=sg.k==='empty',dim=focusSeg&&focusSeg!==sg.k;
-    const op=empty?.32:glass?(dim?.22:.82):(dim?.3:1);
+    const lt=document.documentElement.dataset.theme==='light',op=empty?(lt?.55:.32):glass?(dim?.22:(lt?.95:.82)):(dim?.3:1);
     html+=`<g class="wd${empty?' empty':''}" data-s="${sg.k}" opacity="${op}">${sliceSVG(sg,glass||empty)}</g>`});
   G.innerHTML=html}
 function drawRing(g,L,total){const svg=$('ring');const vis=L.filter(([k])=>g[k]>0);
