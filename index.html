@@ -2229,7 +2229,8 @@ function renderSettings(){const lb=store('dc_bud_lastbk',null),days=lb?Math.floo
   const dc=$('dataCard');if(dc)dc.innerHTML=rows.map(([k,v])=>`<div><span>${k}</span><b>${escapeHTML(v)}</b></div>`).join('')}
 /* one backup file for everything; older budget-only or trackers-only files still import */
 function afterImport(){fillInputs();splitRows();changed();tsave()}
-$('bdExport').addEventListener('click',()=>{const d=iso(new Date());persist('dc_bud_lastbk',new Date().toISOString());if(document.querySelector('.pg.on[data-pg=settings]'))renderSettings();dlFile('budget-backup-'+d+'.json',JSON.stringify({app:'diyelo-budget',version:3,exported:new Date().toISOString(),budget:s,trackers:ts}),'application/json');toast('Backup saved')});
+const hasData=()=>!!(num(s.net)||s.bills.length||s.loans.length||s.accts.length||s.bank.length||s.log.length||ts.trackers.length);
+$('bdExport').addEventListener('click',()=>{if(!hasData()){toast('Nothing to back up yet. Add your data first.');return}const d=iso(new Date());persist('dc_bud_lastbk',new Date().toISOString());if(document.querySelector('.pg.on[data-pg=settings]'))renderSettings();dlFile('budget-backup-'+d+'.json',JSON.stringify({app:'diyelo-budget',version:3,exported:new Date().toISOString(),budget:s,trackers:ts}),'application/json');toast('Backup saved')});
 $('bdImport').addEventListener('click',()=>$('bdFile').click());
 $('bdFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();
   r.onload=()=>{let j;try{j=JSON.parse(r.result)}catch(x){toast('That file is not a valid backup');return}
