@@ -1202,7 +1202,7 @@ function persist(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catc
 /* save a file: on phones use the Share sheet (Save to Files, AirDrop, Drive...), because iPhone Home Screen apps block normal downloads */
 function dlFile(name,data,type,done){const blob=new Blob([data],{type});const touch=matchMedia('(pointer:coarse)').matches;
   let file=null;try{file=new File([blob],name,{type})}catch(e){}
-  if(touch&&file&&navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:name}).then(()=>done&&done(true)).catch(e=>{if(e&&e.name==='AbortError')toast('Backup not saved');else plainDl(blob,name,done)});return}
+  if(touch&&file&&navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file]}).then(()=>done&&done(true)).catch(e=>{if(e&&e.name==='AbortError')toast('Backup not saved');else plainDl(blob,name,done)});return}
   plainDl(blob,name,done)}
 function plainDl(blob,name,done){try{const u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download=name;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);done&&done(true)}catch(e){toast('Could not save the file')}}
 function toast(msg){let t=$('miniToast');if(!t){t=document.createElement('div');t.id='miniToast';t.setAttribute('role','status');document.body.appendChild(t)}t.textContent=msg;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
