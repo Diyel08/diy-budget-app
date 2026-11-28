@@ -2085,7 +2085,16 @@ function payBox(){const pr=payRef(),opts=[];s.bank.forEach(a=>{if(hasSubs(a))a.s
   if(!s.bank.length)return '<div class="flowtip">Add your accounts in <b>Money</b> so checking items here also updates their balances.</div>';
   return `<div class="paypick${pr?'':' need'}"><span>${pr?'Pay goes into <b>'+escapeHTML(refLabel(pr))+'</b>':'Pick the account your pay goes into'}</span><button type="button" class="lnk" id="payPickT">${pr?'Change':'Choose'}</button>
     <div class="chips sm" id="payPick" hidden>${opts.map(([n,u])=>{const r=refOf(n,u),on=pr&&r&&r.i===pr.i&&r.sj===pr.sj;return `<button type="button" data-pa="${escapeHTML(n)}" data-pu="${escapeHTML(u||'')}" class="${on?'on':''}">${escapeHTML(refLabel(r))}</button>`}).join('')}</div></div>`}
-function renderCheck(){const box=$('ckBody');if(!box)return;const p=pdRec(false),{which,L}=ckPlan(),d=T.parse(curPd());
+/* An entry you logged by hand that matches something now in your plan (same name) becomes that planned item,
+   so it shows as already done instead of appearing twice. It's taken from the pay account like any ticked item. */
+const nmKey=v=>String(v||'').toUpperCase().replace(/\s+/g,' ').trim();
+function adoptExtras(p,L){if(!p)return false;let ch=false;const pr=payRef();
+  p.items.forEach((x,i)=>{if(x.key)return;const c=L.filter(y=>y.key!=='pay'&&nmKey(y.n)===nmKey(x.n)&&!p.items.some(z=>z.key===y.key)&&!(p.skip||[]).includes(y.key));
+    if(!c.length)return;const y=c.sort((a,b)=>Math.abs(a.a-num(x.a))-Math.abs(b.a-num(x.a)))[0];
+    if(!x.mv&&!x.acct&&pr&&y.t!=='Income'){x.acct=refLabel(pr);settleEntry(p,i);x=p.items[i]}
+    x.key=y.key;x.t=y.t;if(y.dl!=null&&s.loans[y.dl]){x.dl=y.dl;const l=s.loans[y.dl];l.paid=num(l.paid)+1;if(num(l.total))l.paid=Math.min(l.paid,num(l.total))}ch=true});
+  if(ch)save();return ch}
+function renderCheck(){const box=$('ckBody');if(!box)return;adoptExtras(pdRec(false),ckPlan().L);const p=pdRec(false),{which,L}=ckPlan(),d=T.parse(curPd());
   const done=k=>p&&(k==='pay'?(p.payMv?{a:num(p.net),acct:refLabel(payRef())}:null):p.items.find(x=>x.key===k)),sk=k=>!!(p&&p.skip&&p.skip.includes(k)&&!done(k)),Lc=L.filter(x=>!sk(x.key)),n=Lc.filter(x=>done(x.key)).length,pr=Lc.length?n/Lc.length:0;
   const extras=p?p.items.filter(x=>!x.key):[],net=p?num(p.net):num(s.net),t=p?lTot(p):{inc:net,out:0,left:net,by:{}};
   const next=paydaysFrom(new Date(Date.now()+864e5),1)[0],dn=Math.round((next-new Date(new Date().toDateString()))/864e5);
