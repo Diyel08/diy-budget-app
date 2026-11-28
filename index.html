@@ -699,8 +699,8 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
   /* Payday checklist: summary pinned on the left, items on the right */
   .pg[data-pg=payday] [data-yp=check]{max-width:none}
   #ckBody{display:grid;grid-template-columns:minmax(320px,400px) minmax(0,1fr);gap:0 24px;align-items:start}
-  #ckBody>.ck-hero{grid-column:1;grid-row:1/span 30;position:sticky;top:24px}
-  #ckBody>*:not(.ck-hero){grid-column:2}
+  #ckBody>.ck-left{grid-column:1;grid-row:1/span 30;position:sticky;top:24px}
+  #ckBody>*:not(.ck-left){grid-column:2}
   #ckBody>.cap:first-of-type,#ckBody>.note:first-of-type{margin-top:0}
   #pyTop{max-width:520px}
   /* Money and Debts: two columns */
@@ -982,6 +982,187 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 #paySet .pay-f .note{margin:6px 2px 0}
 #payInfo .lnk{font:inherit;padding:0}
 
+/* ================= DESKTOP BENTO (≥1100px): no dead air ================= */
+@media(min-width:1100px){
+  .app{padding-top:16px!important;padding-bottom:16px!important}
+  .pg[data-pg=home].dk-on{display:none}
+  .pg[data-pg=home].dk-on.on{display:block}
+  .dk-on>.home-l,.dk-on>.home-r{display:none!important}
+  .dk-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:118px 118px 132px minmax(250px,1fr);gap:14px;height:calc(100vh - 32px);min-height:640px}
+  .dk-c,.dk-hero{border-radius:24px;padding:16px 18px;min-width:0;min-height:0;overflow:hidden;position:relative}
+  .dk-c{background:var(--card);border:1px solid var(--line)}
+  .dk-inc{grid-area:1/1/2/4}.dk-exp{grid-area:2/1/3/4}
+  .dk-hero{grid-area:1/4/3/9}
+  .dk-up{grid-area:1/9/3/13;display:flex;flex-direction:column}
+  .dk-donut{grid-area:3/1/5/5;display:flex;flex-direction:column;align-items:center}
+  .dk-goal{grid-area:3/5/4/7}.dk-debt{grid-area:3/7/4/9}
+  .dk-chart{grid-area:4/5/5/9;display:flex;flex-direction:column}
+  .dk-next{grid-area:3/9/4/13;display:flex;flex-direction:column;justify-content:center;padding:10px}
+  .dk-acc{grid-area:4/9/5/13;display:flex;flex-direction:column}
+  .dk-goal .dk-big,.dk-debt .dk-big{font-size:24px}
+  .dk-h{display:flex;align-items:center;gap:8px;width:100%;margin-bottom:6px}
+  .dk-h h3{font-size:15px;font-weight:600;letter-spacing:-.1px}
+  .dk-h .dk-sub{font-size:12px;color:var(--sub);margin-left:4px}
+  .dk-go{margin-left:auto;width:28px;height:28px;border-radius:50%;background:var(--card2);color:var(--sub);display:grid;place-items:center;font-size:14px;flex:none}
+  .dk-go:hover{background:var(--card3);color:var(--ink)}
+  .dk-big{display:block;font-size:30px;font-weight:700;letter-spacing:-.8px;font-variant-numeric:tabular-nums;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dk-big .of{font-size:15px;font-weight:500;color:var(--sub);letter-spacing:0}
+  .dk-c small{display:block;font-size:12px;color:var(--sub);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dec{opacity:.38;font-size:.62em;font-weight:600;letter-spacing:0}
+  .chg{margin-left:auto;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--card2)}
+  .chg.up{color:var(--mint)}.chg.dn{color:var(--coral,#ff6f61)}
+  .dk-bar{display:block;height:7px;border-radius:99px;background:var(--card3);margin-top:10px;overflow:hidden}
+  .dk-bar>i{display:block;height:100%;border-radius:inherit;background:var(--mint)}
+  .dk-bar.y>i{background:#ffb547}
+  /* hero: the balance on a light card, with a 30-day bar trail */
+  .dk-hero{background:linear-gradient(135deg,#ffffff 0%,#f5f5f7 38%,#cfe3f8 100%);color:#1d1d1f;border:0;display:flex;flex-direction:column;justify-content:space-between;padding:20px 24px}
+  .dk-hero .hd{display:flex;justify-content:space-between;align-items:flex-start;padding:0;margin:0;position:relative;z-index:1}
+  .dk-hero .hd h1{font-size:15px;font-weight:600;color:#6e6e73;letter-spacing:0}
+  .dk-hero .hd .bal b{font-size:52px;font-weight:600;letter-spacing:-1.6px;color:#1d1d1f}
+  .dk-hero .hd .bal{margin-top:8px}
+  .dk-hero .hd small{color:#6e6e73}
+  .dk-hero .hd .eye{color:#6e6e73}
+  .dk-hero .hd .av{display:none}
+  .dk-hero .hd .pill{background:#1d1d1f!important;color:#fff!important}
+  .dk-spark{position:absolute;right:22px;bottom:18px;width:42%;height:46%;display:flex;align-items:flex-end;gap:3px;opacity:.85}
+  .dk-spark i{flex:1;border-radius:3px 3px 1px 1px;background:linear-gradient(180deg,#0066cc,#4d94e0)}
+  .dk-spark i.nil{background:rgba(0,0,0,.08)}
+  /* upcoming payments: a tall list that scrolls inside its card */
+  .dk-up .sec-h{margin:0 0 10px!important}
+  .dk-up .sec-h h2{font-size:15px!important;font-weight:600}
+  .dk-up .up{flex:1;overflow:auto;align-content:start;gap:6px;margin-right:-8px;padding-right:8px}
+  .dk-up .pay{background:var(--card2)!important;border:0!important;border-radius:16px}
+  /* donut card */
+  .dk-donut .ring-wrap{width:min(100%,300px)!important;margin:2px auto 0;flex:none}
+  .dk-donut .legend{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:6px}
+  .dk-donut .seg{width:100%;margin-top:auto}
+  .dk-donut .seginfo{width:100%}
+  /* paydays chart */
+  .dk-bars{flex:1;display:flex;align-items:stretch;gap:14px;min-height:0;padding:6px 4px 0}
+  .dk-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;max-width:80px;margin:0 auto}
+  .dk-stack{flex:1;width:100%;display:flex;flex-direction:column-reverse;gap:2px;justify-content:flex-start}
+  .dk-stack i{display:block;width:100%;border-radius:8px;background:var(--c);min-height:4px}
+  .dk-col span{font-size:11px;color:var(--sub);white-space:nowrap}
+  .dk-leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+  .dk-leg span{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:6px}
+  .dk-leg span::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+  .dk-chart .empty{flex:1;display:grid;place-items:center}
+  /* next payday */
+  .dk-next .pdcard{margin:0!important;flex:none}
+  .dk-next .dk-list{flex:1}
+  .dk-list{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0}
+  .dk-list button{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:12px;text-align:left}
+  .dk-list button:hover{background:var(--card2)}
+  .dk-list .ic{width:28px;height:28px;border-radius:9px;flex:none}
+  .dk-list b{flex:1;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dk-list span{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+}
+@media(min-width:1100px) and (min-height:860px){
+  .dk-grid{grid-template-rows:128px 128px 140px minmax(250px,1fr)}
+}
+@media(min-width:1100px){
+  .dk-next .pdcard{height:100%;border-radius:18px}
+  .dk-donut{justify-content:space-between}
+  .dk-donut .legend{display:grid;gap:6px}
+  .dk-acc .dk-list{flex:1}
+}
+@media(min-width:1100px){
+  .dk-hero .hd{width:100%;gap:16px}
+  .dk-hero .hd>div:first-child{min-width:0}
+  .dk-hero .hd .hd-r{flex:none;display:flex;align-items:center}
+  .dk-hero .hd .bal b{font-size:clamp(34px,3.4vw,50px)}
+  .dk-h h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dk-list .ic{width:30px;height:30px;border-radius:10px;background:#0066cc;color:#fff;display:grid;place-items:center}
+  .dk-list .ic svg{width:16px;height:16px}
+  .dk-donut .ring-wrap{width:min(100%,340px)!important}
+  .dk-donut .legend{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .dk-donut .legend button{padding:6px 9px}
+}
+@media(min-width:1100px){
+  .dk-link{cursor:pointer;transition:background .15s}
+  .dk-link:hover{background:var(--card2)}
+  .dk-donut .dk-h .seg{width:auto!important;margin:0 0 0 auto!important;flex:none;padding:3px}
+  .dk-donut .dk-h .seg button{padding:5px 12px;font-size:12px;min-height:0;height:auto}
+  .dk-donut .ring-wrap{flex:1;display:flex;align-items:center;justify-content:center;max-height:none}
+  .dk-donut .legend{margin-top:auto}
+}
+/* desktop-only widgets are hidden on phones */
+.dkw,.ck-side{display:none}
+.hist-cols{display:block}
+@media(min-width:1100px){
+  .dkw{display:block}.dkw[hidden]{display:none}
+  .dkw.dk-c:empty{display:none}
+  /* Checklist: summary column fills with this payday + coming paydays */
+  .ck-left{display:flex;flex-direction:column;gap:14px}
+  .ck-side{display:flex;flex-direction:column;gap:14px}
+  .ck-card{padding:16px 18px}
+  .hb{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;margin-top:10px}
+  .hb span{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:8px}
+  .hb span i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+  .hb b{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+  .hb em{grid-column:1/-1;height:6px;border-radius:99px;background:var(--card3);overflow:hidden}
+  .hb em i{display:block;height:100%;border-radius:inherit;background:var(--c)}
+  .hb.tot{border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
+  .hb.tot span{color:var(--ink);font-weight:600}
+  .hb b.neg{color:#ff6f61}
+  .np{display:grid;grid-template-columns:auto auto 1fr;gap:10px;align-items:baseline;padding:9px 0;border-top:1px solid var(--line)}
+  .np:first-of-type{border-top:0}
+  .np b{font-size:14px;font-weight:600}.np small{font-size:12px;color:var(--sub)}
+  .np span{justify-self:end;font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
+  /* Plan: all three parts on one screen, no switching */
+  #planSeg{display:none!important}
+  .plan-main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-content:start}
+  .plan-main>[data-pp]{display:block!important;margin:0!important}
+  .plan-main>[data-pp=bills]{grid-column:1/-1;grid-row:2}
+  .plan-main>[data-pp=pay]{grid-column:1;grid-row:1}
+  .plan-main>[data-pp=split]{grid-column:2;grid-row:1}
+  .plan-main>[data-pp=pay]::before,.plan-main>[data-pp=split]::before{display:block;font-size:15px;font-weight:600;margin:0 0 10px 2px}
+  .plan-main>[data-pp=pay]::before{content:"Pay"}
+  .plan-main>[data-pp=split]::before{content:"Savings split"}
+  /* History: list beside a chart */
+  .hist-cols{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-items:start;margin-top:14px}
+  .hist-cols .list{margin-top:0!important}
+  #logChart{position:sticky;top:16px;min-height:340px;display:flex;flex-direction:column}
+  #logChart .dk-bars{min-height:200px}
+  .dk-pair{flex:1;width:100%;display:flex;align-items:flex-end;gap:4px;justify-content:center}
+  .dk-pair i{flex:1;max-width:26px;border-radius:7px 7px 3px 3px;background:var(--c);min-height:3px}
+  .dk-trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .dk-trio b{display:block;font-size:18px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+  .dk-trio small{margin:0}
+  /* Money: allocation under goals */
+  #mAlloc{margin-top:14px;padding:16px 18px}
+  .alloc{display:flex;height:14px;border-radius:99px;overflow:hidden;gap:2px;margin:8px 0 12px}
+  .alloc i{display:block;height:100%;background:var(--c);min-width:3px}
+  .alloc-l{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 18px}
+  .alloc-l div{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:13px}
+  .alloc-l span{display:flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .alloc-l span i{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+  .alloc-l b{font-weight:600}.alloc-l em{font-style:normal;color:var(--sub);font-variant-numeric:tabular-nums;min-width:74px;text-align:right}
+  /* Debts: payoff timeline + next debt payments */
+  #dTime{margin-top:14px;padding:16px 18px}
+  .pt{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 44px;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+  .pt:first-of-type{border-top:0}
+  .pt b{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pt small{font-size:12px;color:var(--sub);margin:2px 0 0}
+  .pt em{height:8px;border-radius:99px;background:var(--card3);overflow:hidden}
+  .pt em i{display:block;height:100%;background:#ffb547;border-radius:inherit}
+  .pt>span{font-size:13px;font-weight:600;text-align:right}
+  .dk-bars.mini{height:150px;flex:none}
+  .dk-bars.mini .dk-col b{font-size:11px;font-weight:600}
+  /* Settings: cards pack like a masonry wall */
+  .pg[data-pg=settings] .set{display:block!important;columns:3 300px;column-gap:16px}
+  .pg[data-pg=settings] .set>*{break-inside:avoid;margin:0 0 16px!important;display:block}
+  .pg[data-pg=settings] .set .foot{column-span:all}
+}
+@media(min-width:1100px){
+  #dNext{margin-top:14px;padding:16px 18px}
+  #dNext .dk-bars.mini{height:190px}
+  .hist-cols #logChart{min-height:420px}
+  .hist-cols #logChart .dk-bars{flex:1}
+}
+@media(min-width:1100px){html[data-theme=light] .dk-hero{box-shadow:0 0 0 1px var(--line)}}
+@media(min-width:1100px) and (max-width:1359px){.dk-donut .legend{grid-template-columns:repeat(2,minmax(0,1fr))!important}.dk-donut .ring-wrap{width:min(100%,280px)!important}}
+
 </style>
 </head>
 <body>
@@ -1087,8 +1268,8 @@ body.dragging,body.dragging *{cursor:grabbing!important}
   </div>
   <div data-yp="hist" hidden>
     <div class="tiles" id="logSum"></div>
-  <div class="list" id="logList"></div>
-    <button class="it add solo" type="button" id="logNew">+ Log a past payday</button>
+  <div class="hist-cols"><div class="hist-l"><div class="list" id="logList"></div>
+    <button class="it add solo" type="button" id="logNew">+ Log a past payday</button></div><div class="dkw dk-c" id="logChart"></div></div>
   </div>
 </section>
 
@@ -1107,6 +1288,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
   <div class="col">
   <div class="sec-h c2h"><h2>Savings goals</h2></div>
   <div class="list" id="goals"></div>
+  <div class="dkw dk-c" id="mAlloc"></div>
   </div>
   </div>
 </section>
@@ -1119,11 +1301,13 @@ body.dragging,body.dragging *{cursor:grabbing!important}
   <div class="sec-h"><h2>From each payday</h2><b id="debtSum" class="sec-v"></b></div>
   <div class="list" id="debts"></div>
   <p class="note" id="loanNote" style="margin:8px 4px 0"></p>
+  <div class="dkw dk-c" id="dTime"></div>
   </div>
   <div class="col">
   <div class="sec-h c2h"><h2>Due-date trackers</h2></div>
   <div class="tiles" id="tSum"></div>
   <div class="list" id="tList"></div>
+  <div class="dkw dk-c" id="dNext"></div>
   </div>
   </div>
 </section>
@@ -1449,7 +1633,7 @@ function setEye(){
   $('balSub').textContent=useBank?s.bank.length+' account'+(s.bank.length===1?'':'s')+(s.balAt?' · updated '+dShort(T.parse(s.balAt)):''):s.accts.length?'Total in '+s.accts.length+' savings goal'+(s.accts.length===1?'':'s'):'Add your accounts in Money';
   $('setHide').setAttribute('aria-checked',String(hidden));
 }
-const toggleHide=()=>{hidden=!hidden;persist('dc_bud_hide',hidden);setEye();renderHomeX();if(document.querySelector('.pg.on[data-pg=wallet]'))renderWallet()};
+const toggleHide=()=>{hidden=!hidden;persist('dc_bud_hide',hidden);setEye();renderHomeX();try{renderDk()}catch(_){};if(document.querySelector('.pg.on[data-pg=wallet]'))renderWallet()};
 $('eye').addEventListener('click',toggleHide);$('setHide').addEventListener('click',toggleHide);
 $('range').addEventListener('click',e=>{const b=e.target.closest('button[data-r]');if(!b)return;range=b.dataset.r;segSet($('range'),'r',range);renderHome()});
 
@@ -1482,7 +1666,7 @@ function renderHome(){
   $('ringL').textContent=f?f[1]:(g.net?'Net pay':'No pay yet');{const rv=$('ringV'),v=f?g[f[0]]:g.net,txt=range==='pay'?peso(v):peso(Math.round(v));rv.textContent=txt;countUp(rv);rv.style.fontSize=(txt.length<=8?25:txt.length<=10?22:txt.length<=12?19:16)+'px'}$('ringS').textContent=f?Math.round(g[f[0]]/total*100)+'% of pay':(g.net?lbl:'Set it in Plan');
   $('legend').innerHTML=L.map(([k,n,c])=>`<li><button type="button" data-seg="${k}" class="${focusSeg===k?'on':''}" style="--c:${c}" aria-pressed="${focusSeg===k}"><span>${n}</span><b>${peso(range==='pay'?g[k]:Math.round(g[k]))}</b></button></li>`).join('');
   setStatus($('status'),calc(s.payday));
-  renderUpcoming();renderHomeX();renderPdCard();
+  renderUpcoming();renderHomeX();renderPdCard();try{renderDk()}catch(e){console.error(e)}
 }
 function renderPdCard(){const c=$('pdCard');if(!c)return;const p=pdRec(false),{L}=ckPlan(),n=p?L.filter(x=>p.items.find(y=>y.key===x.key)).length:0,d=T.parse(curPd()),fut=pdFuture();
   const dn=Math.round((d-new Date(new Date().toDateString()))/864e5);let t,sub,pr=L.length?n/L.length:0;c.dataset.to='check';
@@ -1657,7 +1841,7 @@ function renderWallet(){
     const sub=g?peso(b)+' of '+peso(g)+(need===0?' · reached':k>0?' · ~'+Math.ceil(need/k)+' paydays':''):'Set a goal amount';
     return `<button class="it" type="button" data-eg="${i}"><span class="gring" style="--c:${c}"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16"/><circle cx="20" cy="20" r="16" stroke-dasharray="${CIR}" stroke-dashoffset="${CIR*(1-pr)}"/></svg><b>${Math.round(pr*100)}%</b></span><span><b>${escapeHTML(a.n||'Untitled goal')}</b><small>${sub}</small></span><span class="val">${a.k>=0&&a.k<=2?num(s.pct[a.k])+'%':'—'}<small>of extra</small></span><i class="chev"></i></button>`}).join('')
     +'<button class="it add" type="button" id="addGoal">+ Add savings goal</button>';
-  renderBank();
+  renderBank();try{renderAlloc()}catch(e){console.error(e)}
   const tot=s.accts.reduce((a,x)=>a+num(x.b),0);
   walletSubSet();
 }
@@ -1916,7 +2100,7 @@ function renderUpcoming(){
   const items=ts.trackers.map(t=>{const n=T.next(t);return n&&{t,n}}).filter(Boolean).sort((a,b)=>a.n.d-b.n.d);
   if(!items.length){box.innerHTML='<div class="empty">All your trackers are paid up.</div>';return}
   const wide=matchMedia('(min-width:900px)').matches;
-  box.innerHTML=items.slice(0,wide?6:3).map(({t,n})=>{const st=status(t,n),tag=st[0]==='late'?'<span class="tag late">Overdue</span>':st[0]==='today'?'<span class="tag today">Today</span>':'';
+  box.innerHTML=items.slice(0,dkMoved?12:wide?6:3).map(({t,n})=>{const st=status(t,n),tag=st[0]==='late'?'<span class="tag late">Overdue</span>':st[0]==='today'?'<span class="tag today">Today</span>':'';
     return `<button class="pay" type="button" data-tid="${escapeHTML(t.id)}"><span class="ic" style="--c:${CATC[t.category]||'var(--white)'}">${escapeHTML((t.name||'?').charAt(0).toUpperCase())}</span><span><small>${dLong(n.d)}${tag}</small><b>${escapeHTML(t.name)}</b></span><span class="amt">${t.amount?tm(t.amount):'—'}<em>${PER[t.frequency]||''}</em></span></button>`}).join('');
 }
 
@@ -2035,7 +2219,7 @@ function renderLog(){
   const L=sortedLog(),last=L[0],saved=s.log.reduce((a,p)=>a+(lTot(p).by['Savings']||0),0);
   /* history pane has no subtitle of its own */
   $('logSum').innerHTML=`<div><span>Saved, all paydays</span><b>${peso(Math.round(saved))}</b></div><div><span>Last payday</span><b>${last?dShort(T.parse(last.date)||new Date()):'—'}</b></div><div class="${last&&lTot(last).left<0?'bad':''}"><span>Left last time</span><b>${last?peso(Math.round(lTot(last).left)):'—'}</b></div>`;
-  $('logSum').hidden=!L.length;
+  $('logSum').hidden=!L.length;try{renderLogChart()}catch(e){console.error(e)}
   $('logList').innerHTML=L.length?L.map(p=>{const t=lTot(p),sv=t.by['Savings']||0;
     return `<button class="it" type="button" data-lp="${escapeHTML(p.id)}"><i class="ic" style="--c:var(--blue);color:#fff">${ICONS.bill}</i><span><b>${fmtDay(p.date)}</b><small>Saved ${peso(sv)} · ${p.items.length} entr${p.items.length===1?'y':'ies'}</small></span><span class="val${t.left<0?' red':''}">${peso2(t.left)}<small>left</small></span><i class="chev"></i></button>`}).join('')
     :'<div class="empty">No paydays logged yet.<br>After each payday, log your net pay and every transfer or expense.<br><button class="pill" type="button" id="logNew2">Log a payday</button></div>';
@@ -2196,12 +2380,12 @@ function renderCheck(){const box=$('ckBody');if(!box)return;adoptExtras(pdRec(fa
   $('pySub').textContent=dLong(d)+' · '+which;
   const row=x=>{const dd=done(x.key);if(sk(x.key))return `<button class="ckr skip" type="button" data-unskip="${x.key}"><i class="ckb" aria-hidden="true"></i><span><b>${escapeHTML(x.n)}</b><small>Skipped this payday · tap to bring back</small></span><em>${peso2(x.a)}</em></button>`;return `<button class="ckr${dd?' done':''}" type="button" data-ck="${x.key}"><i class="ckb" aria-hidden="true">${ICONS.ok}</i><span><b>${escapeHTML(x.n)}</b><small>${escapeHTML(flowTxt(x))}</small></span><em>${peso2(dd?dd.a:x.a)}</em>${dd?'':`<i class="ckskip" data-skip="${x.key}" role="button" aria-label="Skip ${escapeHTML(x.n)} this payday">Skip</i>`}</button>`};
   const grp=(title,keys)=>{const R=L.filter(x=>keys.includes(x.t));return R.length?`<p class="cap">${title}</p><div class="list ckl">${R.map(row).join('')}</div>`:''};
-  box.innerHTML=`<div class="ck-hero${all?' win':''}">
+  box.innerHTML=`<div class="ck-left"><div class="ck-hero${all?' win':''}">
       <div class="ck-top"><div><small>${all?'Payday complete':pdFuture()?'Upcoming payday · get ready':'Payday checklist'}</small><b>${all?'All done 🎉':n+' of '+Lc.length+' done'}</b></div>
       <div class="ck-ring"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="18"/><circle cx="22" cy="22" r="18" stroke-dasharray="${2*Math.PI*18}" stroke-dashoffset="${2*Math.PI*18*(1-pr)}"/></svg><span>${Math.round(pr*100)}%</span></div></div>
       <label class="fld"><span>Net pay received</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" id="ckNet" value="${net||''}" placeholder="0.00"></div></label>
       <div class="ck-m"><div><span>Moved / spent</span><b id="ckOut">${peso2(t.out)}</b></div>${(()=>{const pr=payRef();if(!pr)return `<div><span>Left in pay account</span><b id="ckLeft" class="${t.left<0?'neg':''}">${peso2(t.left)}</b></div>`;const a=s.bank[pr.i],v=pr.sj!=null&&hasSubs(a)?num(a.subs[pr.sj].bal):num(a.bal);return `<div><span>${escapeHTML(a.n)} balance now</span><b id="ckLeft" data-real="1" class="${v<0?'neg':''}">${peso2(v)}</b></div>`})()}</div>
-    </div>
+    </div>${ckSide(p,t)}</div>
     ${L.length?'<p class="note" style="margin:10px 4px 0">Tap an item once it\'s done. Only ticked items count and move money. Not this time? Tap Skip.</p>':'<div class="empty" style="margin-top:12px">Nothing planned yet.<br>Add your pay, bills and savings in the Plan tab, then come back here on payday.<br><button class="pill" type="button" data-y-go="plan">Open Plan</button></div>'}
     ${payBox()}${grp('Pay',['Income'])}${grp('Debts & contributions',['Loan & Coop'])}${grp('Savings',['Savings'])}${grp('Bills & living costs',['Living cost'])}
     ${extras.length?`<p class="cap">Also this payday · not in your plan</p><div class="list ckl">${extras.map(x=>`<button type="button" class="ckr done extra" data-cx="${p.items.indexOf(x)}"><i class="ckb" aria-hidden="true">${ICONS.ok}</i><span><b>${escapeHTML(x.n||x.t)}</b><small>${escapeHTML(x.t)}${x.acct?' · '+escapeHTML(x.acct):''} · tap to edit or remove</small></span><em>${x.t==='Income'?'+':''}${peso2(x.a)}</em></button>`).join('')}</div>`:''}
@@ -2234,7 +2418,7 @@ $('ckBody').addEventListener('change',e=>{if(e.target.id==='ckNet')renderCheck()
 /* Debts page */
 function renderBills(){const r=calc(s.payday);debtRows(r);$('debtSum').textContent=r.loan?peso2(r.loan)+' this cutoff':'';
   $('loanNote').textContent=s.loans.length?'Checking a debt off in the payday checklist counts the payment automatically.':'Add loans and coop deductions that come out of each payday.';
-  renderTrackers();let left=0;s.loans.forEach(l=>{const i=debtInfo(l);if(i)left+=i.amt});
+  renderTrackers();try{renderDebtTime()}catch(e){console.error(e)}let left=0;s.loans.forEach(l=>{const i=debtInfo(l);if(i)left+=i.amt});
   $('billsSub').textContent=s.loans.length||ts.trackers.length?(left?peso(Math.round(left))+' left to pay':'All paid up')+' · '+(s.loans.length+ts.trackers.length)+' item'+(s.loans.length+ts.trackers.length===1?'':'s'):'Loans, installments and contributions.'}
 
 /* ========== ME (profile sheet from the logo) ========== */
@@ -2434,6 +2618,83 @@ function renderPaySet(){const box=$('payFields');if(!box)return;const P=pay();
 function setPay(ch){s.pay=Object.assign({},pay(),ch);pdPicked=false;save();renderPaySet();render()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-pt]');if(!b)return;const ch={t:b.dataset.pt};if((ch.t==='weekly'||ch.t==='biweekly')&&!pay().a)ch.a=iso(new Date());setPay(ch);toast(PAYT[ch.t])});
 document.addEventListener('change',e=>{const id=e.target.id;if(id==='payD1'||id==='payD2'){const v=Math.min(31,Math.max(1,parseInt(e.target.value,10)||0));if(!v)return renderPaySet();setPay(id==='payD1'?{d1:v}:{d2:v})}else if(id==='payA'&&e.target.value)setPay({a:e.target.value})});
+/* ========== DESKTOP BENTO: every card earns its space (≥1100px wide) ========== */
+const DK=matchMedia('(min-width:1100px)');
+const pesoDk=(v,mask)=>{if(mask)return '••••••';const n=Number(v)||0,s2=Math.abs(n).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2}),[w,d]=s2.split('.');return `${n<0?'−':''}₱${w}<span class="dec">.${d}</span>`};
+const chg=(a,b)=>{if(!b)return '';const p=Math.round((a-b)/Math.abs(b)*100);if(!isFinite(p)||!p)return '';return `<span class="chg ${p>0?'up':'dn'}">${p>0?'▲':'▼'} ${Math.abs(p)}%</span>`};
+let dkMoved=null;
+function dkMount(){const sec=document.querySelector('[data-pg=home]');if(!sec)return;
+  if(DK.matches&&!dkMoved){
+    const g=document.createElement('div');g.className='dk-grid';g.id='dkGrid';
+    g.innerHTML=`<div class="dk-c dk-inc" id="dkInc"></div><div class="dk-c dk-exp" id="dkExp"></div><div class="dk-hero" id="dkHero"><div id="dkHeroIn"></div><div class="dk-spark" id="dkSpark"></div></div>
+      <div class="dk-c dk-up" id="dkUp"></div><div class="dk-c dk-donut" id="dkDonut"><div class="dk-h" id="dkDonutH"><h3>Your pay</h3></div></div>
+      <div class="dk-c dk-goal dk-link" id="dkGoal" data-go="wallet"></div><div class="dk-c dk-debt dk-link" id="dkDebt" data-go="bills"></div><div class="dk-c dk-chart" id="dkChart"></div>
+      <div class="dk-c dk-next" id="dkNext"></div><div class="dk-c dk-acc" id="dkAcc"></div>`;
+    sec.appendChild(g);
+    const mv=[[sec.querySelector('.hd'),'dkHeroIn'],[sec.querySelector('.home-r .sec-h'),'dkUp'],[$('upList'),'dkUp'],[sec.querySelector('.ring-wrap'),'dkDonut'],[$('legend'),'dkDonut'],[$('segInfo'),'dkDonut'],[$('range'),'dkDonutH'],[$('pdCard'),'dkNext']];
+    dkMoved=mv.filter(([el])=>el).map(([el,to])=>{const r={el,parent:el.parentNode,next:el.nextSibling};$(to).appendChild(el);return r});
+    sec.classList.add('dk-on')}
+  else if(!DK.matches&&dkMoved){dkMoved.slice().reverse().forEach(r=>r.parent.insertBefore(r.el,r.next));dkMoved=null;const g=$('dkGrid');if(g)g.remove();sec.classList.remove('dk-on')}}
+try{DK.addEventListener('change',()=>{dkMount();render()})}catch(_){DK.addListener&&DK.addListener(()=>{dkMount();render()})}
+function lastPaydays(n){const today=iso(new Date());return sortedLog().filter(p=>String(p.date)<=today||p.date===curPd()).slice(0,n)}
+function renderDk(){if(!dkMoved)return;const H=hidden;
+  /* this payday in / out, compared with the one before */
+  const L=lastPaydays(2),p=L[0],q=L[1],a=p?lTot(p):{inc:num(s.net),out:0,by:{}},b=q?lTot(q):null;
+  $('dkInc').innerHTML=`<div class="dk-h"><h3>Came in</h3>${b?chg(a.inc,b.inc):''}</div><b class="dk-big">${pesoDk(a.inc,H)}</b><small>${p?'Payday '+dShort(T.parse(p.date)):'Your net pay'}${a.by['Income']?' · incl. '+(H?'••••':peso(a.by['Income']))+' extra':''}</small>`;
+  $('dkExp').innerHTML=`<div class="dk-h"><h3>Moved / spent</h3>${b?chg(a.out,b.out):''}</div><b class="dk-big">${pesoDk(a.out,H)}</b><small>${a.inc?Math.round(a.out/a.inc*100)+'% of what came in':'Tick items in the checklist'}</small>`;
+  /* balance spark: total of all accounts, day by day, last 30 days */
+  const today=new Date(new Date().toDateString()),firstD=s.bank.reduce((m2,acc)=>{const h0=(acc.hist||[])[0];return h0&&(!m2||String(h0.d)<m2)?String(h0.d):m2},''),since=firstD?Math.round((today-T.parse(firstD))/864e5)+1:7,days=Math.max(7,Math.min(30,since)),vals=[];
+  for(let k=days-1;k>=0;k--){const d=iso(new Date(today.getFullYear(),today.getMonth(),today.getDate()-k));let tot=0,any=false;
+    s.bank.forEach(acc=>{const Hh=(acc.hist||[]).filter(e=>String(e.d)<=d);const last=Hh.length?num(Hh[Hh.length-1].bal):null;if(last!=null){any=true;tot+=acc.cur==='USD'?last*num(s.usd):last}});vals.push(any?tot:null)}
+  const vv=vals.filter(v=>v!=null),mx=Math.max(...vv,1),mn=Math.min(...vv,mx),rg=mx-mn||1;
+  $('dkSpark').innerHTML=vals.map(v=>`<i style="height:${v==null?4:18+(v-mn)/rg*82}%" class="${v==null?'nil':''}"></i>`).join('');
+  /* emergency fund */
+  const m=meData();
+  $('dkGoal').innerHTML=`<div class="dk-h"><h3>Emergency fund</h3></div>${m.ef?`<b class="dk-big">${H?'••••••':peso(Math.round(m.efSaved))}</b><i class="dk-bar"><i style="width:${Math.min(m.efp,1)*100}%"></i></i><small>${Math.round(m.efp*100)}% of ${peso(m.ef.g)}${m.efFrom?' · '+escapeHTML(m.efFrom):''}</small>`:'<small>Add an Emergency fund goal in Money.</small>'}`;
+  /* debts */
+  let tot=0,paid=0;s.loans.forEach(l=>{const t2=num(l.total);if(t2){tot+=t2*num(l.a);paid+=Math.min(num(l.paid),t2)*num(l.a)}});
+  $('dkDebt').innerHTML=`<div class="dk-h"><h3>Debts left</h3></div>${m.dAmt?`<b class="dk-big">${H?'••••••':peso(Math.round(m.dAmt))}</b><i class="dk-bar y"><i style="width:${tot?paid/tot*100:0}%"></i></i><small>${tot?Math.round(paid/tot*100)+'% paid':''}${m.dLast?' · free by '+m.dLast.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):''}</small>`:`<b class="dk-big">₱0</b><small>${s.loans.length?'All paid off 🎉':'No debts added'}</small>`}`;
+  /* paydays chart: where each payday went */
+  const P=sortedLog().slice(0,6).reverse(),K=[['Living cost','Bills',C.bills],['Loan & Coop','Debts',C.loan],['Savings','Savings',C.save]];
+  const rows=P.map(x=>{const t2=lTot(x);return {d:x.date,by:t2.by,inc:t2.inc,left:Math.max(t2.inc-t2.out,0)}});
+  const top=Math.max(...rows.map(r=>Math.max(r.inc,K.reduce((s2,k)=>s2+(r.by[k[0]]||0),0)+r.left)),1);
+  $('dkChart').innerHTML=`<div class="dk-h"><h3>Paydays</h3><small class="dk-sub">Where each payday went</small><button class="dk-go" type="button" data-go="payday" aria-label="Open Payday">↗</button></div>
+    ${rows.length?`<div class="dk-bars">${rows.map(r=>`<div class="dk-col" title="${dShort(T.parse(r.d))}"><div class="dk-stack">${[...K.map(k=>[r.by[k[0]]||0,k[2],k[1]]),[r.left,C.main,'Left']].map(([v,c,n])=>v>0?`<i style="height:${v/top*100}%;--c:${c}" title="${n}: ${H?'••••':peso(Math.round(v))}"></i>`:'').join('')}</div><span>${dShort(T.parse(r.d))}</span></div>`).join('')}</div>
+    <div class="dk-leg">${[...K.map(k=>[k[1],k[2]]),['Left',C.main]].map(([n,c])=>`<span style="--c:${c}">${n}</span>`).join('')}</div>`:'<div class="empty">Log your first payday to see this chart.</div>'}`;
+  /* accounts */
+  $('dkAcc').innerHTML=`<div class="dk-h"><h3>Accounts</h3><button class="dk-go" type="button" data-go="wallet" aria-label="Open Money">↗</button></div><div class="dk-list">${s.bank.length?s.bank.map(acc=>`<button type="button" data-go="wallet"><i class="ic" style="--c:#0066cc">${ICONS.bank}</i><b>${escapeHTML(acc.n||'Account')}</b><span>${H?'••••••':money(acc,acctBal(acc))}</span></button>`).join(''):'<div class="empty">Add your accounts in Money.</div>'}</div>`;
+}
+/* desktop-only side cards: fill the space with what helps on payday */
+function ckSide(p,tt){if(!DK.matches)return '';const H=hidden,mask=v=>H?'••••':v;
+  const K=[['Income','Extra income',C.main],['Loan & Coop','Debts',C.loan],['Savings','Savings',C.save],['Living cost','Bills & living',C.bills],['Other','Other','#a1a1a6']];
+  const inc=Math.max(tt.inc,1),rows=K.filter(k=>tt.by[k[0]]);
+  const by=`<div class="dk-c ck-card"><div class="dk-h"><h3>This payday</h3><small class="dk-sub">${p?dShort(T.parse(p.date)):''}</small></div>
+    ${rows.length?rows.map(([k,n,c])=>`<div class="hb"><span><i style="--c:${c}"></i>${n}</span><b>${mask(peso(tt.by[k]))}</b><em><i style="width:${Math.min(tt.by[k]/inc,1)*100}%;--c:${c}"></i></em></div>`).join(''):'<small>Nothing ticked yet.</small>'}
+    <div class="hb tot"><span>Left from this payday</span><b class="${tt.left<0?'neg':''}">${mask(peso2(tt.left))}</b></div></div>`;
+  const nx=paydaysFrom(new Date(Date.now()+864e5),4),now=new Date(new Date().toDateString());
+  const up=`<div class="dk-c ck-card"><div class="dk-h"><h3>Coming paydays</h3></div>${nx.map(d=>{const r=calc(iso(d)),out=r.sub+r.loan+r.sched,dn=Math.round((d-now)/864e5);
+    return `<div class="np"><b>${dShort(d)}</b><small>${dn<=1?'tomorrow':'in '+dn+' days'}</small><span>${out?mask(peso(Math.round(out)))+' planned out':'—'}</span></div>`}).join('')}</div>`;
+  return `<div class="ck-side">${by}${up}</div>`}
+function renderLogChart(){const box=$('logChart');if(!box)return;if(!DK.matches){box.innerHTML='';return}const H=hidden;
+  const P=sortedLog().slice(0,10).reverse();if(!P.length){box.innerHTML='';return}
+  const R2=P.map(x=>{const t2=lTot(x);return {d:x.date,inc:t2.inc,out:t2.out,sv:t2.by['Savings']||0}}),top=Math.max(...R2.map(r=>Math.max(r.inc,r.out)),1);
+  const tin=R2.reduce((a,r)=>a+r.inc,0),tout=R2.reduce((a,r)=>a+r.out,0),tsv=R2.reduce((a,r)=>a+r.sv,0);
+  box.innerHTML=`<div class="dk-h"><h3>In vs out</h3><small class="dk-sub">last ${R2.length} payday${R2.length>1?'s':''}</small></div>
+    <div class="dk-bars pair">${R2.map(r=>`<div class="dk-col"><div class="dk-pair"><i style="height:${r.inc/top*100}%;--c:${C.main}" title="In"></i><i style="height:${r.out/top*100}%;--c:${C.bills}" title="Out"></i></div><span>${dShort(T.parse(r.d))}</span></div>`).join('')}</div>
+    <div class="dk-leg"><span style="--c:${C.main}">Came in</span><span style="--c:${C.bills}">Moved / spent</span></div>
+    <div class="dk-trio"><div><small>Came in</small><b>${H?'••••':peso(Math.round(tin))}</b></div><div><small>Moved / spent</small><b>${H?'••••':peso(Math.round(tout))}</b></div><div><small>Saved</small><b>${H?'••••':peso(Math.round(tsv))}</b><small>${tin?Math.round(tsv/tin*100)+'% of pay':''}</small></div></div>`}
+function renderAlloc(){const box=$('mAlloc');if(!box)return;if(!DK.matches||!s.bank.length){box.innerHTML='';box.hidden=true;return}box.hidden=false;const H=hidden;
+  const A=s.bank.map(a=>({n:a.n||'Account',v:Math.max(bankPHP(a),0)})).sort((a,b)=>b.v-a.v),tot=A.reduce((x,a)=>x+a.v,0)||1;
+  const pal=['#0066cc','#4d94e0','#98ff98','#ffb547','#ff6f61','#a89cff','#8fd3ff','#c7c7cc','#6e6e73'];
+  box.innerHTML=`<div class="dk-h"><h3>Where your money is</h3><small class="dk-sub">${H?'••••':peso(Math.round(tot))} total</small></div>
+    <div class="alloc">${A.map((a,i)=>`<i style="width:${a.v/tot*100}%;--c:${pal[i%pal.length]}" title="${escapeHTML(a.n)}"></i>`).join('')}</div>
+    <div class="alloc-l">${A.map((a,i)=>`<div><span><i style="--c:${pal[i%pal.length]}"></i>${escapeHTML(a.n)}</span><b>${Math.round(a.v/tot*100)}%</b><em>${H?'••••':peso(Math.round(a.v))}</em></div>`).join('')}</div>`}
+function renderDebtTime(){const box=$('dTime');if(!box)return;if(!DK.matches||!s.loans.length){box.innerHTML='';box.hidden=true;const nb=$('dNext');if(nb){nb.innerHTML='';nb.hidden=true}return}box.hidden=false;const H=hidden;
+  const rows=s.loans.map(l=>{const t2=num(l.total),pd=Math.min(num(l.paid),t2||Infinity),i=debtInfo(l);return {n:l.n||'Debt',pr:t2?pd/t2:0,left:debtLeft(l),i}});
+  const nx=paydaysFrom(new Date(Date.now()-864e5*6),8).filter(d=>d>=new Date(new Date().toDateString())).slice(0,6),outs=nx.map(d=>{const r=calc(iso(d));return r.loan}),top=Math.max(...outs,1);
+  box.innerHTML=`<div class="dk-h"><h3>Payoff timeline</h3></div>${rows.map(r=>`<div class="pt"><div><b>${escapeHTML(r.n)}</b><small>${r.i?(r.left>0?r.left+' payments left · done '+r.i.last.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):''):'Paid off ✓'}</small></div><em><i style="width:${r.pr*100}%"></i></em><span>${Math.round(r.pr*100)}%</span></div>`).join('')}
+`;const nb=$('dNext');if(nb){nb.hidden=false;nb.innerHTML=`<div class="dk-h"><h3>Debt payments, next paydays</h3><small class="dk-sub">${H?'••••':peso(Math.round(outs.reduce((x,y)=>x+y,0)))} over ${nx.length}</small></div>
+    <div class="dk-bars mini">${nx.map((d,k)=>`<div class="dk-col"><div class="dk-stack"><i style="height:${outs[k]/top*100}%;--c:${C.loan}"></i></div><b>${outs[k]?(H?'••':peso(Math.round(outs[k]))):'—'}</b><span>${dShort(d)}</span></div>`).join('')}</div>`}}
 /* ========== SETTINGS ========== */
 function syncChartChips(){const v=chartStyle();document.querySelectorAll('[data-cs]').forEach(b=>b.classList.toggle('on',b.dataset.cs===v));const sn=$('setSnd');if(sn)sn.setAttribute('aria-checked',soundOn())}
 document.addEventListener('click',e=>{if(!e.target.closest('#setSnd'))return;try{localStorage.setItem('dc_bud_snd',soundOn()?'off':'on')}catch(_){}syncChartChips();if(soundOn())glassTing(.3)});
@@ -2465,7 +2726,7 @@ $('bdReset').addEventListener('click',()=>{ask('Erase all data?','Plan, debts, g
 /* ========== RENDER ========== */
 function render(){setTimeout(()=>addPasteBtns(),0);try{renderPaySet()}catch(_){}const p=(document.querySelector('.pg.on')||{dataset:{}}).dataset.pg;
   if(p==='home')renderHome();else if(p==='payday'){fillInputs();renderPlan();renderLog();renderCheck()}else if(p==='wallet')renderWallet();else if(p==='bills')renderBills();else if(p==='settings'){setEye();renderSettings()}else setEye()}
-settleAll();applyProfile();renderPaySet();fillInputs();splitRows();planTab('pay');pyPane('check');
+settleAll();applyProfile();renderPaySet();dkMount();fillInputs();splitRows();planTab('pay');pyPane('check');
 setTimeout(()=>fxUpdate(),1500);
 /* tab bar shrinks while scrolling down and grows back when scrolling up (like Instagram) */
 (function(){let last=0,ticking=false;const tb=$('tabbar');
