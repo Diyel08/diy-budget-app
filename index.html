@@ -975,6 +975,12 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 .me-hero .me-av .av-in svg{width:52%;height:52%}
 .me-name{display:inline-block;margin-top:6px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font:600 12px var(--sf)}
 .me-name:active{opacity:.7}
+/* pay schedule */
+#paySet .pay-t{border-bottom:0}
+#paySet .pay-chips{padding:0 14px 12px;flex-wrap:wrap}
+#paySet .pay-f{padding:0 14px 12px}
+#paySet .pay-f .note{margin:6px 2px 0}
+#payInfo .lnk{font:inherit;padding:0}
 
 </style>
 </head>
@@ -1061,6 +1067,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
           <label class="fld"><span>Work days this cutoff</span><div class="in"><input type="number" inputmode="numeric" min="0" max="16" data-k="days" placeholder="0"><em>days</em></div></label>
         </div>
         <p class="note">Work days are used for daily costs like fare and meals.</p>
+        <p class="note" id="payInfo"></p>
       </div>
       <div data-pp="bills" hidden>
         <div class="grp-h" style="margin:0 4px 8px"><h3 style="font-size:16px;font-weight:600">This cutoff</h3><b id="billsSum"></b></div>
@@ -1134,6 +1141,14 @@ body.dragging,body.dragging *{cursor:grabbing!important}
     <div class="list">
       <label class="it"><i class="ic" style="--c:#0066cc;color:#fff" data-icon="user"></i><span><b>Your name</b><small>Shown in the sidebar and greeting</small></span><input id="setName" class="set-in" type="text" autocomplete="name" placeholder="Add your name" maxlength="40"></label>
       <div class="it"><i class="ic" style="--c:#0066cc;color:#fff" data-icon="user"></i><span><b>Picture</b><small>Your initials or the Di logo</small></span><div class="chips sm"><button type="button" data-av="init">Initials</button><button type="button" data-av="di">Logo</button></div></div>
+    </div>
+    </div>
+    <div class="set-g">
+    <p class="list-t">Pay schedule</p>
+    <div class="list" id="paySet">
+      <div class="it pay-t"><i class="ic" style="--c:#0066cc;color:#fff" data-icon="cal"></i><span><b>How often you get paid</b><small id="payNext">Next payday</small></span></div>
+      <div class="chips pay-chips" id="payType"><button type="button" data-pt="semi">Twice a month</button><button type="button" data-pt="monthly">Monthly</button><button type="button" data-pt="biweekly">Every 2 weeks</button><button type="button" data-pt="weekly">Weekly</button></div>
+      <div class="pay-f" id="payFields"></div>
     </div>
     </div>
     <div class="set-g">
@@ -1254,6 +1269,7 @@ const ICONS_D='M94.5,686.9C72.0,683.3 67.8,682.0 60.0,676.9C46.1,667.6 36.7,655.
 const ICONS={
   pie2:'',
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg>',
   pie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg>',
   gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
@@ -1334,11 +1350,43 @@ const C={bills:'#ff6f61',loan:'#ffb547',save:'#98ff98',wants:'#a89cff',main:'#00
 const splitName=i=>((s.accts.find(a=>a.k===i)||{}).n||'Split '+(i+1));
 const hasSplit=i=>s.accts.some(a=>a.k===i);
 
+/* ========== PAY SCHEDULE: twice a month (any two days), monthly, every 2 weeks, or weekly ========== */
+const PAYT={semi:'Twice a month',monthly:'Monthly',biweekly:'Every 2 weeks',weekly:'Weekly'};
+function pay(){const p=s.pay||{};return {t:PAYT[p.t]?p.t:'semi',d1:Math.min(31,Math.max(1,+p.d1||15)),d2:Math.min(31,Math.max(1,+p.d2||30)),a:p.a||''}}
+const ord=n=>n+(n%100>=11&&n%100<=13?'th':['th','st','nd','rd'][n%10]||'th');
+const dayIn=(y,m,d)=>Math.min(d,new Date(y,m+1,0).getDate());
+/* every payday in a month, in order */
+function paydaysInMonth(y,m){const P=pay();
+  if(P.t==='semi'){const a=dayIn(y,m,Math.min(P.d1,P.d2)),b=dayIn(y,m,Math.max(P.d1,P.d2));return a===b?[new Date(y,m,a)]:[new Date(y,m,a),new Date(y,m,b)]}
+  if(P.t==='monthly')return [new Date(y,m,dayIn(y,m,P.d1))];
+  const step=P.t==='weekly'?7:14,an=T.parse(P.a)||new Date(2026,0,2),first=new Date(y,m,1),last=new Date(y,m+1,0);
+  const k=Math.ceil(Math.round((first-an)/864e5)/step);let d=new Date(an.getFullYear(),an.getMonth(),an.getDate()+k*step);const out=[];
+  while(d<=last){out.push(d);d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+step)}return out}
+const perMonth=()=>({semi:2,monthly:1,biweekly:26/12,weekly:52/12})[pay().t];
+/* the latest payday on or before a date */
+function pdBefore(dt){let y=dt.getFullYear(),m=dt.getMonth();for(let k=0;k<3;k++){const L=paydaysInMonth(y,m).filter(d=>d<=dt);if(L.length)return L[L.length-1];m--;if(m<0){m=11;y--}}return dt}
+/* which kind of payday: first of the month and/or last of the month (monthly pay is both) */
+function ctxOf(w){const P=pay();
+  if(/^\d{4}-\d\d-\d\d$/.test(String(w))){const d=T.parse(w);if(d){const L=paydaysInMonth(d.getFullYear(),d.getMonth()),i=L.findIndex(x=>x.getDate()===d.getDate());return {first:i<=0,last:i<0||i===L.length-1,date:w}}}
+  if(P.t==='semi')return {first:w!=='30th',last:w==='30th'||paydaysInMonth(2026,0).length<2,date:null};
+  return ctxOf(curPd())}
+/* the cuts that make up a month, for the monthly and yearly views */
+function monthCuts(){if(pay().t==='semi')return ['15th','30th'];const n=new Date();return paydaysInMonth(n.getFullYear(),n.getMonth()).map(iso)}
+/* how a payday is named */
+function cutName(w){const P=pay();if(P.t!=='semi'){const c=ctxOf(w);return c.date?dShort(T.parse(c.date))+' payday':'This payday'}
+  const d=w==='30th'?Math.max(P.d1,P.d2):Math.min(P.d1,P.d2);return (d>=31?'End of month':ord(d))}
+/* labels for "when you pay it" follow your schedule */
+function wLabel(w){const P=pay(),lo=Math.min(P.d1,P.d2),hi=Math.max(P.d1,P.d2);
+  if(w==='15th only')return P.t==='semi'?ord(lo)+' only':P.t==='monthly'?'Once a month':'First payday of the month';
+  if(w==='30th only')return P.t==='semi'?(hi>=31?'End of month':ord(hi))+' only':P.t==='monthly'?'Once a month':'Last payday of the month';
+  if(w==='Split')return P.t==='monthly'?'Monthly':'Monthly, spread';return w}
+function wHint(w){const P=pay();
+  return {'Daily':'Amount per work day','Every payday':'Full amount each payday','Split':P.t==='semi'?'Monthly amount, half each cutoff':P.t==='monthly'?'Monthly amount':'Monthly amount, spread across your paydays','15th only':P.t==='monthly'?'Paid from your monthly pay':'Only on the first payday of each month','30th only':P.t==='monthly'?'Paid from your monthly pay':'Only on the last payday of each month'}[w]||''}
 /* date (yyyy-mm-dd) of the payday a cutoff refers to: this payday if it matches, otherwise the next one */
-function pdDateFor(which){const c=curPd(),cd=T.parse(c);const is15=d=>d.getDate()===15;if(cd&&(is15(cd)===(which==='15th')))return c;
-  const n=paydaysFrom(new Date(),4).find(d=>is15(d)===(which==='15th'));return n?iso(n):c}
+function pdDateFor(which){if(/^\d{4}-/.test(String(which)))return which;const c=curPd();if(pay().t!=='semi')return c;const want=which!=='30th';
+  if(ctxOf(c).first===want)return c;const n=paydaysFrom(new Date(),6).find(d=>ctxOf(iso(d)).first===want);return n?iso(n):c}
 const notYet=(b,payday)=>!!(b.from&&String(pdDateFor(payday))<String(b.from));
-function amountFor(b,payday){if(notYet(b,payday||s.payday))return 0;const a=num(b.a),d=num(s.days);switch(b.w){case'Daily':return a*d;case'Every payday':return a;case'Split':return a/2;case'15th only':return payday==='15th'?a:0;case'30th only':return payday==='30th'?a:0;default:return 0}}
+function amountFor(b,payday){payday=payday||s.payday;if(notYet(b,payday))return 0;const a=num(b.a),d=num(s.days),c=ctxOf(payday);switch(b.w){case'Daily':return a*d;case'Every payday':return a;case'Split':return a/perMonth();case'15th only':return c.first?a:0;case'30th only':return c.last?a:0;default:return 0}}
 function calc(payday){
   payday=payday||s.payday;
   const bills=s.bills.map(b=>amountFor(b,payday)),sub=bills.reduce((a,b)=>a+b,0);
@@ -1363,7 +1411,7 @@ const DEBTC='var(--yellow)';
 /* ========== NAVIGATION ========== */
 const pages=[...document.querySelectorAll('.pg')];
 function show(tab){
-  if((tab==='payday'||tab==='plan')&&!pdPicked&&typeof curPd==='function'){const d=T.parse(curPd());if(d){const w=d.getDate()===15?'15th':'30th';if(s.payday!==w){s.payday=w;save()}}}
+  if((tab==='payday'||tab==='plan')&&!pdPicked&&typeof curPd==='function'){const d=T.parse(curPd());if(d){const c=ctxOf(curPd()),w=c.first&&!(c.last&&pay().t==='semi'&&paydaysInMonth(d.getFullYear(),d.getMonth()).length>1)?'15th':'30th';if(s.payday!==w){s.payday=w;save()}}}
   if(tab==='plan'||tab==='log'){pyPane(tab==='plan'?'plan':'hist');tab='payday'}
   pages.forEach(p=>p.classList.toggle('on',p.dataset.pg===tab));
   document.querySelectorAll('#tabbar button').forEach(b=>{const on=b.dataset.tab===tab;b.classList.toggle('on',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});
@@ -1408,7 +1456,7 @@ $('range').addEventListener('click',e=>{const b=e.target.closest('button[data-r]
 function segments(){
   const add=r=>({bills:r.sub,loan:r.loan,save:r.sched+r.parts[0]+r.parts[1],wants:r.parts[2]||0,main:Math.max(r.stay,0),net:r.net});
   if(range==='pay')return add(calc(s.payday));
-  const a=add(calc('15th')),b=add(calc('30th')),m={};Object.keys(a).forEach(k=>m[k]=a[k]+b[k]);
+  const cs=monthCuts().map(w=>add(calc(w))),m={};Object.keys(cs[0]).forEach(k=>m[k]=cs.reduce((x,c)=>x+c[k],0));
   if(range==='year')Object.keys(m).forEach(k=>m[k]*=12);
   return m;
 }
@@ -1429,7 +1477,7 @@ function renderHome(){
   const total=L.reduce((a,x)=>a+g[x[0]],0)||1;
   drawRing(g,L,total);
   renderSegInfo(g,L,total);
-  const lbl={pay:s.payday+' cutoff',month:'Per month · est.',year:'Per year · est.'}[range];
+  const lbl={pay:pay().t==='semi'?cutName(s.payday)+' cutoff':'Per payday',month:'Per month · est.',year:'Per year · est.'}[range];
   const f=focusSeg&&L.find(x=>x[0]===focusSeg);
   $('ringL').textContent=f?f[1]:(g.net?'Net pay':'No pay yet');{const rv=$('ringV'),v=f?g[f[0]]:g.net,txt=range==='pay'?peso(v):peso(Math.round(v));rv.textContent=txt;countUp(rv);rv.style.fontSize=(txt.length<=8?25:txt.length<=10?22:txt.length<=12?19:16)+'px'}$('ringS').textContent=f?Math.round(g[f[0]]/total*100)+'% of pay':(g.net?lbl:'Set it in Plan');
   $('legend').innerHTML=L.map(([k,n,c])=>`<li><button type="button" data-seg="${k}" class="${focusSeg===k?'on':''}" style="--c:${c}" aria-pressed="${focusSeg===k}"><span>${n}</span><b>${peso(range==='pay'?g[k]:Math.round(g[k]))}</b></button></li>`).join('');
@@ -1540,7 +1588,7 @@ function glassTing(fill){if(!soundOn())return;try{AC=AC||new (window.AudioContex
   const n=AC.createBufferSource(),b=AC.createBuffer(1,AC.sampleRate*.02,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,4);
   const hp=AC.createBiquadFilter(),ng=AC.createGain();hp.type='highpass';hp.frequency.value=3000;ng.gain.value=.15;n.buffer=b;n.connect(hp);hp.connect(ng);ng.connect(out);n.start(t)}catch(e){}}
 /* what makes up the focused slice */
-function segItems(k){const mult=range==='year'?12:1,cuts=range==='pay'?[s.payday]:['15th','30th'],out={};
+function segItems(k){const mult=range==='year'?12:1,cuts=range==='pay'?[s.payday]:monthCuts(),out={};
   const add=(n,v)=>{if(v>0)out[n]=(out[n]||0)+v*mult};
   cuts.forEach(w=>{const r=calc(w);
     if(k==='bills')s.bills.forEach((b,i)=>add(b.n||'Bill',r.bills[i]));
@@ -1566,13 +1614,13 @@ $('pdSeg').addEventListener('click',e=>{const b=e.target.closest('button[data-v]
 function fillInputs(){document.querySelectorAll('[data-yp=plan] [data-k]').forEach(el=>{if(document.activeElement!==el){const v=get(el.dataset.k);el.value=(v===0&&!el.dataset.k.startsWith('pct'))?'':v}})}
 function billRows(){
   const r=calc(s.payday);
-  $('bills').innerHTML=s.bills.map((b,i)=>`<button class="it" type="button" data-eb="${i}"><i class="dot" style="--c:var(--pink)"></i><span><b>${escapeHTML(b.n||'Untitled bill')}</b><small>${peso(b.a)} · ${escapeHTML(b.w)}${b.from&&notYet(b,s.payday)?' · starts '+escapeHTML(fmtDay(b.from)):''}</small></span><span class="val">${peso(r.bills[i])}</span><i class="chev"></i></button>`).join('')
+  $('bills').innerHTML=s.bills.map((b,i)=>`<button class="it" type="button" data-eb="${i}"><i class="dot" style="--c:var(--pink)"></i><span><b>${escapeHTML(b.n||'Untitled bill')}</b><small>${peso(b.a)} · ${escapeHTML(wLabel(b.w))}${b.from&&notYet(b,s.payday)?' · starts '+escapeHTML(fmtDay(b.from)):''}</small></span><span class="val">${peso(r.bills[i])}</span><i class="chev"></i></button>`).join('')
     +'<button class="it add" type="button" id="addBill">+ Add bill</button>';
 }
 
 function debtRows(r){const CIR=2*Math.PI*16;
   $('debts').innerHTML=s.loans.map((l,i)=>{const t=num(l.total),pd=Math.min(num(l.paid),t||Infinity),left=debtLeft(l),pr=t?pd/t:0;
-    const sub=peso(l.a)+' · '+escapeHTML(l.w)+(t?' · '+(left?left+' left':'done'):'');
+    const sub=peso(l.a)+' · '+escapeHTML(wLabel(l.w))+(t?' · '+(left?left+' left':'done'):'');
     return `<button class="it" type="button" data-ed="${i}"><span class="gring" style="--c:${DEBTC}"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16"/><circle cx="20" cy="20" r="16" stroke-dasharray="${CIR}" stroke-dashoffset="${CIR*(1-pr)}"/></svg><b>${t?Math.round(pr*100)+'%':'∞'}</b></span><span><b>${escapeHTML(l.n||'Untitled debt')}</b><small>${sub}</small></span><span class="val">${peso(r.loans[i])}</span><i class="chev"></i></button>`}).join('')
     +'<button class="it add" type="button" id="addDebt">+ Add debt</button>';
 }
@@ -1588,7 +1636,7 @@ function breakdown(r){
 }
 function renderPlan(){
   const r=calc(s.payday);
-  segSet($('pdSeg'),'v',s.payday);
+  segSet($('pdSeg'),'v',s.payday);{const P=pay(),bs=$('pdSeg').querySelectorAll('button');if(bs.length===2){bs[0].textContent=ord(Math.min(P.d1,P.d2));bs[1].textContent=Math.max(P.d1,P.d2)>=31?'End':ord(Math.max(P.d1,P.d2))}}
   $('sumStay').textContent=peso2(r.stay);$('sumBills').textContent=peso(r.sub);$('sumLoan').textContent=peso(r.loan);$('sumSave').textContent=peso(r.sched+r.parts.reduce((a,b)=>a+b,0));
   $('bdInline').innerHTML=breakdown(r);$('bdLines').innerHTML=breakdown(r);
   setStatus($('resStatus'),r,true);
@@ -1660,15 +1708,15 @@ function editBill(i,isNew){
   $('editTitle').textContent=isNew?'New bill':'Edit bill';
   $('editBody').innerHTML=`<label class="fld"><span>Name</span><div class="in"><input data-eb-f="n" value="${escapeHTML(b.n)}" placeholder="e.g. Rent" enterkeyhint="next"></div></label>
     <label class="fld"><span>Amount</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" min="0" step="0.01" data-eb-f="a" value="${b.a||''}" placeholder="0"></div></label>
-    <p class="cap">When you pay it</p><div class="chips" id="whenChips">${WHEN.map(w=>`<button type="button" data-when="${w}" class="${w===b.w?'on':''}">${w}</button>`).join('')}</div>
+    <p class="cap">When you pay it</p><div class="chips" id="whenChips">${WHEN.filter(w=>!(pay().t==='monthly'&&w==='30th only')).map(w=>`<button type="button" data-when="${w}" class="${w===b.w||(pay().t==='monthly'&&w==='15th only'&&b.w==='30th only')?'on':''}">${escapeHTML(wLabel(w))}</button>`).join('')}</div>
     <p class="note" id="whenHint"></p>
     <label class="fld" style="margin-top:12px"><span>Starts on (optional)</span><div class="in"><input type="date" data-eb-f="from" value="${escapeHTML(b.from||'')}"></div></label>
     <p class="note">Leave empty if it already applies. Paydays before this date skip it.</p>
-    <div class="calc"><span>This cutoff (${s.payday})</span><b id="billNow"></b></div>
+    <div class="calc"><span>${pay().t==='semi'?'This cutoff ('+cutName(s.payday)+')':'Each payday'}</span><b id="billNow"></b></div>
     <button class="del" type="button" id="edDel">${isNew?'Cancel':'Delete bill'}</button>`;
   updBillSheet();openSheet('editSheet');
 }
-function updBillSheet(){const b=s.bills[ed.i];$('whenHint').textContent=WHEN_HINT[b.w]||'';$('billNow').textContent=peso2(amountFor(b,s.payday))}
+function updBillSheet(){const b=s.bills[ed.i];$('whenHint').textContent=wHint(b.w);$('billNow').textContent=peso2(amountFor(b,s.payday))}
 function editGoal(i,isNew){
   ed={type:'goal',i,isNew};const a=s.accts[i];
   $('editTitle').textContent=isNew?'New savings goal':'Edit goal';
@@ -1686,7 +1734,7 @@ function editDebt(i,isNew){
   $('editTitle').textContent=isNew?'New debt':'Edit debt';
   $('editBody').innerHTML=`<label class="fld"><span>Name</span><div class="in"><input data-ed-f="n" value="${escapeHTML(l.n)}" placeholder="e.g. Coop loan" enterkeyhint="next"></div></label>
     <label class="fld" style="margin-top:12px"><span>Amount deducted</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" min="0" step="0.01" data-ed-f="a" value="${l.a||''}" placeholder="0"></div></label>
-    <p class="cap">When it is deducted</p><div class="chips" id="dWhen">${DWHEN.map(w=>`<button type="button" data-dw="${w}" class="${w===l.w?'on':''}">${w}</button>`).join('')}</div>
+    <p class="cap">When it is deducted</p><div class="chips" id="dWhen">${DWHEN.filter(w=>!(pay().t==='monthly'&&w==='30th only')).map(w=>`<button type="button" data-dw="${w}" class="${w===l.w||(pay().t==='monthly'&&w==='15th only'&&l.w==='30th only')?'on':''}">${escapeHTML(wLabel(w))}</button>`).join('')}</div>
     <p class="note" id="dHint"></p>
     <div class="g2" style="margin-top:12px"><label class="fld"><span>Total payments</span><div class="in"><input type="number" inputmode="numeric" min="0" step="1" data-ed-f="total" value="${l.total||''}" placeholder="No end"></div></label>
     <label class="fld"><span>Paid so far</span><div class="in"><input type="number" inputmode="numeric" min="0" step="1" data-ed-f="paid" value="${l.paid||''}" placeholder="0"></div></label></div>
@@ -1697,7 +1745,7 @@ function editDebt(i,isNew){
   updDebtSheet();openSheet('editSheet');
 }
 function updDebtSheet(){const l=s.loans[ed.i],t=num(l.total),pd=num(l.paid),left=debtLeft(l);
-  $('dHint').textContent=WHEN_HINT[l.w]||'';$('dBar').style.width=(t?Math.min(pd/t,1)*100:0)+'%';
+  $('dHint').textContent=wHint(l.w);$('dBar').style.width=(t?Math.min(pd/t,1)*100:0)+'%';
   $('dNote').textContent=!t?'No end set. Enter the total number of payments to see how many are left.':left?pd+' of '+t+' paid · '+left+' left · '+peso2(left*num(l.a))+' to go':'Paid off. It is no longer deducted from your pay.';
   $('dPlus').disabled=t>0&&!left;$('dMinus').disabled=!pd;
   const p=$('editBody').querySelector('[data-ed-f=paid]');if(p&&document.activeElement!==p)p.value=pd||''}
@@ -1981,8 +2029,7 @@ const lget=id=>s.log.find(p=>p.id===id);
 const r2=v=>Math.round(v*100)/100;
 function lTot(p){let inc=num(p.net),out=0;const by={};p.items.forEach(x=>{const a=num(x.a);if(x.t==='Income')inc+=a;else out+=a;by[x.t]=(by[x.t]||0)+a});return {inc,out,left:inc-out,by}}
 /* most recent payday on or before today (15th or end of month, max 30th) */
-function defDate(){const d=new Date();let y=d.getFullYear(),m=d.getMonth();const end=(yy,mm)=>Math.min(30,new Date(yy,mm+1,0).getDate());
-  if(d.getDate()>=end(y,m))return iso(new Date(y,m,end(y,m)));if(d.getDate()>=15)return iso(new Date(y,m,15));m--;if(m<0){m=11;y--}return iso(new Date(y,m,end(y,m)))}
+function defDate(){return iso(pdBefore(new Date(new Date().toDateString())))}
 const sortedLog=()=>s.log.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
 function renderLog(){
   const L=sortedLog(),last=L[0],saved=s.log.reduce((a,p)=>a+(lTot(p).by['Savings']||0),0);
@@ -2052,7 +2099,7 @@ $('lBody').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==
 $('lBody').addEventListener('click',e=>{if(!lv)return;const p=lget(lv.id);if(!p)return;
   const li=e.target.closest('[data-li]');if(li){lEntry(p.id,+li.dataset.li);return}
   if(e.target.closest('#lAdd')){const last=p.items[p.items.length-1];p.items.push({t:last?last.t:'Savings',n:'',acct:'',a:0,note:''});lEntry(p.id,p.items.length-1,true);return}
-  if(e.target.closest('#lFill')){const d=T.parse(p.date),which=d&&d.getDate()<=15?'15th':'30th',r=calc(which);
+  if(e.target.closest('#lFill')){const which=cutName(p.date),r=calc(p.date);
     if(!num(p.net))p.net=num(s.net);
     s.bills.forEach((b,i)=>{if(r.bills[i]>0)p.items.push({t:'Living cost',n:b.n,acct:'',a:r2(r.bills[i]),note:''})});
     s.loans.forEach((l,i)=>{if(r.loans[i]>0)p.items.push({t:'Loan & Coop',n:l.n,acct:'',a:r2(r.loans[i]),note:''})});
@@ -2088,7 +2135,7 @@ function adjBal(r,delta){const a=s.bank[r.i];if(!a)return;if(r.sj!=null&&hasSubs
 function lineFor(r,delta,d,note,why,mv){const a=s.bank[r.i];if(!(a.hist||[]).length)recBal(a,'Starting balance',d);adjBal(r,delta);
   a.hist.push({d,bal:r2(acctBal(a)),note,amt:r2(delta),why:why||'',mv,sj:r.sj})}
 /* the payday a date belongs to: latest 15th / end-of-month on or before it */
-function pdOn(ds){const d=T.parse(ds)||new Date();let y=d.getFullYear(),m=d.getMonth();const e=pdEnd(y,m);if(d.getDate()>=e)return iso(new Date(y,m,e));if(d.getDate()>=15)return iso(new Date(y,m,15));m--;if(m<0){m=11;y--}return iso(new Date(y,m,pdEnd(y,m)))}
+function pdOn(ds){const d=T.parse(ds)||new Date();return iso(pdBefore(new Date(d.getFullYear(),d.getMonth(),d.getDate())))}
 function recFor(pd){let p=s.log.find(x=>x.date===pd);if(!p){p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:pd,net:pd===curPd()?num(s.net):0,items:[]};s.log.push(p)}return p}
 function moveMoney(o){const mv='m'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),d=o.d||iso(new Date()),amt=r2(o.amt);
   if(o.from)lineFor(o.from,-amt,d,o.to?'Sent to '+refLabel(o.to):(o.t==='Loan & Coop'?'Payment':'Spent'),o.why,mv);
@@ -2110,14 +2157,14 @@ function syncNet(v,rec){v=r2(num(v));const cur=rec||s.log.find(x=>x.date===curPd
   if(cur){cur.net=v;if(cur.payMv&&v>0)setMoveAmt(cur.payMv,v)}}
 /* ========== PAYDAY: checklist / plan / history ========== */
 let pyCur='check';
-function pyPane(v){pyCur=v;$('pdSeg').hidden=v!=='plan';segSet($('pyTop'),'y',v);document.querySelectorAll('[data-yp]').forEach(x=>x.hidden=x.dataset.yp!==v);if(v==='check')renderCheck();if(v==='plan')fillInputs();if(v==='hist')renderLog()}
+function pyPane(v){pyCur=v;$('pdSeg').hidden=v!=='plan'||pay().t!=='semi';segSet($('pyTop'),'y',v);document.querySelectorAll('[data-yp]').forEach(x=>x.hidden=x.dataset.yp!==v);if(v==='check')renderCheck();if(v==='plan')fillInputs();if(v==='hist')renderLog()}
 $('pyTop').addEventListener('click',e=>{const b=e.target.closest('button[data-y]');if(b)pyPane(b.dataset.y)});
 /* the payday being worked on: the latest 15th / end-of-month on or before today */
 /* within 6 days after a payday, work on that one; otherwise get ready for the next one */
 const curPd=()=>{const last=defDate(),since=Math.round((new Date(new Date().toDateString())-T.parse(last))/864e5);return since<=6?last:iso(paydaysFrom(new Date(Date.now()+864e5),1)[0])};
 const pdFuture=()=>T.parse(curPd())>new Date(new Date().toDateString());
 function pdRec(create){const d=curPd();let p=s.log.find(x=>x.date===d);if(!p&&create){p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:d,net:num(s.net),items:[]};s.log.push(p)}return p}
-function ckPlan(){const d=T.parse(curPd()),which=d&&d.getDate()===15?'15th':'30th',r=calc(which),L=[];
+function ckPlan(){const d=T.parse(curPd()),which=pay().t==='semi'?cutName(ctxOf(curPd()).first&&paydaysInMonth(d.getFullYear(),d.getMonth()).length>1?'15th':'30th')+' cutoff':PAYT[pay().t]+' pay',r=calc(curPd()),L=[];
   const pr=payRef(),pdx=s.log.find(x=>x.date===curPd()),net=pdx?num(pdx.net):num(s.net);if(pr&&net>0)L.push({key:'pay',t:'Income',n:'Pay received',a:r2(net)});
   s.loans.forEach((l,i)=>{if(r.loans[i]>0)L.push({key:'l'+i,t:'Loan & Coop',n:l.n||'Debt',a:r2(r.loans[i]),dl:i})});
   if(r.sched>0)L.push({key:'sv',t:'Savings',n:'Scheduled savings',a:r2(r.sched)});
@@ -2146,7 +2193,7 @@ function renderCheck(){const box=$('ckBody');if(!box)return;adoptExtras(pdRec(fa
   const extras=p?p.items.filter(x=>!x.key):[],net=p?num(p.net):num(s.net),t=p?lTot(p):{inc:net,out:0,left:net,by:{}};
   const next=paydaysFrom(new Date(Date.now()+864e5),1)[0],dn=Math.round((next-new Date(new Date().toDateString()))/864e5);
   const all=Lc.length&&n===Lc.length;
-  $('pySub').textContent=dLong(d)+' · '+which+' cutoff';
+  $('pySub').textContent=dLong(d)+' · '+which;
   const row=x=>{const dd=done(x.key);if(sk(x.key))return `<button class="ckr skip" type="button" data-unskip="${x.key}"><i class="ckb" aria-hidden="true"></i><span><b>${escapeHTML(x.n)}</b><small>Skipped this payday · tap to bring back</small></span><em>${peso2(x.a)}</em></button>`;return `<button class="ckr${dd?' done':''}" type="button" data-ck="${x.key}"><i class="ckb" aria-hidden="true">${ICONS.ok}</i><span><b>${escapeHTML(x.n)}</b><small>${escapeHTML(flowTxt(x))}</small></span><em>${peso2(dd?dd.a:x.a)}</em>${dd?'':`<i class="ckskip" data-skip="${x.key}" role="button" aria-label="Skip ${escapeHTML(x.n)} this payday">Skip</i>`}</button>`};
   const grp=(title,keys)=>{const R=L.filter(x=>keys.includes(x.t));return R.length?`<p class="cap">${title}</p><div class="list ckl">${R.map(row).join('')}</div>`:''};
   box.innerHTML=`<div class="ck-hero${all?' win':''}">
@@ -2192,12 +2239,12 @@ function renderBills(){const r=calc(s.payday);debtRows(r);$('debtSum').textConte
 
 /* ========== ME (profile sheet from the logo) ========== */
 const pdEnd=(y,m)=>Math.min(30,new Date(y,m+1,0).getDate());
-function paydaysFrom(start,count){const out=[];let y=start.getFullYear(),m=start.getMonth();const t0=new Date(start.getFullYear(),start.getMonth(),start.getDate()).getTime();
-  while(out.length<count){for(const d of [15,pdEnd(y,m)]){const dt=new Date(y,m,d);if(dt.getTime()>=t0&&out.length<count)out.push(dt)}m++;if(m>11){m=0;y++}}return out}
-const whichPd=d=>d.getDate()===15?'15th':'30th';
+function paydaysFrom(start,count){const out=[];let y=start.getFullYear(),m=start.getMonth(),guard=0;const t0=new Date(start.getFullYear(),start.getMonth(),start.getDate()).getTime();
+  while(out.length<count&&guard++<600){for(const dt of paydaysInMonth(y,m)){if(dt.getTime()>=t0&&out.length<count)out.push(dt)}m++;if(m>11){m=0;y++}}return out}
+const whichPd=d=>iso(d);
 function debtInfo(l){const left=debtLeft(l);if(left<=0)return null;let n=0,amt=0,last=null;
   for(const d of paydaysFrom(new Date(),400)){const a=amountFor(l,whichPd(d));if(a>0){amt+=a;n++;last=d;
-    if(l.w==='Split'?n>=left*2:n>=left)break}}return {amt,last}}
+    if(l.w==='Split'?n>=left*perMonth()-1e-9:n>=left)break}}return {amt,last}}
 function meData(){const now=new Date(),next=paydaysFrom(now,1)[0],days=Math.round((new Date(next.getFullYear(),next.getMonth(),next.getDate())-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
   const worth=s.bank.length?bankTotal():s.accts.reduce((a,g)=>a+num(g.b),0);
   /* emergency fund: money in accounts marked "Emergency fund" counts automatically; otherwise the goal's saved amount */
@@ -2373,6 +2420,20 @@ function applyProfile(){const n=meName();document.title='Budget'+(n?' · '+n:'')
   document.querySelectorAll('[data-av]').forEach(b=>b.classList.toggle('on',b.dataset.av===((s.me&&s.me.av)||'init')))}
 document.addEventListener('input',e=>{if(e.target.id!=='setName')return;s.me=s.me||{av:'init'};s.me.name=e.target.value;save();applyProfile()});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-av]');if(!b)return;s.me=s.me||{name:''};s.me.av=b.dataset.av;save();applyProfile();toast(b.dataset.av==='di'?'Using the logo':'Using your initials')});
+/* ========== PAY SCHEDULE settings ========== */
+function payDesc(){const P=pay(),lo=Math.min(P.d1,P.d2),hi=Math.max(P.d1,P.d2);
+  return P.t==='semi'?'Twice a month · '+ord(lo)+' & '+(hi>=31?'end of month':ord(hi)):P.t==='monthly'?'Monthly · every '+(P.d1>=31?'end of month':ord(P.d1)):PAYT[P.t]+(P.a?' · from '+dShort(T.parse(P.a)):'')}
+function renderPaySet(){const box=$('payFields');if(!box)return;const P=pay();
+  document.querySelectorAll('[data-pt]').forEach(b=>b.classList.toggle('on',b.dataset.pt===P.t));
+  const nx=paydaysFrom(new Date(),3);$('payNext').textContent='Next: '+nx.map(d=>dShort(d)).join(' · ');
+  const dayF=(id,lbl,v,hint)=>`<label class="fld"><span>${lbl}</span><div class="in"><input type="number" inputmode="numeric" min="1" max="31" id="${id}" value="${v}"><em>${hint||'day'}</em></div></label>`;
+  box.innerHTML=P.t==='semi'?`<div class="g2">${dayF('payD1','First payday',P.d1)}${dayF('payD2','Second payday',P.d2)}</div><p class="note">Short months use their last day (30 becomes 28 in February). Use 31 for the very last day.</p>`
+    :P.t==='monthly'?`${dayF('payD1','Payday',P.d1)}<p class="note">Use 31 for the very last day of each month.</p>`
+    :`<label class="fld"><span>A recent payday</span><div class="in"><input type="date" id="payA" value="${escapeHTML(P.a)}"></div></label><p class="note">Pick any payday you already got. The app counts every ${P.t==='weekly'?'7':'14'} days from it.</p>`;
+  const pi=$('payInfo');if(pi)pi.innerHTML=escapeHTML(payDesc())+' · <button type="button" class="lnk" data-go="settings">Change</button>'}
+function setPay(ch){s.pay=Object.assign({},pay(),ch);pdPicked=false;save();renderPaySet();render()}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-pt]');if(!b)return;const ch={t:b.dataset.pt};if((ch.t==='weekly'||ch.t==='biweekly')&&!pay().a)ch.a=iso(new Date());setPay(ch);toast(PAYT[ch.t])});
+document.addEventListener('change',e=>{const id=e.target.id;if(id==='payD1'||id==='payD2'){const v=Math.min(31,Math.max(1,parseInt(e.target.value,10)||0));if(!v)return renderPaySet();setPay(id==='payD1'?{d1:v}:{d2:v})}else if(id==='payA'&&e.target.value)setPay({a:e.target.value})});
 /* ========== SETTINGS ========== */
 function syncChartChips(){const v=chartStyle();document.querySelectorAll('[data-cs]').forEach(b=>b.classList.toggle('on',b.dataset.cs===v));const sn=$('setSnd');if(sn)sn.setAttribute('aria-checked',soundOn())}
 document.addEventListener('click',e=>{if(!e.target.closest('#setSnd'))return;try{localStorage.setItem('dc_bud_snd',soundOn()?'off':'on')}catch(_){}syncChartChips();if(soundOn())glassTing(.3)});
@@ -2384,7 +2445,7 @@ function renderSettings(){const lb=store('dc_bud_lastbk',null),days=lb?Math.floo
   const rows=[['Accounts',n(s.bank.length,'account')+(subs?' · '+n(subs,'sub-account'):'')],['Savings goals',n(s.accts.length,'goal')],['Debts',n(s.loans.length,'debt')+' · '+n(ts.trackers.length,'tracker')],['Payday history',n(s.log.length,'payday')+' · '+n(ents,'entry').replace('entrys','entries')],['Bills in plan',n(s.bills.length,'bill')],['Stored on','This device and browser only']];
   const dc=$('dataCard');if(dc)dc.innerHTML=rows.map(([k,v])=>`<div><span>${k}</span><b>${escapeHTML(v)}</b></div>`).join('')}
 /* one backup file for everything; older budget-only or trackers-only files still import */
-function afterImport(){applyProfile();fillInputs();splitRows();changed();tsave()}
+function afterImport(){applyProfile();renderPaySet();fillInputs();splitRows();changed();tsave()}
 const hasData=()=>!!(num(s.net)||s.bills.length||s.loans.length||s.accts.length||s.bank.length||s.log.length||ts.trackers.length);
 $('bdExport').addEventListener('click',()=>{if(!hasData()){toast('Nothing to back up yet. Add your data first.');return}const d=iso(new Date());dlFile('budget-backup-'+d+'.json',JSON.stringify({app:'diyelo-budget',version:3,exported:new Date().toISOString(),budget:s,trackers:ts}),'application/json',()=>{persist('dc_bud_lastbk',new Date().toISOString());if(document.querySelector('.pg.on[data-pg=settings]'))renderSettings();toast('Backup saved')})});
 $('bdImport').addEventListener('click',()=>$('bdFile').click());
@@ -2402,9 +2463,9 @@ $('bdFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.val
 $('bdReset').addEventListener('click',()=>{ask('Erase all data?','Plan, debts, goals, accounts, payday log and payment trackers will all be cleared. Export a backup first if you want to keep them.','Erase').then(ok=>{if(!ok)return;s=blank();ts={version:1,currency:ts.currency||'PHP',trackers:[]};afterImport();toast('All data erased')})});
 
 /* ========== RENDER ========== */
-function render(){setTimeout(()=>addPasteBtns(),0);const p=(document.querySelector('.pg.on')||{dataset:{}}).dataset.pg;
+function render(){setTimeout(()=>addPasteBtns(),0);try{renderPaySet()}catch(_){}const p=(document.querySelector('.pg.on')||{dataset:{}}).dataset.pg;
   if(p==='home')renderHome();else if(p==='payday'){fillInputs();renderPlan();renderLog();renderCheck()}else if(p==='wallet')renderWallet();else if(p==='bills')renderBills();else if(p==='settings'){setEye();renderSettings()}else setEye()}
-settleAll();applyProfile();fillInputs();splitRows();planTab('pay');pyPane('check');
+settleAll();applyProfile();renderPaySet();fillInputs();splitRows();planTab('pay');pyPane('check');
 setTimeout(()=>fxUpdate(),1500);
 /* tab bar shrinks while scrolling down and grows back when scrolling up (like Instagram) */
 (function(){let last=0,ticking=false;const tb=$('tabbar');
