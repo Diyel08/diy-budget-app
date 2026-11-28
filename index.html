@@ -1172,6 +1172,64 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 .xp .xundo{display:block;margin:12px auto 0;font-size:14px}
 .xp .warn{color:#ffb547}
 
+/* ===== DESKTOP: every tab fills the screen (≥1100px) ===== */
+@media(min-width:1100px){
+  .pg.on:not([data-pg=home]){min-height:calc(100vh - 32px);display:flex!important;flex-direction:column}
+  .pg.on:not([data-pg=home])>.ph{flex:none}
+  /* Payday */
+  .pg[data-pg=payday]>[data-yp]:not([hidden]){flex:1;display:flex;flex-direction:column;min-height:0}
+  #ckBody{flex:1}
+  .ck-left{min-height:calc(100vh - 210px)}
+  .ck-side{flex:1}.ck-side>.ck-card:last-child{flex:1}
+  .plan-cols{flex:1;align-items:stretch!important}
+  .plan-side{display:flex;flex-direction:column}.plan-side .sum{flex:1}
+  .plan-main{grid-template-rows:auto 1fr}
+  .plan-main>[data-pp=bills]{grid-column:1!important;grid-row:2!important;display:flex!important;flex-direction:column}
+  .plan-main>[data-pp=bills] .list{flex:1}
+  #planDebts{grid-column:2;grid-row:2;padding:16px 18px}
+  .pdrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+  .pdrow:first-of-type{border-top:0}
+  .pdrow span{flex:1;min-width:0}.pdrow b{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pdrow small{font-size:12px;color:var(--sub);margin:1px 0 0}
+  .pdrow em{font-style:normal;font-weight:600;font-variant-numeric:tabular-nums}
+  .alloc-l.one{grid-template-columns:1fr}
+  .hist-cols{flex:1;align-items:stretch!important}
+  .hist-l{display:flex;flex-direction:column;gap:14px}
+  .hist-l>.add{margin:0!important}
+  #logTypes{flex:1;padding:16px 18px}
+  #logChart{position:static;height:auto}
+  /* Money */
+  .pg[data-pg=wallet] .cols2{flex:1;align-items:stretch!important}
+  .pg[data-pg=wallet] .col{display:flex;flex-direction:column}
+  #mTrend{margin-top:14px;padding:16px 18px;flex:1;display:flex;flex-direction:column;min-height:200px}
+  .trend{flex:1;display:flex;align-items:flex-end;gap:4px;min-height:120px;padding-top:8px}
+  .trend i{flex:1;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,#4d94e0,#0066cc);min-height:4px}
+  .trend i:hover{filter:brightness(1.2)}
+  .trend-x{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:6px}
+  /* Debts */
+  .pg[data-pg=bills] .cols2{flex:1;align-items:stretch!important}
+  .pg[data-pg=bills] .col{display:flex;flex-direction:column}
+  #dTime,#dNext{flex:1;display:flex;flex-direction:column}
+  #dNext .dk-bars.mini{flex:1;height:auto;min-height:190px}
+  .dk-trio.top{margin:0 0 4px;border:0;padding:0}
+  .dk-trio.top b{font-size:22px}
+  /* Settings: three even columns, last card in each stretches */
+  .pg[data-pg=settings] .set{flex:1;display:grid!important;columns:auto;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto auto 1fr;gap:16px;align-items:stretch}
+  .pg[data-pg=settings] .set>*{margin:0!important}
+  .s-data{grid-column:1;grid-row:1}.s-prof{grid-column:1;grid-row:2}.s-tips{grid-column:1;grid-row:3}
+  .s-pay{grid-column:2;grid-row:1/3}.s-about{grid-column:2;grid-row:3}
+  .s-disp{grid-column:3;grid-row:1}.s-back{grid-column:3;grid-row:2/4}
+  .pg[data-pg=settings] .set .foot{grid-column:1/-1;grid-row:4}
+  .s-tips,.s-about,.s-back,.s-pay{display:flex!important;flex-direction:column}
+  .s-tips>.list,.s-about>.data-card,.s-back>.list,.s-pay>.list{flex:1}
+  .tips .it{min-height:0;padding:11px 14px}
+  .tips .it small{white-space:normal}
+  #aboutCard .dr{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--line);font-size:14px}
+  #aboutCard .dr:first-child{border-top:0}
+  #aboutCard .dr span{color:var(--sub)}#aboutCard .dr b{font-weight:500;text-align:right}
+}
+@media(min-width:1100px){.plan-main{align-content:stretch!important}.plan-main>[data-pp=bills]>.list{display:flex;flex-direction:column}.plan-main>[data-pp=bills]>.list>.add{margin-top:auto}}
+
 </style>
 </head>
 <body>
@@ -1263,6 +1321,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
         <div class="grp-h" style="margin:0 4px 8px"><h3 style="font-size:16px;font-weight:600">This cutoff</h3><b id="billsSum"></b></div>
         <div class="list" id="bills"></div>
       </div>
+      <div class="dkw dk-c" id="planDebts"></div>
       <div data-pp="split" class="grp split" hidden>
         <div class="g2">
           <label class="fld"><span style="--c:var(--green)">Scheduled savings</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" min="0" step="0.01" data-k="sched" placeholder="0"></div></label>
@@ -1278,7 +1337,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
   <div data-yp="hist" hidden>
     <div class="tiles" id="logSum"></div>
   <div class="hist-cols"><div class="hist-l"><div class="list" id="logList"></div>
-    <button class="it add solo" type="button" id="logNew">+ Log a past payday</button></div><div class="dkw dk-c" id="logChart"></div></div>
+    <button class="it add solo" type="button" id="logNew">+ Log a past payday</button><div class="dkw dk-c" id="logTypes"></div></div><div class="dkw dk-c" id="logChart"></div></div>
   </div>
 </section>
 
@@ -1298,6 +1357,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
   <div class="sec-h c2h"><h2>Savings goals</h2></div>
   <div class="list" id="goals"></div>
   <div class="dkw dk-c" id="mAlloc"></div>
+  <div class="dkw dk-c" id="mTrend"></div>
   </div>
   </div>
 </section>
@@ -1325,18 +1385,18 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 <section class="pg" data-pg="settings" aria-label="Settings">
   <header class="ph"><h1>Settings</h1></header>
   <div class="set">
-    <div class="set-g set-data">
+    <div class="set-g set-data s-data">
     <p class="list-t">Your data</p>
     <div class="data-card" id="dataCard"></div>
     </div>
-    <div class="set-g">
+    <div class="set-g s-prof">
     <p class="list-t">Profile</p>
     <div class="list">
       <label class="it"><i class="ic" style="--c:#0066cc;color:#fff" data-icon="user"></i><span><b>Your name</b><small>Shown in the sidebar and greeting</small></span><input id="setName" class="set-in" type="text" autocomplete="name" placeholder="Add your name" maxlength="40"></label>
       <div class="it"><i class="ic" style="--c:#0066cc;color:#fff" data-icon="user"></i><span><b>Picture</b><small>Your initials or the Di logo</small></span><div class="chips sm"><button type="button" data-av="init">Initials</button><button type="button" data-av="di">Logo</button></div></div>
     </div>
     </div>
-    <div class="set-g">
+    <div class="set-g s-pay">
     <p class="list-t">Pay schedule</p>
     <div class="list" id="paySet">
       <div class="it pay-t"><i class="ic" style="--c:#0066cc;color:#fff" data-icon="cal"></i><span><b>How often you get paid</b><small id="payNext">Next payday</small></span></div>
@@ -1344,7 +1404,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
       <div class="pay-f" id="payFields"></div>
     </div>
     </div>
-    <div class="set-g">
+    <div class="set-g s-disp">
     <p class="list-t">Display</p>
     <div class="list">
       <button class="it" type="button" role="switch" id="setHide" aria-checked="false"><i class="ic" style="--c:#8e8e93" data-icon="eyeoff"></i><span><b>Hide balance</b><small>Mask the balance on Home</small></span><i class="tg" aria-hidden="true"></i></button>
@@ -1353,7 +1413,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
       <div class="it" id="setChart"><i class="ic" style="--c:#0066cc;color:#fff" data-icon="pie"></i><span><b>Chart style</b><small>How the donut on Home looks</small></span><div class="chips sm"><button type="button" data-cs="glass">Glass</button><button type="button" data-cs="solid">Solid</button></div></div>
     </div>
     </div>
-    <div class="set-g">
+    <div class="set-g s-back">
     <p class="list-t">Backup</p>
     <p class="bk-last" id="bkLast"></p>
     <div class="list">
@@ -1363,6 +1423,14 @@ body.dragging,body.dragging *{cursor:grabbing!important}
     </div>
     <input type="file" id="bdFile" accept="application/json,.json,text/plain" hidden>
     </div>
+    <div class="set-g s-tips dkw"><p class="list-t">On a computer</p><div class="list tips">
+      <div class="it"><span><b>Rearrange</b><small>Hover a row, then drag the ⠿ grip</small></span></div>
+      <div class="it"><span><b>Delete</b><small>Hover a row and click 🗑, or select it and press Delete</small></span></div>
+      <div class="it"><span><b>More options</b><small>Right-click any row: Open, Move up, Move down, Delete</small></span></div>
+      <div class="it"><span><b>Move with keys</b><small>Select a row with Tab, then Alt + ↑ / ↓</small></span></div>
+      <div class="it"><span><b>Get the newest version</b><small>Press Ctrl + Shift + R after an update</small></span></div>
+    </div></div>
+    <div class="set-g s-about dkw"><p class="list-t">About this app</p><div class="data-card" id="aboutCard"></div></div>
     <p class="foot">Everything you type stays in this browser and is never sent anywhere. Export a backup before clearing browser data.</p>
   </div>
 </section>
@@ -1833,7 +1901,7 @@ function renderPlan(){
   $('sumStay').textContent=peso2(r.stay);$('sumBills').textContent=peso(r.sub);$('sumLoan').textContent=peso(r.loan);$('sumSave').textContent=peso(r.sched+r.parts.reduce((a,b)=>a+b,0));
   $('bdInline').innerHTML=breakdown(r);$('bdLines').innerHTML=breakdown(r);
   setStatus($('resStatus'),r,true);
-  billRows();$('billsSum').textContent=peso2(r.sub);
+  billRows();$('billsSum').textContent=peso2(r.sub);try{renderPlanDebts(r)}catch(e){console.error(e)}
   debtRows(r);$('debtSum').textContent=peso2(r.loan);
   $('loanNote').textContent=s.loans.length?'Tap a debt to mark a payment. It stops being deducted once all payments are made.':'Add loans and coop deductions here so they come off each payday.';
   const sum=s.pct.reduce((a,b)=>a+num(b),0),bad=!!s.accts.length&&Math.abs(sum-100)>=1e-4;
@@ -1850,7 +1918,7 @@ function renderWallet(){
     const sub=g?peso(b)+' of '+peso(g)+(need===0?' · reached':k>0?' · ~'+Math.ceil(need/k)+' paydays':''):'Set a goal amount';
     return `<button class="it" type="button" data-eg="${i}"><span class="gring" style="--c:${c}"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16"/><circle cx="20" cy="20" r="16" stroke-dasharray="${CIR}" stroke-dashoffset="${CIR*(1-pr)}"/></svg><b>${Math.round(pr*100)}%</b></span><span><b>${escapeHTML(a.n||'Untitled goal')}</b><small>${sub}</small></span><span class="val">${a.k>=0&&a.k<=2?num(s.pct[a.k])+'%':'—'}<small>of extra</small></span><i class="chev"></i></button>`}).join('')
     +'<button class="it add" type="button" id="addGoal">+ Add savings goal</button>';
-  renderBank();try{renderAlloc()}catch(e){console.error(e)}
+  renderBank();try{renderAlloc();renderTrend()}catch(e){console.error(e)}
   const tot=s.accts.reduce((a,x)=>a+num(x.b),0);
   walletSubSet();
 }
@@ -2229,7 +2297,7 @@ function renderLog(){
   const L=sortedLog(),last=L[0],saved=s.log.reduce((a,p)=>a+(lTot(p).by['Savings']||0),0);
   /* history pane has no subtitle of its own */
   $('logSum').innerHTML=`<div><span>Saved, all paydays</span><b>${peso(Math.round(saved))}</b></div><div><span>Last payday</span><b>${last?dShort(T.parse(last.date)||new Date()):'—'}</b></div><div class="${last&&lTot(last).left<0?'bad':''}"><span>Left last time</span><b>${last?peso(Math.round(lTot(last).left)):'—'}</b></div>`;
-  $('logSum').hidden=!L.length;try{renderLogChart()}catch(e){console.error(e)}
+  $('logSum').hidden=!L.length;try{renderLogChart();renderLogTypes()}catch(e){console.error(e)}
   $('logList').innerHTML=L.length?L.map(p=>{const t=lTot(p),sv=t.by['Savings']||0;
     return `<button class="it" type="button" data-lp="${escapeHTML(p.id)}"><i class="ic" style="--c:var(--blue);color:#fff">${ICONS.bill}</i><span><b>${fmtDay(p.date)}</b><small>Saved ${peso(sv)} · ${p.items.length} entr${p.items.length===1?'y':'ies'}</small></span><span class="val${t.left<0?' red':''}">${peso2(t.left)}<small>left</small></span><i class="chev"></i></button>`}).join('')
     :'<div class="empty">No paydays logged yet.<br>After each payday, log your net pay and every transfer or expense.<br><button class="pill" type="button" id="logNew2">Log a payday</button></div>';
@@ -2702,7 +2770,8 @@ function renderAlloc(){const box=$('mAlloc');if(!box)return;if(!DK.matches||!s.b
 function renderDebtTime(){const box=$('dTime');if(!box)return;if(!DK.matches||!s.loans.length){box.innerHTML='';box.hidden=true;const nb=$('dNext');if(nb){nb.innerHTML='';nb.hidden=true}return}box.hidden=false;const H=hidden;
   const rows=s.loans.map(l=>{const t2=num(l.total),pd=Math.min(num(l.paid),t2||Infinity),i=debtInfo(l);return {n:l.n||'Debt',pr:t2?pd/t2:0,left:debtLeft(l),i}});
   const nx=paydaysFrom(new Date(Date.now()-864e5*6),8).filter(d=>d>=new Date(new Date().toDateString())).slice(0,6),outs=nx.map(d=>{const r=calc(iso(d));return r.loan}),top=Math.max(...outs,1);
-  box.innerHTML=`<div class="dk-h"><h3>Payoff timeline</h3></div>${rows.map(r=>`<div class="pt"><div><b>${escapeHTML(r.n)}</b><small>${r.i?(r.left>0?r.left+' payments left · done '+r.i.last.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):''):'Paid off ✓'}</small></div><em><i style="width:${r.pr*100}%"></i></em><span>${Math.round(r.pr*100)}%</span></div>`).join('')}
+  let pdT=0,lfT=0;s.loans.forEach(l=>{const t2=num(l.total);if(t2){pdT+=Math.min(num(l.paid),t2)*num(l.a)}const ii=debtInfo(l);if(ii)lfT+=ii.amt});const lastAll=rows.reduce((m2,r)=>r.i&&(!m2||r.i.last>m2)?r.i.last:m2,null);
+  box.innerHTML=`<div class="dk-trio top"><div><small>Paid so far</small><b>${H?'••••':peso(Math.round(pdT))}</b></div><div><small>Left to pay</small><b>${H?'••••':peso(Math.round(lfT))}</b></div><div><small>Debt-free by</small><b>${lastAll?lastAll.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):'Now 🎉'}</b></div></div><div class="dk-h" style="margin-top:14px"><h3>Payoff timeline</h3></div>${rows.map(r=>`<div class="pt"><div><b>${escapeHTML(r.n)}</b><small>${r.i?(r.left>0?r.left+' payments left · done '+r.i.last.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):''):'Paid off ✓'}</small></div><em><i style="width:${r.pr*100}%"></i></em><span>${Math.round(r.pr*100)}%</span></div>`).join('')}
 `;const nb=$('dNext');if(nb){nb.hidden=false;nb.innerHTML=`<div class="dk-h"><h3>Debt payments, next paydays</h3><small class="dk-sub">${H?'••••':peso(Math.round(outs.reduce((x,y)=>x+y,0)))} over ${nx.length}</small></div>
     <div class="dk-bars mini">${nx.map((d,k)=>`<div class="dk-col"><div class="dk-stack"><i style="height:${outs[k]/top*100}%;--c:${C.loan}"></i></div><b>${outs[k]?(H?'••':peso(Math.round(outs[k]))):'—'}</b><span>${dShort(d)}</span></div>`).join('')}</div>`}}
 /* ========== Payday ⇄ due-date trackers: paying it in the checklist marks the tracker paid ========== */
@@ -2760,12 +2829,36 @@ document.addEventListener('click',e=>{if(!ed||ed.type!=='debt')return;
   const f=e.target.closest('[data-xa]');if(f){xp.from=f.dataset.xa?[f.dataset.xa,f.dataset.xu]:null;$('xFrom').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===f));xpPreview();return}
   if(e.target.closest('#xPay')){xpPay();return}
   if(e.target.closest('#xUndo')){xpUndo();return}});
+/* ---- more desktop cards so every tab uses its space ---- */
+function renderPlanDebts(r){const box=$('planDebts');if(!box)return;if(!DK.matches){box.innerHTML='';return}const net=num(s.net)||1;
+  const parts=[['Bills',r.sub,C.bills],['Debts',r.loan,C.loan],['Savings',r.sched+r.parts.reduce((a,b)=>a+b,0),C.save],['Stays',Math.max(r.stay,0),C.main]];
+  box.innerHTML=`<div class="dk-h"><h3>Debts this ${pay().t==='semi'?'cutoff':'payday'}</h3><small class="dk-sub">${peso2(r.loan)}</small><button class="dk-go" type="button" data-go="bills" aria-label="Open Debts">↗</button></div>
+    ${s.loans.length?s.loans.map((l,i)=>`<div class="pdrow"><span><b>${escapeHTML(l.n||'Debt')}</b><small>${escapeHTML(wLabel(l.w))}${num(l.total)?' · '+debtLeft(l)+' left':''}</small></span><em>${r.loans[i]>0?peso2(r.loans[i]):'—'}</em></div>`).join(''):'<small>No debts added.</small>'}
+    <div class="dk-h" style="margin-top:16px"><h3>Where this pay goes</h3></div>
+    <div class="alloc">${parts.map(([n,v,c])=>v>0?`<i style="width:${v/net*100}%;--c:${c}" title="${n}"></i>`:'').join('')}</div>
+    <div class="alloc-l one">${parts.map(([n,v,c])=>`<div><span><i style="--c:${c}"></i>${n}</span><b>${Math.round(v/net*100)}%</b><em>${peso(Math.round(v))}</em></div>`).join('')}</div>`}
+function renderLogTypes(){const box=$('logTypes');if(!box)return;if(!DK.matches||!s.log.length){box.innerHTML='';return}const H=hidden,by={};let inc=0;
+  s.log.forEach(p=>{const t2=lTot(p);inc+=t2.inc;Object.keys(t2.by).forEach(k=>by[k]=(by[k]||0)+t2.by[k])});
+  const K=[['Income','Extra income',C.main],['Loan & Coop','Debts',C.loan],['Savings','Savings',C.save],['Living cost','Bills & living',C.bills],['Other','Other','#a1a1a6']].filter(k=>by[k[0]]);
+  box.innerHTML=`<div class="dk-h"><h3>All paydays, by type</h3><small class="dk-sub">${s.log.length} payday${s.log.length>1?'s':''}</small></div>
+    ${K.map(([k,n,c])=>`<div class="hb"><span><i style="--c:${c}"></i>${n}</span><b>${H?'••••':peso(Math.round(by[k]))}</b><em><i style="width:${Math.min(by[k]/Math.max(inc,1),1)*100}%;--c:${c}"></i></em></div>`).join('')}
+    <div class="hb tot"><span>Total that came in</span><b>${H?'••••':peso(Math.round(inc))}</b></div>`}
+function renderTrend(){const box=$('mTrend');if(!box)return;if(!DK.matches||!s.bank.length){box.innerHTML='';return}const H=hidden;
+  const today=new Date(new Date().toDateString()),firstD=s.bank.reduce((m2,acc)=>{const h0=(acc.hist||[])[0];return h0&&(!m2||String(h0.d)<m2)?String(h0.d):m2},''),since=firstD?Math.round((today-T.parse(firstD))/864e5)+1:7,days=Math.max(7,Math.min(30,since)),pts=[];
+  for(let k=days-1;k>=0;k--){const dd=new Date(today.getFullYear(),today.getMonth(),today.getDate()-k),d=iso(dd);let tot=0;s.bank.forEach(acc=>{const Hh=(acc.hist||[]).filter(e=>String(e.d)<=d);if(Hh.length){const v=num(Hh[Hh.length-1].bal);tot+=acc.cur==='USD'?v*num(s.usd):v}});pts.push([dd,tot])}
+  const vs=pts.map(p=>p[1]),mx=Math.max(...vs,1),mn=Math.min(...vs),rg=mx-mn||1,ch=vs[vs.length-1]-vs[0];
+  box.innerHTML=`<div class="dk-h"><h3>Total balance</h3><small class="dk-sub">last ${days} days</small>${vs[0]?`<span class="chg ${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${H?'••••':peso(Math.round(Math.abs(ch)))}</span>`:''}</div>
+    <div class="trend">${pts.map(([d,v])=>`<i style="height:${12+(v-mn)/rg*88}%" title="${dShort(d)}: ${H?'••••':peso(Math.round(v))}"></i>`).join('')}</div>
+    <div class="trend-x"><span>${dShort(pts[0][0])}</span><span>Today</span></div>`}
+function renderAbout(){const box=$('aboutCard');if(!box)return;let kb=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^dc_bud/.test(k))kb+=(localStorage.getItem(k)||'').length}}catch(_){}
+  const lb=store('dc_bud_lastbk',null),rows=[['Pay schedule',payDesc()],['Next payday',dLong(paydaysFrom(new Date(),1)[0])],['Data size',(kb/1024).toFixed(1)+' KB of about 5 MB'],['Last backup',lb?dShort(new Date(lb)):'Never'],['Works offline','Yes, after the first visit']];
+  box.innerHTML=rows.map(([a,b])=>`<div class="dr"><span>${a}</span><b>${escapeHTML(b)}</b></div>`).join('')}
 /* ========== SETTINGS ========== */
 function syncChartChips(){const v=chartStyle();document.querySelectorAll('[data-cs]').forEach(b=>b.classList.toggle('on',b.dataset.cs===v));const sn=$('setSnd');if(sn)sn.setAttribute('aria-checked',soundOn())}
 document.addEventListener('click',e=>{if(!e.target.closest('#setSnd'))return;try{localStorage.setItem('dc_bud_snd',soundOn()?'off':'on')}catch(_){}syncChartChips();if(soundOn())glassTing(.3)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cs]');if(!b)return;try{localStorage.setItem('dc_bud_chart',b.dataset.cs)}catch(_){}syncChartChips();paintRing();toast(b.dataset.cs==='glass'?'Glass chart':'Solid chart')});
 setTimeout(syncChartChips,0);
-function renderSettings(){const lb=store('dc_bud_lastbk',null),days=lb?Math.floor((Date.now()-new Date(lb))/864e5):null;
+function renderSettings(){try{renderAbout()}catch(e){console.error(e)}const lb=store('dc_bud_lastbk',null),days=lb?Math.floor((Date.now()-new Date(lb))/864e5):null;
   const el=$('bkLast');if(el){el.textContent=lb?'Last backup: '+dShort(new Date(lb))+(days>=14?' · it has been '+days+' days, export a new one':''):'No backup yet. Export one so you never lose your data.';el.className='bk-last'+(!lb||days>=14?' warn':'')}
   const n=(x,k)=>x+' '+k+(x===1?'':'s'),subs=s.bank.reduce((a,b)=>a+(hasSubs(b)?b.subs.length:0),0),ents=s.log.reduce((a,p)=>a+p.items.length,0);
   const rows=[['Accounts',n(s.bank.length,'account')+(subs?' · '+n(subs,'sub-account'):'')],['Savings goals',n(s.accts.length,'goal')],['Debts',n(s.loans.length,'debt')+' · '+n(ts.trackers.length,'tracker')],['Payday history',n(s.log.length,'payday')+' · '+n(ents,'entry').replace('entrys','entries')],['Bills in plan',n(s.bills.length,'bill')],['Stored on','This device and browser only']];
