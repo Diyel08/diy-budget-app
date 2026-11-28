@@ -940,6 +940,24 @@ html[data-theme=light] #ringG .wd:not(.empty){filter:none}
 .ckr.skip{opacity:.5}
 .ckr.skip .ckb{border-style:dashed}
 .ckr.skip em{text-decoration:line-through;color:var(--sub)}
+/* desktop row tools (hover) + right-click menu */
+#rowTools{position:fixed;z-index:60;display:flex;gap:4px;transform:translate(-100%,-50%);padding:3px;border-radius:999px;background:var(--card2);box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .12s}
+#rowTools.on{opacity:1;pointer-events:auto}
+#rowTools button{width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--sub)}
+#rowTools button svg{width:17px;height:17px}
+#rowTools .rt-grip{cursor:grab}
+#rowTools .rt-del:hover{background:#e5534b;color:#fff}
+#rowTools .rt-grip:hover{background:var(--line);color:var(--fg,inherit)}
+#rowTools.nogrip .rt-grip{display:none}
+.rt-on .chev,.ckr.rt-on .ckskip{display:none}
+.it.rt-on,.ckr.rt-on{padding-right:86px}
+#rowTools.nogrip~* {}
+.it.rt-1,.ckr.rt-1{padding-right:52px}
+body.dragging,body.dragging *{cursor:grabbing!important}
+#ctxMenu{position:fixed;z-index:80;min-width:170px;padding:6px;border-radius:14px;background:var(--card2);box-shadow:0 12px 34px rgba(0,0,0,.35);border:1px solid var(--line);display:flex;flex-direction:column}
+#ctxMenu button{text-align:left;padding:9px 12px;border-radius:9px;font:500 14px var(--sf);color:inherit}
+#ctxMenu button:hover,#ctxMenu button:focus{background:var(--line);outline:none}
+#ctxMenu button.bad{color:#e5534b}
 
 </style>
 </head>
@@ -2265,6 +2283,56 @@ function dgEnd(){clearTimeout(dgTimer);if(!dg)return;const d=dg;dg=null;if(!d.on
     conf.done();toast('Order saved')},230)}
 document.addEventListener('touchend',dgEnd,{passive:true});document.addEventListener('touchcancel',dgEnd,{passive:true});
 document.addEventListener('contextmenu',e=>{if(e.target.closest(Object.keys(DRAG).join(',')))e.preventDefault()});
+/* ========== DESKTOP: hover tools, mouse drag, right-click menu, Delete key ========== */
+const FINE=matchMedia('(hover:hover) and (pointer:fine)');
+function rowReorder(k,from,to){const conf=DRAG[k],arr=conf&&conf.arr();if(!arr||to<0||to>=arr.length||from===to)return false;
+  const idx=arr.map((_,i)=>i),[m]=idx.splice(from,1);idx.splice(to,0,m);const [item]=arr.splice(from,1);arr.splice(to,0,item);
+  if(conf.remap){const map={};idx.forEach((old,nw)=>map[old]=nw);remapIdx(conf.remap,map)}conf.done();return true}
+function rowInfo(row){const k=dgSel(row);if(!k)return null;const rows=[...row.parentNode.children].filter(r=>r.matches(k));return {k,rows,i:rows.indexOf(row)}}
+function rowName(row){const b=row.querySelector('b');return b?b.textContent.trim():'this item'}
+/* one click from the hover tools still asks first for the items that the swipe deletes without asking */
+function deskDelete(row){if(row.dataset.eb!==undefined||row.dataset.cx!==undefined||row.dataset.li!==undefined){ask('Delete '+rowName(row)+'?','You can add it again any time.','Delete').then(ok=>{if(ok)swipeDelete(row)})}else swipeDelete(row)}
+let rt=null,rtRow=null;
+function rtEl(){if(rt)return rt;rt=document.createElement('div');rt.id='rowTools';rt.innerHTML=`<button type="button" class="rt-grip" title="Drag to reorder" aria-label="Drag to reorder"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><button type="button" class="rt-del" title="Delete" aria-label="Delete">${ICONS.trash}</button>`;
+  document.body.appendChild(rt);
+  rt.addEventListener('mouseleave',e=>{if(!rtRow||!rtRow.contains(e.relatedTarget))rtHide()});
+  rt.querySelector('.rt-del').addEventListener('click',e=>{e.stopPropagation();const r=rtRow;rtHide();if(r)deskDelete(r)});
+  rt.querySelector('.rt-grip').addEventListener('pointerdown',e=>{if(!rtRow||e.button!==0)return;e.preventDefault();mDragStart(rtRow,e)});
+  return rt}
+function rtShow(row){if(!FINE.matches||dg||document.body.classList.contains('dragging'))return;const el=rtEl(),r=row.getBoundingClientRect(),info=rowInfo(row);
+  const ng=!info||info.rows.length<2;el.classList.toggle('nogrip',ng);rtRow=row;row.classList.add('rt-on');row.classList.toggle('rt-1',ng);
+  el.style.top=(r.top+r.height/2)+'px';el.style.left=(r.right-8)+'px';el.classList.add('on')}
+function rtHide(){if(rtRow)rtRow.classList.remove('rt-on','rt-1');rtRow=null;if(rt)rt.classList.remove('on')}
+document.addEventListener('mouseover',e=>{if(!FINE.matches)return;const row=e.target.closest&&e.target.closest(SWIPE_SEL);if(row&&row!==rtRow){rtHide();rtShow(row)}});
+document.addEventListener('mouseout',e=>{if(!rtRow)return;const to=e.relatedTarget;if(to&&(rtRow.contains(to)||(rt&&rt.contains(to))))return;if(e.target.closest&&e.target.closest(SWIPE_SEL)===rtRow)rtHide()});
+addEventListener('scroll',rtHide,true);addEventListener('resize',rtHide);
+/* drag with the mouse (grip): same feel as the phone's hold-and-drag */
+function mDragStart(row,e){const info=rowInfo(row);if(!info||info.rows.length<2)return;rtHide();
+  dg={row,k:info.k,list:row.parentNode,rows:info.rows,y0:e.clientY,x0:e.clientX,on:true,mouse:true};
+  dg.from=info.i;dg.to=dg.from;dg.tops=dg.rows.map(r=>r.getBoundingClientRect().top);dg.hs=dg.rows.map(r=>r.getBoundingClientRect().height);
+  document.body.classList.add('dragging');row.classList.add('lifted');dg.rows.forEach(r=>{if(r!==row)r.style.transition='transform .22s cubic-bezier(.2,.8,.2,1)'});swEat=true}
+document.addEventListener('pointermove',e=>{if(!dg||!dg.mouse)return;const dy=e.clientY-dg.y0;dg.row.style.transform=`translateY(${dy}px) scale(1.02)`;
+  const mid=dg.tops[dg.from]+dg.hs[dg.from]/2+dy;let to=dg.from;
+  dg.rows.forEach((r,i)=>{const c=dg.tops[i]+dg.hs[i]/2;if(i<dg.from&&mid<c)to=Math.min(to,i);if(i>dg.from&&mid>c)to=Math.max(to,i)});
+  if(to!==dg.to){dg.to=to;const H=dg.hs[dg.from];dg.rows.forEach((r,i)=>{if(r===dg.row)return;let y=0;if(dg.from<to&&i>dg.from&&i<=to)y=-H;if(dg.from>to&&i<dg.from&&i>=to)y=H;r.style.transform=y?`translateY(${y}px)`:''})}});
+document.addEventListener('pointerup',()=>{if(dg&&dg.mouse)dgEnd()});
+/* right-click menu */
+let cm=null;
+function cmHide(){if(cm){cm.remove();cm=null}}
+document.addEventListener('contextmenu',e=>{if(!FINE.matches)return;const row=e.target.closest(SWIPE_SEL);if(!row)return;e.preventDefault();cmHide();rtHide();
+  const info=rowInfo(row),opts=[['edit','Open']];if(info&&info.rows.length>1){if(info.i>0)opts.push(['up','Move up']);if(info.i<info.rows.length-1)opts.push(['down','Move down'])}opts.push(['del','Delete']);
+  cm=document.createElement('div');cm.id='ctxMenu';cm.setAttribute('role','menu');cm.innerHTML=opts.map(([k,l])=>`<button type="button" role="menuitem" data-cm="${k}" class="${k==='del'?'bad':''}">${l}</button>`).join('');document.body.appendChild(cm);
+  const w=cm.offsetWidth,h=cm.offsetHeight;cm.style.left=Math.min(e.clientX,innerWidth-w-8)+'px';cm.style.top=Math.min(e.clientY,innerHeight-h-8)+'px';
+  cm.addEventListener('click',ev=>{const b=ev.target.closest('[data-cm]');if(!b)return;const k=b.dataset.cm;cmHide();
+    if(k==='edit')row.click();else if(k==='del')deskDelete(row);else if(info&&rowReorder(info.k,info.i,info.i+(k==='up'?-1:1)))toast('Order saved')});
+  cm.querySelector('button').focus()});
+document.addEventListener('pointerdown',e=>{if(cm&&!e.target.closest('#ctxMenu'))cmHide()},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&cm){cmHide();return}
+  if(cm&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();const bs=[...cm.querySelectorAll('button')],i=bs.indexOf(document.activeElement);bs[(i+(e.key==='ArrowDown'?1:-1)+bs.length)%bs.length].focus();return}
+  /* keyboard: Delete removes the focused row, Alt+Up/Down moves it */
+  const row=document.activeElement&&document.activeElement.matches&&document.activeElement.matches(SWIPE_SEL)?document.activeElement:null;if(!row)return;
+  if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();deskDelete(row)}
+  else if(e.altKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')){const info=rowInfo(row);if(info&&rowReorder(info.k,info.i,info.i+(e.key==='ArrowUp'?-1:1))){e.preventDefault();toast('Order saved')}}});
 /* ========== SETTINGS ========== */
 function syncChartChips(){const v=chartStyle();document.querySelectorAll('[data-cs]').forEach(b=>b.classList.toggle('on',b.dataset.cs===v));const sn=$('setSnd');if(sn)sn.setAttribute('aria-checked',soundOn())}
 document.addEventListener('click',e=>{if(!e.target.closest('#setSnd'))return;try{localStorage.setItem('dc_bud_snd',soundOn()?'off':'on')}catch(_){}syncChartChips();if(soundOn())glassTing(.3)});
