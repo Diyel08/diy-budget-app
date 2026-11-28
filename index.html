@@ -1969,7 +1969,18 @@ function lEntry(id,i,isNew){const p=lget(id);if(!p)return;const x=p.items[i];lv=
     <button class="del" type="button" id="lDelE">${isNew?'Cancel':'Delete entry'}</button>`;
   lOpen();
 }
-function lCleanEntry(){if(!lv||lv.v!=='entry')return;const p=lget(lv.id);if(!p)return;const x=p.items[lv.i];if(x&&lv.isNew&&!x.n&&!num(x.a))p.items.splice(lv.i,1);save()}
+function refFromLabel(l){l=String(l||'').trim();if(!l)return null;const k=l.indexOf(' › '),n=k<0?l:l.slice(0,k),u=k<0?null:l.slice(k+3);const i=accIx(n);if(i<0)return null;
+  const a=s.bank[i];if(hasSubs(a)&&u!=null&&!a.subs.some(x=>x.n===u))return null;return refOf(n,u)}
+/* An entry tied to one of your accounts moves real money: Income adds to it, Living cost / Debt / Other takes from it,
+   Savings goes from your pay account into it. Only for entries dated on/after that account's starting balance. */
+function settleEntry(p,i){let x=p.items[i];if(!x||x.key)return '';const r=refFromLabel(x.acct),amt=r2(num(x.a));
+  const h0=r&&(s.bank[r.i].hist||[])[0],after=!h0||String(p.date)>=String(h0.d);const want=!!(r&&amt>0&&after);
+  if(x.mv){if(want&&x.mvAc===x.acct)return '';const keep={...x};delete keep.mv;delete keep.mvAc;undoMove(x.mv);p.items.splice(i,0,keep);x=keep}
+  if(!want)return '';const o={amt,why:x.n||x.t,t:x.t,noLog:true};
+  if(x.t==='Income')o.to=r;else if(x.t==='Savings'){const pr=payRef();o.to=r;if(pr&&!(pr.i===r.i&&pr.sj===r.sj))o.from=pr}else o.from=r;
+  x.mv=moveMoney(o);x.mvAc=x.acct;return (o.to&&!o.from?'Added to ':o.from&&!o.to?'Taken from ':'Moved to ')+refLabel(r)}
+function lCleanEntry(){if(!lv||lv.v!=='entry')return;const p=lget(lv.id);if(!p)return;const x=p.items[lv.i];if(x&&lv.isNew&&!x.n&&!num(x.a)){p.items.splice(lv.i,1);save();return}
+  const m=settleEntry(p,lv.i);save();if(m)toast(m)}
 function lEnd(quiet){lCleanEntry();const p=lv&&lget(lv.id);if(p&&!p.items.length&&!num(p.net)){s.log=s.log.filter(x=>x!==p);save()}lv=null;if(!quiet)render();else renderLog()}
 $('lAct').addEventListener('click',()=>{if(!lv)return;if(lv.v==='entry'){lCleanEntry();lDetail(lv.id)}else closeSheet()});
 $('lBack').addEventListener('click',()=>{if(!lv)return;if(lv.v==='entry'){lCleanEntry();lDetail(lv.id)}else closeSheet()});
