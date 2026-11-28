@@ -1707,9 +1707,9 @@ $('editBody').addEventListener('click',e=>{if(!ed)return;const w=e.target.closes
   else if(e.target.closest('#aDep')||e.target.closest('#aWd')){const a=s.bank[ed.i],v=num($('aMv').value),d=$('aMvD').value||iso(new Date()),dep=!!e.target.closest('#aDep');
     if(!(v>0)){toast('Enter the amount first');return}if(!T.parse(d)){toast('Pick a date');return}ed.mvd=d;
     const me={i:ed.i,sj:hasSubs(a)?ed.msub:null},why=(($('aMvWhy')||{}).value||'').trim(),to=!dep&&ed.mvTo?refOf(ed.mvTo.a,ed.mvTo.sub):null;
-    if(dep)moveMoney({to:me,amt:v,d,why,t:'Income',noLog:true});
+    if(dep)moveMoney({to:me,amt:v,d,why:why||'Deposit',t:'Income'});
     else moveMoney({from:me,to,amt:v,d,why:why||(to?'Moved to '+refLabel(to):'Withdrawal'),t:to?'Savings':'Living cost'});
-    ed.mvTo=null;changed();reAcct();toast(dep?'Deposited '+money(a,v)+' · now '+money(a,acctBal(a)):to?'Moved '+money(a,v)+' to '+refLabel(to)+' · logged in Payday':'Withdrew '+money(a,v)+' · logged in Payday')}
+    ed.mvTo=null;changed();reAcct();toast(dep?'Deposited '+money(a,v)+' · now '+money(a,acctBal(a))+' · logged in Payday':to?'Moved '+money(a,v)+' to '+refLabel(to)+' · logged in Payday':'Withdrew '+money(a,v)+' · logged in Payday')}
   else if(e.target.closest('[data-mto]')){const b2=e.target.closest('[data-mto]'),v2=b2.dataset.mto;ed.mvTo=v2?{a:v2,sub:b2.dataset.msu||null}:null;$('aMvTo').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b2))}
   else if(e.target.closest('#aHistAll'))reAcct(true)
   else if(e.target.closest('[data-hrow]')&&!e.target.closest('[data-hx]')&&!e.target.closest('.hwhy')){const k=+e.target.closest('[data-hrow]').dataset.hrow;ed.hedit=ed.hedit===k?null:k;const hb=$('aHist');hb.innerHTML=histRows(s.bank[ed.i],true);const inp=hb.querySelector('.hwhy');if(inp)inp.focus()}
