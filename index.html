@@ -1162,6 +1162,15 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 }
 @media(min-width:1100px){html[data-theme=light] .dk-hero{box-shadow:0 0 0 1px var(--line)}}
 @media(min-width:1100px) and (max-width:1359px){.dk-donut .legend{grid-template-columns:repeat(2,minmax(0,1fr))!important}.dk-donut .ring-wrap{width:min(100%,280px)!important}}
+/* extra payment on a debt */
+.xp{margin-top:18px;padding-top:6px;border-top:1px solid var(--line)}
+.xp .cap.sm{font-size:13px;margin:12px 4px 6px}
+.xp .chips{flex-wrap:wrap}
+.xp #xPrev{margin:10px 4px}
+.xp #xPrev b{color:var(--ink)}
+.xp .btn{width:100%}
+.xp .xundo{display:block;margin:12px auto 0;font-size:14px}
+.xp .warn{color:#ffb547}
 
 </style>
 </head>
@@ -1925,12 +1934,13 @@ function editDebt(i,isNew){
     <div class="bar" style="--c:${DEBTC};margin-top:12px"><i id="dBar"></i></div>
     <p class="note" id="dNote"></p>
     <div class="g2" style="margin-top:4px"><button class="btn ghost" type="button" id="dMinus">− Undo one</button><button class="btn" type="button" id="dPlus">+ Mark one paid</button></div>
+    ${!isNew&&num(l.total)&&debtLeft(l)>0?xpHTML(l):''}
     <button class="del" type="button" id="edDel">${isNew?'Cancel':'Delete debt'}</button>`;
   updDebtSheet();openSheet('editSheet');
 }
 function updDebtSheet(){const l=s.loans[ed.i],t=num(l.total),pd=num(l.paid),left=debtLeft(l);
   $('dHint').textContent=wHint(l.w);$('dBar').style.width=(t?Math.min(pd/t,1)*100:0)+'%';
-  $('dNote').textContent=!t?'No end set. Enter the total number of payments to see how many are left.':left?pd+' of '+t+' paid · '+left+' left · '+peso2(left*num(l.a))+' to go':'Paid off. It is no longer deducted from your pay.';
+  $('dNote').textContent=!t?'No end set. Enter the total number of payments to see how many are left.':left?pd+' of '+t+' paid · '+left+' left · '+peso2(Math.max(left*num(l.a)-num(l.cr),0))+' to go':'Paid off. It is no longer deducted from your pay.';
   $('dPlus').disabled=t>0&&!left;$('dMinus').disabled=!pd;
   const p=$('editBody').querySelector('[data-ed-f=paid]');if(p&&document.activeElement!==p)p.value=pd||''}
 /* balance history: one line each time a balance is saved, a deposit or a withdrawal */
@@ -2411,7 +2421,7 @@ $('ckBody').addEventListener('click',e=>{
     if(x.dl!=null&&s.loans[x.dl]){const l=s.loans[x.dl];l.paid=num(l.paid)+1;if(num(l.total))l.paid=Math.min(l.paid,num(l.total))}
     if(navigator.vibrate)try{navigator.vibrate(8)}catch(_){}}}
   if(!p.items.length&&!num(p.net)&&!p.payMv&&!(p.skip&&p.skip.length))s.log=s.log.filter(y=>y!==p);
-  save();renderCheck();
+  save();try{trackSync()}catch(_){}renderCheck();
   const {L:L2}=ckPlan(),p2=pdRec(false);if(p2&&L2.length&&L2.every(y=>p2.items.find(z=>z.key===y.key)||(p2.skip||[]).includes(y.key)||(y.key==='pay'&&p2.payMv)))toast('Payday complete! 🎉')});
 $('ckBody').addEventListener('input',e=>{if(e.target.id!=='ckNet')return;const p=pdRec(true);syncNet(e.target.value,p);save();const t=lTot(p);const pe=document.querySelector('[data-ck=pay] em');if(pe)pe.textContent=peso2(num(p.net));$('ckOut').textContent=peso2(t.out);const l=$('ckLeft');if(!l.dataset.real){l.textContent=peso2(t.left);l.className=t.left<0?'neg':''}else{const pr=payRef(),a=s.bank[pr.i],v=pr.sj!=null&&hasSubs(a)?num(a.subs[pr.sj].bal):num(a.bal);l.textContent=peso2(v)}});
 $('ckBody').addEventListener('change',e=>{if(e.target.id==='ckNet')renderCheck()});
@@ -2428,7 +2438,7 @@ function paydaysFrom(start,count){const out=[];let y=start.getFullYear(),m=start
 const whichPd=d=>iso(d);
 function debtInfo(l){const left=debtLeft(l);if(left<=0)return null;let n=0,amt=0,last=null;
   for(const d of paydaysFrom(new Date(),400)){const a=amountFor(l,whichPd(d));if(a>0){amt+=a;n++;last=d;
-    if(l.w==='Split'?n>=left*perMonth()-1e-9:n>=left)break}}return {amt,last}}
+    if(l.w==='Split'?n>=left*perMonth()-1e-9:n>=left)break}}return {amt:Math.max(amt-num(l.cr),0),last}}
 function meData(){const now=new Date(),next=paydaysFrom(now,1)[0],days=Math.round((new Date(next.getFullYear(),next.getMonth(),next.getDate())-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
   const worth=s.bank.length?bankTotal():s.accts.reduce((a,g)=>a+num(g.b),0);
   /* emergency fund: money in accounts marked "Emergency fund" counts automatically; otherwise the goal's saved amount */
@@ -2695,6 +2705,61 @@ function renderDebtTime(){const box=$('dTime');if(!box)return;if(!DK.matches||!s
   box.innerHTML=`<div class="dk-h"><h3>Payoff timeline</h3></div>${rows.map(r=>`<div class="pt"><div><b>${escapeHTML(r.n)}</b><small>${r.i?(r.left>0?r.left+' payments left · done '+r.i.last.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):''):'Paid off ✓'}</small></div><em><i style="width:${r.pr*100}%"></i></em><span>${Math.round(r.pr*100)}%</span></div>`).join('')}
 `;const nb=$('dNext');if(nb){nb.hidden=false;nb.innerHTML=`<div class="dk-h"><h3>Debt payments, next paydays</h3><small class="dk-sub">${H?'••••':peso(Math.round(outs.reduce((x,y)=>x+y,0)))} over ${nx.length}</small></div>
     <div class="dk-bars mini">${nx.map((d,k)=>`<div class="dk-col"><div class="dk-stack"><i style="height:${outs[k]/top*100}%;--c:${C.loan}"></i></div><b>${outs[k]?(H?'••':peso(Math.round(outs[k]))):'—'}</b><span>${dShort(d)}</span></div>`).join('')}</div>`}}
+/* ========== Payday ⇄ due-date trackers: paying it in the checklist marks the tracker paid ========== */
+function trackSync(){if(!ts||!Array.isArray(ts.trackers)||!ts.trackers.length)return false;let ch=false;const live=new Set(),TY=['Loan & Coop','Living cost','Savings','Other'];
+  s.log.forEach(p=>p.items.forEach(x=>{if(!TY.includes(x.t)||!(num(x.a)>0))return;const tr=ts.trackers.find(k=>nmKey(k.name)===nmKey(x.n));if(!tr)return;
+    const src=x.mv||(p.id+':'+nmKey(x.n));live.add(src);
+    if(Object.values(tr.payments||{}).some(E=>Array.isArray(E)&&E.some(e=>e.src===src)))return;
+    const pd=T.parse(p.date);if(!pd)return;const lim=new Date(pd.getFullYear(),pd.getMonth(),pd.getDate()+10);
+    const per=T.list(tr).find(q=>!T.paid(tr,q.key)&&q.d<=lim);if(!per)return;
+    tr.payments=tr.payments||{};tr.paid=tr.paid||{};
+    tr.payments[per.key]=[...T.ents(tr,per.key),{date:p.date,amount:num(x.a),paidTo:tr.name,ref:'',method:tr.method||'',notes:'From payday checklist',auto:true,src}];tr.paid[per.key]=true;ch=true}));
+  /* untick in the checklist → the tracker goes back to unpaid */
+  ts.trackers.forEach(tr=>Object.keys(tr.payments||{}).forEach(k=>{const E=tr.payments[k];if(!Array.isArray(E)||!E.some(e=>e.src&&!live.has(e.src)))return;
+    const keep=E.filter(e=>!(e.src&&!live.has(e.src)));if(keep.length)tr.payments[k]=keep;else{delete tr.payments[k];delete tr.paid[k]}ch=true}));
+  if(ch)persist(TKEY,ts);return ch}
+/* ========== EXTRA PAYMENT on a debt's principal (any amount) ========== */
+let xp={mode:'short',from:null};
+function xpHTML(l){const pr=payRef();xp={mode:'short',from:pr?[s.bank[pr.i].n,pr.sj!=null&&hasSubs(s.bank[pr.i])?s.bank[pr.i].subs[pr.sj].n:'']:null};
+  const opts=[];s.bank.forEach(a=>{if(hasSubs(a))a.subs.forEach(u=>opts.push([a.n,u.n]));else opts.push([a.n,''])});
+  return `<div class="xp"><p class="cap">Pay extra on the principal</p>
+    <label class="fld"><span>Extra amount</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" id="xAmt" placeholder="e.g. 30000"></div></label>
+    ${opts.length?`<p class="cap sm">Paid from</p><div class="chips sm" id="xFrom">${opts.map(([n,u])=>{const on=xp.from&&xp.from[0]===n&&xp.from[1]===u;return `<button type="button" data-xa="${escapeHTML(n)}" data-xu="${escapeHTML(u)}" class="${on?'on':''}">${escapeHTML(u?n+' › '+u:n)}</button>`}).join('')}<button type="button" data-xa="" data-xu="" class="${xp.from?'':'on'}">Cash / not tracked</button></div>`:''}
+    <p class="cap sm">After this payment</p><div class="chips sm" id="xMode"><button type="button" data-xm="short" class="on">Finish sooner</button><button type="button" data-xm="lower">Lower each payment</button></div>
+    <p class="note" id="xPrev">Enter an amount to see what changes.</p>
+    <button class="btn" type="button" id="xPay" disabled>Pay extra</button>
+    ${l.xp?`<button class="lnk xundo" type="button" id="xUndo">Undo last extra payment (${peso2(l.xp.amt)})</button>`:''}
+    <p class="note">Interest rules differ per lender. If your lender gives you a new schedule, set Total payments and Amount deducted to match it.</p></div>`}
+function xpCalc(l,X){const a=num(l.a),left=debtLeft(l),bal=Math.max(left*a-num(l.cr),0);X=Math.min(X,bal);const rest=r2(bal-X);
+  if(rest<=0.004)return {rest:0,left:0,a,cr:0,X};
+  if(xp.mode==='lower')return {rest,left,a:r2(rest/left),cr:0,X};
+  const nl=Math.ceil(rest/a-1e-9);return {rest,left:nl,a,cr:r2(nl*a-rest),X}}
+function xpDone(l,c){const tmp=Object.assign({},l,{total:num(l.paid)+c.left,a:c.a,cr:c.cr});const i=c.left?debtInfo(tmp):null;return i?i.last.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):'today'}
+function xpPreview(){const l=s.loans[ed.i],X=num(($('xAmt')||{}).value),b=$('xPay'),pv=$('xPrev');if(!pv)return;b.disabled=!(X>0);
+  if(!(X>0)){pv.textContent='Enter an amount to see what changes.';return}
+  const c=xpCalc(l,X),was=debtInfo(l);
+  pv.innerHTML=c.left===0?`<b>Paid off in full</b> · ${peso2(c.X)} clears the rest.`:xp.mode==='lower'?`<b>${peso2(c.a)}</b> per payment instead of ${peso2(num(l.a))} · still ${c.left} payments · ${peso2(c.rest)} left`
+    :`<b>${c.left} payment${c.left===1?'':'s'} left</b> instead of ${debtLeft(l)} · done ${xpDone(l,c)}${was?' instead of '+was.last.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):''} · ${peso2(c.rest)} left`;
+  if(xp.from&&xp.from[0]){const r=refOf(xp.from[0],xp.from[1]||null),acc=r&&s.bank[r.i],have=acc?(r.sj!=null&&hasSubs(acc)?num(acc.subs[r.sj].bal):num(acc.bal)):0;if(acc&&have<c.X)pv.innerHTML+=`<br><span class="warn">${escapeHTML(xp.from[1]||xp.from[0])} only has ${peso2(have)} in the app. Pick the account the money really comes from.</span>`}
+  b.textContent='Pay '+peso2(c.X)}
+function xpPay(){const l=s.loans[ed.i],X=num($('xAmt').value);if(!(X>0))return;const c=xpCalc(l,X);
+  const tr=ts.trackers.find(k=>nmKey(k.name)===nmKey(l.n)),info=tr?T.info(tr):null;
+  const from=xp.from&&xp.from[0]?refOf(xp.from[0],xp.from[1]||null):null;
+  const mv=moveMoney({from,amt:c.X,why:(l.n||'Debt')+' · extra payment',t:'Loan & Coop',rec:pdRec(true)});
+  l.xp={amt:c.X,mv,total:num(l.total),a:num(l.a),cr:num(l.cr),tr:tr?{id:tr.id,periods:tr.periods,amount:tr.amount}:null};
+  l.total=num(l.paid)+c.left;l.a=c.a;l.cr=c.cr;
+  if(tr){if(c.left===0||xp.mode==='short')tr.periods=info.paid+c.left;else tr.amount=c.a;persist(TKEY,ts)}
+  changed();editDebt(ed.i,false);toast(c.left===0?'Paid off! 🎉':'Extra payment saved · '+(xp.mode==='lower'?'now '+peso2(c.a)+' each':c.left+' payments left'))}
+function xpUndo(){const l=s.loans[ed.i],u=l.xp;if(!u)return;ask('Undo this extra payment?','The '+peso2(u.amt)+' goes back and the debt returns to how it was.','Undo').then(ok=>{if(!ok)return;
+  if(u.mv)undoMove(u.mv);l.total=u.total;l.a=u.a;l.cr=u.cr;delete l.xp;
+  if(u.tr){const tr=ts.trackers.find(k=>k.id===u.tr.id);if(tr){tr.periods=u.tr.periods;tr.amount=u.tr.amount;persist(TKEY,ts)}}
+  changed();editDebt(ed.i,false);toast('Extra payment undone')})}
+document.addEventListener('input',e=>{if(e.target.id==='xAmt')xpPreview()});
+document.addEventListener('click',e=>{if(!ed||ed.type!=='debt')return;
+  const m=e.target.closest('[data-xm]');if(m){xp.mode=m.dataset.xm;$('xMode').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===m));xpPreview();return}
+  const f=e.target.closest('[data-xa]');if(f){xp.from=f.dataset.xa?[f.dataset.xa,f.dataset.xu]:null;$('xFrom').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===f));xpPreview();return}
+  if(e.target.closest('#xPay')){xpPay();return}
+  if(e.target.closest('#xUndo')){xpUndo();return}});
 /* ========== SETTINGS ========== */
 function syncChartChips(){const v=chartStyle();document.querySelectorAll('[data-cs]').forEach(b=>b.classList.toggle('on',b.dataset.cs===v));const sn=$('setSnd');if(sn)sn.setAttribute('aria-checked',soundOn())}
 document.addEventListener('click',e=>{if(!e.target.closest('#setSnd'))return;try{localStorage.setItem('dc_bud_snd',soundOn()?'off':'on')}catch(_){}syncChartChips();if(soundOn())glassTing(.3)});
@@ -2724,9 +2789,9 @@ $('bdFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.val
 $('bdReset').addEventListener('click',()=>{ask('Erase all data?','Plan, debts, goals, accounts, payday log and payment trackers will all be cleared. Export a backup first if you want to keep them.','Erase').then(ok=>{if(!ok)return;s=blank();ts={version:1,currency:ts.currency||'PHP',trackers:[]};afterImport();toast('All data erased')})});
 
 /* ========== RENDER ========== */
-function render(){setTimeout(()=>addPasteBtns(),0);try{renderPaySet()}catch(_){}const p=(document.querySelector('.pg.on')||{dataset:{}}).dataset.pg;
+function render(){setTimeout(()=>addPasteBtns(),0);try{renderPaySet()}catch(_){}try{trackSync()}catch(e){console.error(e)}const p=(document.querySelector('.pg.on')||{dataset:{}}).dataset.pg;
   if(p==='home')renderHome();else if(p==='payday'){fillInputs();renderPlan();renderLog();renderCheck()}else if(p==='wallet')renderWallet();else if(p==='bills')renderBills();else if(p==='settings'){setEye();renderSettings()}else setEye()}
-settleAll();applyProfile();renderPaySet();dkMount();fillInputs();splitRows();planTab('pay');pyPane('check');
+settleAll();try{trackSync()}catch(_){}applyProfile();renderPaySet();dkMount();fillInputs();splitRows();planTab('pay');pyPane('check');
 setTimeout(()=>fxUpdate(),1500);
 /* tab bar shrinks while scrolling down and grows back when scrolling up (like Instagram) */
 (function(){let last=0,ticking=false;const tb=$('tabbar');
