@@ -725,9 +725,12 @@ button.av:active{transform:scale(.9) rotate(-10deg);box-shadow:0 0 0 3px #1c1c1f
   #meSheet .me-hero{padding:22px}
 }
 @media(min-width:900px){
-  #meSheet .me-c.row{grid-column:span 1;display:block}
-  #meSheet .me-c.row b{font-size:20px;margin-top:2px}
-  #meSheet .me-grid>.me-c:nth-child(3){grid-row:span 2}
+  /* Me on desktop: net worth + paydays on the left, ring in the middle, debts over saved on the right */
+  #meSheet .me-grid>.me-c:nth-child(1){grid-column:1/3;grid-row:1}
+  #meSheet .me-grid>.me-c:nth-child(2){grid-column:3;grid-row:1/3}
+  #meSheet .me-grid>.me-c:nth-child(3){grid-column:4;grid-row:1}
+  #meSheet .me-grid>.me-c:nth-child(4){grid-column:4;grid-row:2}
+  #meSheet .me-grid>.me-c:nth-child(5){grid-column:1/3;grid-row:2}
 }
 .hrow{cursor:pointer}
 .hrow .why{color:#9fb6ff;margin-top:2px}
@@ -966,6 +969,12 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 .tb-brand small.muted{opacity:.6}
 .set-in{flex:1;min-width:0;max-width:240px;margin-left:auto;text-align:right;background:transparent;border:0;outline:0;font:500 16px var(--sf);color:inherit;padding:6px 0}
 .set-in::placeholder{color:var(--sub)}
+
+/* Me: avatar icon centred (the hero's span rule was turning it into a block) + name prompt */
+.me-hero .me-av .av-in{display:grid!important;place-items:center;margin:0;width:100%;height:100%;color:#fff!important}
+.me-hero .me-av .av-in svg{width:52%;height:52%}
+.me-name{display:inline-block;margin-top:6px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font:600 12px var(--sf)}
+.me-name:active{opacity:.7}
 
 </style>
 </head>
@@ -1389,7 +1398,7 @@ function setEye(){
   const useBank=s.bank.length>0,tot=useBank?bankTotal():s.accts.reduce((a,x)=>a+num(x.b),0);
   $('balV').textContent=hidden?'••••••••••••':peso2(tot);$('balV').classList.toggle('mask',hidden);
   $('eye').innerHTML=hidden?ICONS.eye:ICONS.eyeoff;$('eye').setAttribute('aria-label',hidden?'Show balance':'Hide balance');$('eye').setAttribute('aria-pressed',String(!hidden));
-  $('balSub').textContent=useBank?s.bank.length+' account'+(s.bank.length===1?'':'s')+(s.balAt?' · updated '+dShort(T.parse(s.balAt)):''):s.accts.length?'Total in '+s.accts.length+' savings goal'+(s.accts.length===1?'':'s'):'Add your accounts in Wallet';
+  $('balSub').textContent=useBank?s.bank.length+' account'+(s.bank.length===1?'':'s')+(s.balAt?' · updated '+dShort(T.parse(s.balAt)):''):s.accts.length?'Total in '+s.accts.length+' savings goal'+(s.accts.length===1?'':'s'):'Add your accounts in Money';
   $('setHide').setAttribute('aria-checked',String(hidden));
 }
 const toggleHide=()=>{hidden=!hidden;persist('dc_bud_hide',hidden);setEye();renderHomeX();if(document.querySelector('.pg.on[data-pg=wallet]'))renderWallet()};
@@ -1587,7 +1596,7 @@ function renderPlan(){
   debtRows(r);$('debtSum').textContent=peso2(r.loan);
   $('loanNote').textContent=s.loans.length?'Tap a debt to mark a payment. It stops being deducted once all payments are made.':'Add loans and coop deductions here so they come off each payday.';
   const sum=s.pct.reduce((a,b)=>a+num(b),0),bad=!!s.accts.length&&Math.abs(sum-100)>=1e-4;
-  $('pctNote').textContent=!s.accts.length?'Add savings goals in Wallet, then choose which split each one gets.':bad?'The three percentages must add up to 100 (now '+sum+').':'';$('pctNote').classList.toggle('bad',bad);
+  $('pctNote').textContent=!s.accts.length?'Add savings goals in Money, then choose which split each one gets.':bad?'The three percentages must add up to 100 (now '+sum+').':'';$('pctNote').classList.toggle('bad',bad);
   $('splitBar').innerHTML=s.pct.map((p,i)=>`<i style="--c:${C.acc[i]};flex:0 0 calc(${Math.max(num(p),0)/Math.max(sum,100)*100}% - 2px);opacity:${hasSplit(i)?1:.3}"></i>`).join('');
 }
 $('bdOpen').addEventListener('click',()=>openSheet('bdSheet'));
@@ -2014,7 +2023,7 @@ function lEntry(id,i,isNew){const p=lget(id);if(!p)return;const x=p.items[i];lv=
     <label class="fld" style="margin-top:12px"><span>What</span><div class="in"><input id="lN" value="${escapeHTML(x.n||'')}" placeholder="${ph[x.t]||''}" enterkeyhint="next"></div></label>
     <label class="fld" style="margin-top:12px"><span>Amount</span><div class="in"><i>₱</i><input type="text" inputmode="decimal" autocomplete="off" min="0" step="0.01" id="lA" value="${x.a||''}" placeholder="0.00"></div></label>
     <label class="fld" style="margin-top:12px"><span>${x.t==='Income'?'Received in':x.t==='Living cost'?'Paid from':'Sent to'} (account)</span><div class="in"><input id="lAc" value="${escapeHTML(x.acct||'')}" placeholder="e.g. GoTyme"></div></label>
-    ${accts.length?`<div class="chips sm" id="lAccts" style="margin-top:8px">${accts.map(n=>`<button type="button" data-la="${escapeHTML(n)}" class="${x.acct===n||String(x.acct||'').startsWith(n+SEP)?'on':''}">${escapeHTML(n)}</button>`).join('')}</div><div class="chips sm" id="lSubs" style="margin-top:6px">${subChips()}</div>`:'<p class="note">Add your accounts in Wallet to pick them with one tap.</p>'}
+    ${accts.length?`<div class="chips sm" id="lAccts" style="margin-top:8px">${accts.map(n=>`<button type="button" data-la="${escapeHTML(n)}" class="${x.acct===n||String(x.acct||'').startsWith(n+SEP)?'on':''}">${escapeHTML(n)}</button>`).join('')}</div><div class="chips sm" id="lSubs" style="margin-top:6px">${subChips()}</div>`:'<p class="note">Add your accounts in Money to pick them with one tap.</p>'}
     <label class="fld" style="margin-top:12px"><span>Note (optional)</span><div class="in"><input id="lNote" value="${escapeHTML(x.note||'')}" placeholder=""></div></label>
     <button class="del" type="button" id="lDelE">${isNew?'Cancel':'Delete entry'}</button>`;
   lOpen();
@@ -2202,11 +2211,11 @@ function renderMe(){const m=meData(),hr=new Date().getHours(),greet=hr<12?'Good 
   const mask=v=>hidden?'••••••':v,CIR=2*Math.PI*26;
   const badges=[['First payday logged',s.log.length>0],['Accounts set up',s.bank.length>=3],['Emergency fund 50%',m.efp>=.5],['Emergency fund 75%',m.efp>=.75],['Emergency fund full',m.efp>=1],['A debt paid off',m.anyDone],['Debt-free',s.loans.length>0&&s.loans.every(l=>debtLeft(l)===0)]];
   const got=badges.filter(b=>b[1]).length;
-  $('meBody').innerHTML=`<div class="me-hero"><div class="me-av">${avHTML('<svg viewBox="0 0 648 720" aria-hidden="true"><path d="'+ICONS_D+'" fill="#fff"/></svg>')}</div><div><small>${greet},</small><b>${escapeHTML(firstName()||'there')}</b><span>Next payday <em>${dLong(m.next)}</em> · ${m.days===0?'today':m.days===1?'tomorrow':'in '+m.days+' days'}</span></div></div>
+  $('meBody').innerHTML=`<div class="me-hero"><div class="me-av">${avHTML('<svg viewBox="0 0 648 720" aria-hidden="true"><path d="'+ICONS_D+'" fill="#fff"/></svg>')}</div><div>${firstName()?`<small>${greet},</small><b>${escapeHTML(firstName())}</b>`:`<small>Welcome</small><b>${greet}</b>`}${firstName()?'':'<button type="button" class="me-name" data-me="name">Add your name ›</button>'}<span>Next payday <em>${dLong(m.next)}</em> · ${m.days===0?'today':m.days===1?'tomorrow':'in '+m.days+' days'}</span></div></div>
   <div class="me-grid">
-    <div class="me-c wide"><span>Net worth</span><b>${mask(peso2(m.worth))}</b><small>${s.bank.length?'All '+s.bank.length+' accounts'+(s.balAt?' · as of '+dShort(T.parse(s.balAt)):''):'Add accounts in Wallet to see this'}</small></div>
-    <div class="me-c ring"><div class="rw"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26"/><circle cx="32" cy="32" r="26" stroke-dasharray="${CIR}" stroke-dashoffset="${CIR*(1-m.efp)}"/></svg><b>${Math.round(m.efp*100)}%</b></div><span>Emergency fund</span><small>${m.ef?mask(peso(m.efSaved))+' of '+peso(m.ef.g):'Add an Emergency fund goal'}</small>${m.efFrom?`<small class="from">${escapeHTML(m.efFrom)}</small>`:''}</div>
-    <div class="me-c"><span>Debts left</span><b>${m.dAmt?peso(Math.round(m.dAmt)):'₱0'}</b><small>${m.dLast?'Free by '+m.dLast.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):s.loans.length?'All paid off':'No debts added'}</small></div>
+    <div class="me-c wide"><span>Net worth</span><b>${mask(peso2(m.worth))}</b><small>${s.bank.length?'All '+s.bank.length+' accounts'+(s.balAt?' · as of '+dShort(T.parse(s.balAt)):''):'Add accounts in Money to see this'}</small></div>
+    <div class="me-c ring"><div class="rw"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26"/><circle cx="32" cy="32" r="26" stroke-dasharray="${CIR}" stroke-dashoffset="${CIR*(1-m.efp)}"/></svg><b>${m.ef?Math.round(m.efp*100)+'%':'—'}</b></div><span>Emergency fund</span><small>${m.ef?mask(peso(m.efSaved))+' of '+peso(m.ef.g):'Add an Emergency fund goal'}</small>${m.efFrom?`<small class="from">${escapeHTML(m.efFrom)}</small>`:''}</div>
+    <div class="me-c"><span>Debts left</span><b>${m.dAmt?mask(peso(Math.round(m.dAmt))):'₱0'}</b><small>${m.dLast?'Free by '+m.dLast.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):s.loans.length?'All paid off':'No debts added'}</small></div>
     <div class="me-c"><span>Saved last payday</span><b>${m.rate==null?'—':Math.round(m.rate*100)+'%'}</b><small>${m.last?'of pay · '+dShort(T.parse(m.last.date)||new Date()):'Log a payday to see this'}</small></div>
     <div class="me-c wide row"><div><span>Paydays logged</span><small>${s.log.length?'Keep logging every payday':'Start after your next pay'}</small></div><b>${s.log.length}</b></div>
   </div>
@@ -2227,7 +2236,7 @@ $('meBody').addEventListener('click',e=>{const b=e.target.closest('[data-me]');i
   if(k==='hide'){toggleHide();renderMe();return}
   if(k==='export'){$('bdExport').click();return}
   closeSheet(true);
-  if(k==='log'){show('payday');pyPane('check')}else if(k==='acct'){show('wallet');wallet('accts');setTimeout(addAcct,60)}else if(k==='settings')show('settings');else if(k==='plan')show('plan')});
+  if(k==='log'){show('payday');pyPane('check')}else if(k==='acct'){show('wallet');wallet('accts');setTimeout(addAcct,60)}else if(k==='settings')show('settings');else if(k==='name'){show('settings');setTimeout(()=>{const i=$('setName');if(i){i.scrollIntoView({block:'center'});i.focus()}},80)}else if(k==='plan')show('plan')});
 
 
 /* ========== SWIPE TO DELETE (like Messages): drag a row left; drag far or tap the red button to delete ========== */
